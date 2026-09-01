@@ -1,6 +1,7 @@
 let health = document.getElementById('health')
 let starsContainer = document.querySelector('.stars-info')
 let bankcash = document.getElementById('bankm')
+let cash = document.getElementById('cash')
 
 cef.emit('game:hud:setComponentVisible', 'interface', false)
 
