@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Регистрация и авторизация</title>
+    <link rel="stylesheet" href="./css/reset.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+    <!-- Блок регистрации -->
+    <section class="registration">
+        <div class="container">
+            <h2 class="title-one">PERSONAGE REGISTRATION</h2>
+            <h1 class="title-two">РЕГИСТРАЦИЯ</h1>
+            <p class="text">Ознакомьтесь с правилами сервера и<br> настройками игры.</p>
+            <form action="/register" method="POST">
+                <div class="inputs">
+                    <img src="/img/user-icon.png" alt="Логин" />
+                    <input type="text" name="username" placeholder="Логин" required />
+                </div>
+                <div class="inputs">
+                    <img src="/img/mail-icon.png" alt="Электронная почта" />
+                    <input type="email" name="email" placeholder="Электронная почта" required />
+                </div>
+                <div class="inputs">
+                    <img src="/img/paswword-icon.png" alt="Пароль" />
+                    <input type="password" name="password" placeholder="Пароль" required />
+                </div>
+                <div class="inputs">
+                    <img src="/img/paswword-icon.png" alt="Повтор пароля" />
+                    <input type="password" name="repeat_password" placeholder="Повторите пароль" required />
+                </div>
+                <div class="inputs">
+                    <img src="/img/coupon.png" alt="Промокод" />
+                    <input type="text" name="promo" placeholder="Промокод" />
+                </div>
+                <button type="submit">Зарегистрироваться</button>
+                <p class="text" style="padding-top: 20px;">
+                    Есть аккаунт? <a style="color: #fff;" href="#!" onclick="showAuth()">Войти</a>
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Блок авторизации -->
+    <section class="authorization" style="display:none;">
+        <div class="container">
+            <h2 class="title-one">PERSONAGE LOGIN</h2>
+            <h1 class="title-two">АВТОРИЗАЦИЯ</h1>
+            <p class="text">Ознакомьтесь с правилами сервера и<br> настройками игры.</p>
+            <form action="/login" method="POST">
+                <div class="inputs">
+                    <img src="/img/user-icon.png" alt="Логин" />
+                    <input type="text" name="username" placeholder="Логин" required />
+                </div>
+                <div class="inputs">
+                    <img src="/img/paswword-icon.png" alt="Пароль" />
+                    <input type="password" name="password" placeholder="Пароль" required />
+                </div>
+                <button type="submit">Войти</button>
+                <p class="text" style="padding-top: 20px;">
+                    Нет аккаунта? <a style="color: #fff;" href="#!" onclick="showRegister()">Зарегистрироваться</a>
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Простая логика переключения между формами
+        function showAuth() {
+            document.querySelector('.registration').style.display = 'none';
+            document.querySelector('.authorization').style.display = 'block';
+        }
+        function showRegister() {
+            document.querySelector('.authorization').style.display = 'none';
+            document.querySelector('.registration').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
