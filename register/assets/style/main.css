@@ -1,0 +1,403 @@
+input {
+    border: 0;
+    transition: box-shadow 0.4s ease;
+    box-shadow: 0vh 0vh 1.3vh 0.2vh rgba(0, 0, 0, 0.2);
+}
+
+input:focus {
+    outline: none;
+}
+
+input:hover {
+    box-shadow: 0vh 0vh 1.3vh 0.2vh rgba(0, 0, 0, 0.1);
+}
+
+.app {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 55vh;
+    height: 70vh;
+    border-radius: 2vh;
+    background-color: rgba(255, 255, 255, 0.900);
+    transform: translate(-50%, -50%);
+}
+
+.authorization-app h1 {
+    position: fixed;
+    left: 50%;
+    top: 10%;
+    font-size: 3.5vh;
+    color: black;
+    font-family: 'lethality/font/1';
+    transform: translate(-50%, -50%);
+}
+
+.authorization-input-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 50vh;
+    height: 50vh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+}
+
+.authorization-input-box .login {
+    position: relative;
+    width: 36vh;
+    height: 5.5vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2vh;
+    margin-bottom: 2vh;
+    background-color: white;
+    font-family: 'lethality/font/2';
+    background-position: 1.5vh;
+    background-size: 3.5vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/user.svg')
+}
+
+.authorization-input-box .password {
+    position: relative;
+    width: 36vh;
+    height: 5.5vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2vh;
+    background-color: white;
+    margin-bottom: 2.5vh;
+    font-family: 'lethality/font/2';
+    background-position: 1.5vh;
+    background-size: 3.5vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/password.svg')
+}
+
+.authorization-input-box .button {
+    position: relative;
+    width: 36vh;
+    height: 6vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2.1vh;
+    color: #fff;
+    font-family: 'lethality/font/4';
+    padding-top: 1.4vh;
+    cursor: pointer;
+    margin-bottom: 1.5vh;
+    background-color: rgb(232, 26, 63);
+    transition: box-shadow 0.4s ease;
+}
+
+.authorization-input-box .button:hover {
+    box-shadow: 0vh 0vh 1.3vh 0.2vh rgba(232, 26, 63, 0.2);
+}
+
+.authorization-input-box .error-password {
+    margin: 0;
+    position: relative;
+    text-align: center;
+    font-size: 1.85vh;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.800);
+    font-family: 'lethality/font/2';
+    transition: color 0.2s ease;
+}
+
+.authorization-input-box .error-password:hover {
+    color: black;
+}
+
+.reset-app h1 {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    font-size: 3.5vh;
+    color: black;
+    font-family: 'lethality/font/1';
+    transform: translate(-50%, -50%);
+}
+
+.reset-input-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 50vh;
+    height: 50vh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+}
+
+.reset-input-box .login {
+    position: relative;
+    width: 36vh;
+    height: 5.5vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2vh;
+    margin-bottom: 2vh;
+    background-color: white;
+    font-family: 'lethality/font/2';
+    background-position: 1.5vh;
+    background-size: 3.5vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/user.svg')
+}
+
+.reset-input-box .button {
+    position: relative;
+    width: 36vh;
+    height: 6vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2.1vh;
+    color: #fff;
+    font-family: 'lethality/font/4';
+    padding-top: 1.4vh;
+    cursor: pointer;
+    margin-bottom: 1.5vh;
+    background-color: #e81a3f;
+}
+
+.reset-input-box .error-reset {
+    margin: 0;
+    position: relative;
+    text-align: center;
+    font-size: 1.85vh;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.800);
+    font-family: 'lethality/font/2';
+    transition: color 0.2s ease;
+}
+
+.reset-input-box .error-reset:hover {
+    color: black;
+}
+
+.reset-type-app h1 {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    font-size: 3.5vh;
+    color: black;
+    font-family: 'lethality/font/1';
+    transform: translate(-50%, -50%);
+}
+
+.reset-type-app .reset-button-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 50vh;
+    height: 50vh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+}
+
+.reset-type-app .button-vk {
+    position: relative;
+    width: 36vh;
+    height: 6vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2.1vh;
+    color: #fff;
+    font-family: 'lethality/font/4';
+    padding-top: 1.4vh;
+    cursor: pointer;
+    margin-bottom: 1.5vh;
+    background-color: #e81a3f;
+    background-position: 29.0vh;
+    background-size: 2.5vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/vk.svg')
+}
+
+.reset-type-app .button-tg {
+    position: relative;
+    width: 36vh;
+    height: 6vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2.1vh;
+    color: #fff;
+    font-family: 'lethality/font/4';
+    padding-top: 1.4vh;
+    cursor: pointer;
+    margin-bottom: 1.5vh;
+    background-color: #e81a3f;
+    background-position: 29.0vh;
+    background-size: 2.2vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/tg.svg')
+}
+
+.reset-type-app .button-mail {
+    position: relative;
+    width: 36vh;
+    height: 6vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2.1vh;
+    color: #fff;
+    font-family: 'lethality/font/4';
+    padding-top: 1.4vh;
+    cursor: pointer;
+    margin-bottom: 1.5vh;
+    background-color: #e81a3f;
+    background-color: #e81a3f;
+    background-position: 29.0vh;
+    background-size: 2.2vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/mail.svg')
+}
+
+.reset-type-app .error-reset {
+    margin: 0;
+    position: relative;
+    text-align: center;
+    font-size: 1.85vh;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.800);
+    font-family: 'lethality/font/2';
+    transition: color 0.2s ease;
+}
+
+.reset-type-app .error-reset:hover {
+    color: black;
+}
+
+.reset-notify-app {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50vh;
+    height: 50vh;
+}
+
+.reset-notify-app h1 {
+    margin: 0;
+    position: relative;
+    top: -20vh;
+    font-size: 3.5vh;
+    color: black;
+    font-family: 'lethality/font/1';
+}
+
+.reset-notify-app h2 {
+    margin: 0;
+    position: relative;
+    top: -7vh;
+    width: 80%;
+    text-align: center;
+    font-size: 1.95vh;
+    color: rgb(0, 0, 0);
+    font-family: 'lethality/font/2';
+}
+
+.reset-notify-app .error-reset {
+    margin: 0;
+    position: relative;
+    top: -5vh;
+    text-align: center;
+    font-size: 1.85vh;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.800);
+    font-family: 'lethality/font/2';
+    transition: color 0.2s ease;
+}
+
+.reset-notify-app .error-reset:hover {
+    color: black;
+}
+
+.registration-app h1 {
+    position: fixed;
+    left: 50%;
+    top: 10%;
+    font-size: 3.5vh;
+    color: black;
+    font-family: 'lethality/font/1';
+    transform: translate(-50%, -50%);
+}
+
+.registration-input-box {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 50vh;
+    height: 50vh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+}
+
+.registration-input-box .login {
+    position: relative;
+    width: 36vh;
+    height: 5.5vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2vh;
+    margin-bottom: 2vh;
+    background-color: white;
+    font-family: 'lethality/font/2';
+    background-position: 1.5vh;
+    background-size: 3.5vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/user.svg')
+}
+
+.registration-input-box .password {
+    position: relative;
+    width: 36vh;
+    height: 5.5vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2vh;
+    background-color: white;
+    margin-bottom: 2.5vh;
+    font-family: 'lethality/font/2';
+    background-position: 1.5vh;
+    background-size: 3.5vh;
+    background-repeat: no-repeat;
+    background-image: url('../images/password.svg')
+}
+
+.registration-input-box .button {
+    position: relative;
+    width: 36vh;
+    height: 6vh;
+    text-align: center;
+    border-radius: 0.9vh;
+    font-size: 2.1vh;
+    color: #fff;
+    font-family: 'lethality/font/4';
+    padding-top: 1.4vh;
+    cursor: pointer;
+    margin-bottom: 1.5vh;
+    background-color: rgb(232, 26, 63);
+    transition: box-shadow 0.4s ease;
+}
+
+.registration-input-box .button:hover {
+    box-shadow: 0vh 0vh 1.3vh 0.2vh rgba(232, 26, 63, 0.2);
+}

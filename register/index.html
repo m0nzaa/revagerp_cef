@@ -1,0 +1,56 @@
+<head>
+    <title>BY Lethality Studio</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="assets/style/main.css">
+    <link rel="stylesheet" type="text/css" href="assets/style/fonts/fonts.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
+</head>
+<style>
+    body { margin: 0; padding: 0; overflow: hidden; background: transparent; user-select: none; }
+</style>
+<body>
+    <div id="app" class="app" v-if="active">
+        <div class="authorization-app" v-if="page == 1">
+            <h1>АВТОРИЗАЦИЯ</h1>
+            <div class="authorization-input-box">
+                <input v-model="login" class="login" type="text" placeholder="Введите логин" />
+                <input v-model="password" class="password" type="password" placeholder="Введите пароль" />
+                <div class="button" @click="sendBundle()">Авторизоваться</div>
+                <p class="error-password" @click="setPage(2)">Забыли пароль?</p>
+            </div>
+        </div>
+        <div class="reset-app" v-if="page == 2">
+            <h1>СБРОС ПАРОЛЯ</h1>
+            <div class="reset-input-box">
+                <input v-model="login" class="login" type="text" placeholder="Введите логин"/>
+                <div class="button" @click="sendBundle()">Продолжить</div>
+                <p class="error-reset" @click="sendClientEmit(1)">Возникли проблемы?</p>
+            </div>
+        </div>
+        <div class="reset-type-app" v-if="page == 3">
+            <h1>СБРОС ПАРОЛЯ</h1>
+            <div class="reset-button-box">
+                <div class="button-vk" @click="sendClientEmit(2)">Восстановить через</div>
+                <div class="button-tg" @click="sendClientEmit(3)">Восстановить через</div>
+                <div class="button-mail" @click="sendClientEmit(4)">Восстановить через</div>
+                <p class="error-reset" @click="sendClientEmit(1)">Возникли проблемы?</p>
+            </div>
+        </div>
+        <div class="reset-notify-app" v-if="page == 4">
+            <h1>СБРОС ПАРОЛЯ</h1>
+            <h2>На ваш аккаунт {{ typeNotify(notify) }} высланы дальнейшие инструкции</h2>
+            <p class="error-reset" @click="sendClientEmit(1)">Возникли проблемы?</p>
+        </div>
+        <div class="registration-app" v-if="page == 5">
+            <h1>РЕГИСТРАЦИЯ</h1>
+            <div class="registration-input-box">
+                <input v-model="login" class="login" type="text" placeholder="Введите логин" />
+                <input v-model="password" class="password" type="password" :placeholder="login ? `${login}, введите пароль` : `Введите пароль`" />
+                <div class="button" @click="sendBundle()">Продолжить</div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="assets/lib/vue.js"></script>
+<script src="assets/js/main.js"></script>
+<script language="JavaScript"></script>
