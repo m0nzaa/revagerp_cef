@@ -412,13 +412,14 @@
       <div id="page-login" class="rr-page active">
         <div class="rr-field">
           <div class="rr-field-label">Логин</div>
-          <input class="rr-input" type="text" placeholder="Ваш никнейм" />
+          <input class="rr-input" type="text" id="login-name" placeholder="Ваш никнейм" />
         </div>
         <div class="rr-field">
           <div class="rr-field-label">Пароль</div>
-          <input class="rr-input" type="password" placeholder="••••••••" />
+          <input class="rr-input" type="password" id="login-pass" placeholder="••••••••" />
         </div>
-        <button class="rr-btn">Войти в город</button>
+        <div id="login-error" style="color:#ff4444;font-size:12px;margin-bottom:8px;display:none;text-align:center;"></div>
+        <button class="rr-btn" onclick="doLogin()">Войти в город</button>
         <div class="rr-hint">Забыли пароль?</div>
       </div>
 
@@ -429,7 +430,7 @@
         </div>
         <div class="rr-field">
           <div class="rr-field-label">Придумайте логин</div>
-          <input class="rr-input" type="text" placeholder="Ваше имя в городе" />
+          <input class="rr-input" type="text" id="reg-name" placeholder="Ваше имя в городе" />
         </div>
         <div class="rr-divider">
           <div class="rr-divider-line"></div>
@@ -437,12 +438,13 @@
           <div class="rr-divider-line"></div>
         </div>
         <div class="rr-field">
-          <input class="rr-input" type="password" placeholder="Минимум 8 символов" />
+          <input class="rr-input" type="password" id="reg-pass" placeholder="Минимум 8 символов" />
         </div>
         <div class="rr-field">
-          <input class="rr-input" type="password" placeholder="Повторите пароль" />
+          <input class="rr-input" type="password" id="reg-pass2" placeholder="Повторите пароль" />
         </div>
-        <button class="rr-btn">Начать историю</button>
+        <div id="reg-error" style="color:#ff4444;font-size:12px;margin-bottom:8px;display:none;text-align:center;"></div>
+        <button class="rr-btn" onclick="doRegister()">Начать историю</button>
       </div>
     </div>
 
@@ -457,5 +459,40 @@ function switchTab(tab) {
   });
   document.getElementById('page-login').classList.toggle('active', tab === 'login');
   document.getElementById('page-register').classList.toggle('active', tab === 'register');
+}
+
+// Сервер говорит какой режим показать
+window.addEventListener('cef_init', function(e) {
+  var mode = e.detail && e.detail[0];
+  if (mode === 'login') switchTab('login');
+  else switchTab('register');
+});
+
+// Ошибка с сервера
+window.addEventListener('cef_auth_error', function(e) {
+  var msg = e.detail && e.detail[0] ? e.detail[0] : 'Ошибка';
+  var loginActive = document.getElementById('page-login').classList.contains('active');
+  var el = document.getElementById(loginActive ? 'login-error' : 'reg-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+});
+
+function doLogin() {
+  var pass = document.getElementById('login-pass').value;
+  var err = document.getElementById('login-error');
+  err.style.display = 'none';
+  if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
+  samp.callEvent('cef_auth_login', pass);
+}
+
+function doRegister() {
+  var pass  = document.getElementById('reg-pass').value;
+  var pass2 = document.getElementById('reg-pass2').value;
+  var err   = document.getElementById('reg-error');
+  err.style.display = 'none';
+  if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
+  if (pass.length < 6) { err.textContent = 'Минимум 6 символов'; err.style.display = 'block'; return; }
+  if (pass !== pass2) { err.textContent = 'Пароли не совпадают'; err.style.display = 'block'; return; }
+  samp.callEvent('cef_auth_register', pass, 'male');
 }
 </script>
