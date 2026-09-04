@@ -468,10 +468,17 @@ cef.on('cef_init', function(mode) {
 });
 
 // Ошибка с сервера
-cef.on('cef_auth_error', function(msg) {
+cef.on('cef_auth_error', function(code) {
+  var errors = {
+    'err_mode':  'Ошибка режима. Переподключитесь.',
+    'err_empty': 'Пароль не может быть пустым.',
+    'err_short': 'Пароль слишком короткий (минимум 6 символов).',
+    'err_long':  'Пароль слишком длинный (максимум 32 символа).',
+    'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
+  };
   var loginActive = document.getElementById('page-login').classList.contains('active');
   var el = document.getElementById(loginActive ? 'login-error' : 'reg-error');
-  el.textContent = msg || 'Ошибка';
+  el.textContent = errors[code] || code;
   el.style.display = 'block';
 });
 
