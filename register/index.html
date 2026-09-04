@@ -482,7 +482,7 @@ function doLogin() {
   var err = document.getElementById('login-error');
   err.style.display = 'none';
   if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
-  samp.callEvent('cef_auth_login', pass);
+  samp.triggerEvent('cef_auth_login', pass);
 }
 
 function doRegister() {
@@ -493,6 +493,6 @@ function doRegister() {
   if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
   if (pass.length < 6) { err.textContent = 'Минимум 6 символов'; err.style.display = 'block'; return; }
   if (pass !== pass2) { err.textContent = 'Пароли не совпадают'; err.style.display = 'block'; return; }
-  samp.callEvent('cef_auth_register', pass, 'male');
+  samp.triggerEvent('cef_auth_register', pass, 'male');
 }
 </script>
