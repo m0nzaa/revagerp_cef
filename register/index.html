@@ -462,18 +462,16 @@ function switchTab(tab) {
 }
 
 // Сервер говорит какой режим показать
-window.addEventListener('cef_init', function(e) {
-  var mode = e.detail && e.detail[0];
+cef.on('cef_init', function(mode) {
   if (mode === 'login') switchTab('login');
   else switchTab('register');
 });
 
 // Ошибка с сервера
-window.addEventListener('cef_auth_error', function(e) {
-  var msg = e.detail && e.detail[0] ? e.detail[0] : 'Ошибка';
+cef.on('cef_auth_error', function(msg) {
   var loginActive = document.getElementById('page-login').classList.contains('active');
   var el = document.getElementById(loginActive ? 'login-error' : 'reg-error');
-  el.textContent = msg;
+  el.textContent = msg || 'Ошибка';
   el.style.display = 'block';
 });
 
@@ -482,7 +480,7 @@ function doLogin() {
   var err = document.getElementById('login-error');
   err.style.display = 'none';
   if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
-  samp.triggerEvent('cef_auth_login', pass);
+  cef.emit('cef_auth_login', pass);
 }
 
 function doRegister() {
@@ -493,6 +491,6 @@ function doRegister() {
   if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
   if (pass.length < 6) { err.textContent = 'Минимум 6 символов'; err.style.display = 'block'; return; }
   if (pass !== pass2) { err.textContent = 'Пароли не совпадают'; err.style.display = 'block'; return; }
-  samp.triggerEvent('cef_auth_register', pass, 'male');
+  cef.emit('cef_auth_register', pass, 'male');
 }
 </script>
