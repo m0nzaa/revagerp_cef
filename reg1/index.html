@@ -1,503 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Revage Roleplay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-webkit-user-drag:none}
+body{background:#ffffff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden;cursor:default}
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+.layout-left{width:75%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;padding-right:15vw}
+.layout-right{width:25%;height:100vh;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
+.layout-right img{height:95%;width:auto;object-fit:contain;display:block;transform:translateX(-180px);filter:drop-shadow(0 0 20px rgba(0,0,0,0.5));position:relative;z-index:1;animation:slideInImage .8s cubic-bezier(0.2,0.8,0.2,1) forwards;opacity:0}
+.layout-right::after{content:"";position:absolute;top:0;right:0;width:70%;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,0.8));z-index:2;pointer-events:none;animation:fadeIn 1.2s ease-out forwards;opacity:0}
 
-.rr-scene {
-  min-height: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 0;
-  font-family: 'Inter', sans-serif;
-}
+.project-title{position:absolute;bottom:8%;left:0;width:100%;text-align:center;font-size:64px;font-weight:900;font-style:italic;color:#fff;text-transform:uppercase;letter-spacing:2px;z-index:10;text-shadow:0 0 20px rgba(0,0,0,0.5),0 0 10px rgba(0,0,0,0.3);pointer-events:none;font-family:"Arial Black","Segoe UI Black",sans-serif;transform:translateX(-60px);animation:fadeInTitle 1s ease-out .3s forwards;opacity:0}
 
-.rr-outer {
-  width: 460px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #080808;
-  border: 1px solid #1a1a1a;
-}
+.auth-wrapper{width:100%;max-width:560px;padding:0 20px;transition:transform .3s ease}
+.auth-card{background:#171717;border-radius:20px;padding:60px 70px 50px;box-shadow:0 25px 60px rgba(0,0,0,.6);animation:cardEntrance .6s cubic-bezier(0.2,0.8,0.2,1) forwards;opacity:0;transform:translateY(20px)}
 
-.rr-banner {
-  position: relative;
-  height: 160px;
-  background: #0d0d0d;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  padding: 0 2rem 1.25rem;
-}
+@keyframes slideInImage{0%{transform:translateX(100px);opacity:0}100%{transform:translateX(-180px);opacity:1}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+@keyframes fadeInTitle{0%{transform:translateX(-60px) translateY(20px);opacity:0}100%{transform:translateX(-60px) translateY(0);opacity:1}}
+@keyframes cardEntrance{0%{transform:translateY(30px) scale(0.95);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
 
-.rr-city {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-}
+.auth-card.page-switching{animation:cardSwitch .25s cubic-bezier(0.4,0,0.2,1) forwards}
+@keyframes cardSwitch{0%{opacity:1;transform:scale(1)}50%{opacity:0;transform:scale(0.97)}100%{opacity:1;transform:scale(1)}}
 
-.rr-glow-orb {
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 280px;
-  height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(180,130,30,0.18) 0%, transparent 70%);
-  pointer-events: none;
-}
+.auth-title{text-align:center;font-size:22px;line-height:1.5;color:#e0e0e0;margin-bottom:40px}
+.auth-title span{display:block;font-size:16px;color:#9c9c9c;margin-top:8px}
+.field{margin-bottom:20px}
+.field input{width:100%;height:56px;background:#212121;border-radius:8px;border:none;outline:none;padding:0 20px;font-size:16px;color:#f5f5f5;user-select:text;-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;cursor:text}
+.field input::placeholder{color:#777;user-select:none}
+.buttons-row{display:flex;gap:16px;margin-top:30px}
+.btn{flex:1;height:56px;border-radius:8px;border:none;font-size:16px;font-weight:500;cursor:pointer;transition:background .15s,color .15s,opacity .15s;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn-primary{background:#3b3b3b;color:#f1f1f1}
+.btn-secondary{background:#262626;color:#bbb}
+.btn:disabled{opacity:.55;cursor:default}
+.btn:hover:not(:disabled){background:#4a4a4a}
+.forgot{margin-top:30px;text-align:center;font-size:14px;color:#8f8f8f}
+.forgot a{margin-left:6px;font-size:14px;color:#e5e5e5;text-decoration:none;cursor:pointer}
+.forgot a:hover{text-decoration:underline}
 
-.rr-brand {
-  position: relative;
-  z-index: 2;
-}
+.error-msg{margin-top:14px;text-align:center;font-size:14px;color:#ff5555;min-height:20px;display:none}
+.error-msg.visible{display:block}
 
-.rr-brand-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: #D4A017;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  text-shadow: 0 0 40px rgba(212,160,23,0.4);
-}
+.page{display:none}
+.page.active{display:block}
 
-.rr-brand-sub {
-  font-size: 10px;
-  font-weight: 400;
-  color: #4a4030;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  margin-top: 5px;
-}
+@media(min-width:1921px){.auth-wrapper{transform:scale(1.2)}.project-title{font-size:80px}}
+@media(max-height:800px){.auth-wrapper{transform:scale(0.85)}}
+@media(max-width:900px){.layout-right{display:none}.layout-left{width:100%;padding-right:0}}
+@media(max-width:600px){.auth-card{padding:40px 30px 35px}.auth-wrapper{max-width:100%}}
+    </style>
+</head>
+<body>
 
-.rr-live-badge {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(20,20,20,0.9);
-  border: 0.5px solid #2a2a2a;
-  border-radius: 20px;
-  padding: 5px 10px;
-  font-size: 11px;
-  color: #888;
-  letter-spacing: 0.08em;
-}
+<div class="layout-left">
+    <div class="auth-wrapper">
+        <div class="auth-card" id="authCard">
 
-.rr-live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #4ade80;
-  animation: pulse-dot 2s infinite;
-}
+            <!-- ======== ЛОГИН ======== -->
+            <div class="page active" id="page-login">
+                <div class="auth-title">
+                    Добро пожаловать на сервер.
+                    <span>Войдите под своим аккаунтом.</span>
+                </div>
+                <div class="field">
+                    <input type="text" id="login-name" placeholder="Введите никнейм" autocomplete="off" />
+                </div>
+                <div class="field">
+                    <input type="password" id="login-pass" placeholder="Введите пароль" />
+                </div>
+                <div class="error-msg" id="login-error"></div>
+                <div class="buttons-row">
+                    <button class="btn btn-primary" onclick="doLogin()">Войти</button>
+                    <button class="btn btn-secondary" onclick="switchPage('register')">Зарегистрироваться</button>
+                </div>
+                <div class="forgot">
+                    Забыли пароль? <a onclick="void(0)">Восстановить</a>
+                </div>
+            </div>
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
+            <!-- ======== РЕГИСТРАЦИЯ ======== -->
+            <div class="page" id="page-register">
+                <div class="auth-title">
+                    Добро пожаловать на сервер.
+                    <span>Вам необходимо пройти регистрацию.</span>
+                </div>
+                <div class="field">
+                    <input type="text" id="reg-name" placeholder="Введите никнейм" autocomplete="off" />
+                </div>
+                <div class="field">
+                    <input type="password" id="reg-pass" placeholder="Придумайте пароль" />
+                </div>
+                <div class="field">
+                    <input type="password" id="reg-pass2" placeholder="Повторите пароль" />
+                </div>
+                <div class="error-msg" id="reg-error"></div>
+                <div class="buttons-row">
+                    <button class="btn btn-primary" onclick="doRegister()">Зарегистрироваться</button>
+                    <button class="btn btn-secondary" onclick="switchPage('login')">Отмена</button>
+                </div>
+            </div>
 
-.rr-stats-row {
-  display: flex;
-  gap: 0;
-  border-bottom: 0.5px solid #141414;
-}
-
-.rr-stat {
-  flex: 1;
-  padding: 12px 0;
-  text-align: center;
-  border-right: 0.5px solid #141414;
-}
-.rr-stat:last-child { border-right: none; }
-
-.rr-stat-num {
-  font-size: 16px;
-  font-weight: 600;
-  color: #D4A017;
-  font-family: 'Cormorant Garamond', serif;
-}
-
-.rr-stat-label {
-  font-size: 10px;
-  color: #333;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-.rr-body {
-  padding: 1.5rem 2rem 2rem;
-}
-
-.rr-tabs {
-  display: flex;
-  background: #0d0d0d;
-  border-radius: 10px;
-  padding: 3px;
-  margin-bottom: 1.5rem;
-  border: 0.5px solid #1a1a1a;
-}
-
-.rr-tab {
-  flex: 1;
-  padding: 8px 0;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #333;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.25s;
-  user-select: none;
-}
-
-.rr-tab.active {
-  background: #161410;
-  color: #D4A017;
-  border: 0.5px solid #2a2010;
-}
-
-.rr-field { margin-bottom: 14px; }
-
-.rr-field-label {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #3a3530;
-  margin-bottom: 6px;
-}
-
-.rr-input {
-  width: 100%;
-  box-sizing: border-box;
-  background: #0d0d0d;
-  border: 0.5px solid #1e1e1e;
-  border-radius: 10px;
-  padding: 0 16px;
-  height: 46px;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  color: #c8b87a;
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  letter-spacing: 0.02em;
-}
-.rr-input::placeholder { color: #252015; }
-.rr-input:focus {
-  border-color: #8B6914;
-  background: #0f0e0a;
-}
-
-.rr-btn {
-  width: 100%;
-  height: 50px;
-  background: #D4A017;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #0a0800;
-  cursor: pointer;
-  margin-top: 6px;
-  transition: background 0.2s, transform 0.1s;
-  position: relative;
-  overflow: hidden;
-}
-.rr-btn::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 60%;
-  height: 100%;
-  background: rgba(255,255,255,0.12);
-  transform: skewX(-20deg);
-  transition: left 0.4s;
-}
-.rr-btn:hover { background: #E8B420; }
-.rr-btn:hover::after { left: 150%; }
-.rr-btn:active { transform: scale(0.99); }
-
-.rr-hint {
-  text-align: center;
-  font-size: 11px;
-  color: #2a2520;
-  margin-top: 14px;
-  cursor: pointer;
-  letter-spacing: 0.05em;
-  transition: color 0.2s;
-}
-.rr-hint:hover { color: #8B6914; }
-
-.rr-welcome-box {
-  border: 0.5px solid #1e1a10;
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 14px;
-  background: #0b0a06;
-  position: relative;
-  overflow: hidden;
-}
-.rr-welcome-box::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: #D4A017;
-}
-.rr-welcome-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: #c8a840;
-  margin-bottom: 5px;
-}
-.rr-welcome-text {
-  font-size: 12px;
-  color: #3a3020;
-  line-height: 1.7;
-}
-
-.rr-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 4px 0 14px;
-}
-.rr-divider-line { flex: 1; height: 0.5px; background: #141414; }
-.rr-divider-text { font-size: 10px; color: #222; letter-spacing: 0.1em; }
-
-.rr-footer {
-  text-align: center;
-  padding: 0 2rem 1.25rem;
-  font-size: 10px;
-  color: #1e1a14;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.rr-page { display: none; }
-.rr-page.active { display: block; }
-</style>
-
-<div class="rr-scene">
-  <div class="rr-outer">
-
-    <div class="rr-banner">
-      <div class="rr-glow-orb"></div>
-
-      <svg class="rr-city" viewBox="0 0 460 110" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
-        <rect x="20" y="60" width="18" height="50" fill="#111"/>
-        <rect x="22" y="64" width="4" height="4" fill="#D4A01722"/>
-        <rect x="28" y="70" width="4" height="4" fill="#D4A01733"/>
-        <rect x="22" y="72" width="4" height="4" fill="#D4A01711"/>
-        <rect x="44" y="30" width="28" height="80" fill="#0f0f0f"/>
-        <rect x="56" y="24" width="4" height="8" fill="#0f0f0f"/>
-        <rect x="58" y="20" width="1" height="5" fill="#D4A017" opacity="0.4"/>
-        <rect x="47" y="34" width="5" height="5" fill="#D4A01733"/>
-        <rect x="55" y="34" width="5" height="5" fill="#D4A01722"/>
-        <rect x="63" y="34" width="5" height="5" fill="#D4A01711"/>
-        <rect x="47" y="44" width="5" height="5" fill="#D4A01711"/>
-        <rect x="55" y="44" width="5" height="5" fill="#D4A01733"/>
-        <rect x="47" y="54" width="5" height="5" fill="#D4A01722"/>
-        <rect x="78" y="50" width="22" height="60" fill="#101010"/>
-        <rect x="81" y="54" width="4" height="4" fill="#D4A01722"/>
-        <rect x="88" y="54" width="4" height="4" fill="#D4A01733"/>
-        <rect x="81" y="62" width="4" height="4" fill="#D4A01711"/>
-        <rect x="88" y="62" width="4" height="4" fill="#D4A01722"/>
-        <rect x="108" y="40" width="32" height="70" fill="#0e0e0e"/>
-        <rect x="120" y="34" width="8" height="8" fill="#0e0e0e"/>
-        <rect x="123" y="30" width="2" height="6" fill="#D4A017" opacity="0.6"/>
-        <rect x="111" y="44" width="5" height="5" fill="#D4A01733"/>
-        <rect x="119" y="44" width="5" height="5" fill="#D4A01722"/>
-        <rect x="127" y="44" width="5" height="5" fill="#D4A01711"/>
-        <rect x="111" y="54" width="5" height="5" fill="#D4A01711"/>
-        <rect x="119" y="54" width="5" height="5" fill="#D4A01733"/>
-        <rect x="127" y="54" width="5" height="5" fill="#D4A01722"/>
-        <rect x="111" y="64" width="5" height="5" fill="#D4A01722"/>
-        <rect x="148" y="65" width="16" height="45" fill="#111"/>
-        <rect x="151" y="68" width="4" height="4" fill="#D4A01722"/>
-        <rect x="158" y="72" width="4" height="4" fill="#D4A01733"/>
-        <rect x="200" y="20" width="40" height="90" fill="#0c0c0c"/>
-        <rect x="215" y="12" width="10" height="10" fill="#0c0c0c"/>
-        <rect x="219" y="6" width="2" height="8" fill="#D4A017" opacity="0.8"/>
-        <rect x="203" y="24" width="6" height="6" fill="#D4A01733"/>
-        <rect x="213" y="24" width="6" height="6" fill="#D4A01744"/>
-        <rect x="223" y="24" width="6" height="6" fill="#D4A01722"/>
-        <rect x="231" y="24" width="6" height="6" fill="#D4A01711"/>
-        <rect x="203" y="34" width="6" height="6" fill="#D4A01711"/>
-        <rect x="213" y="34" width="6" height="6" fill="#D4A01722"/>
-        <rect x="223" y="34" width="6" height="6" fill="#D4A01733"/>
-        <rect x="203" y="44" width="6" height="6" fill="#D4A01722"/>
-        <rect x="213" y="44" width="6" height="6" fill="#D4A01711"/>
-        <rect x="223" y="44" width="6" height="6" fill="#D4A01744"/>
-        <rect x="203" y="54" width="6" height="6" fill="#D4A01733"/>
-        <rect x="213" y="54" width="6" height="6" fill="#D4A01722"/>
-        <rect x="250" y="45" width="26" height="65" fill="#0f0f0f"/>
-        <rect x="253" y="48" width="5" height="5" fill="#D4A01722"/>
-        <rect x="261" y="48" width="5" height="5" fill="#D4A01733"/>
-        <rect x="253" y="58" width="5" height="5" fill="#D4A01711"/>
-        <rect x="261" y="58" width="5" height="5" fill="#D4A01722"/>
-        <rect x="284" y="55" width="20" height="55" fill="#111"/>
-        <rect x="287" y="58" width="4" height="4" fill="#D4A01722"/>
-        <rect x="295" y="64" width="4" height="4" fill="#D4A01733"/>
-        <rect x="312" y="35" width="36" height="75" fill="#0d0d0d"/>
-        <rect x="326" y="28" width="8" height="9" fill="#0d0d0d"/>
-        <rect x="329" y="23" width="2" height="7" fill="#D4A017" opacity="0.5"/>
-        <rect x="315" y="39" width="6" height="6" fill="#D4A01733"/>
-        <rect x="325" y="39" width="6" height="6" fill="#D4A01722"/>
-        <rect x="335" y="39" width="6" height="6" fill="#D4A01711"/>
-        <rect x="315" y="49" width="6" height="6" fill="#D4A01711"/>
-        <rect x="325" y="49" width="6" height="6" fill="#D4A01733"/>
-        <rect x="335" y="49" width="6" height="6" fill="#D4A01722"/>
-        <rect x="315" y="59" width="6" height="6" fill="#D4A01722"/>
-        <rect x="356" y="60" width="18" height="50" fill="#111"/>
-        <rect x="359" y="63" width="4" height="4" fill="#D4A01722"/>
-        <rect x="367" y="68" width="4" height="4" fill="#D4A01733"/>
-        <rect x="380" y="42" width="28" height="68" fill="#0f0f0f"/>
-        <rect x="383" y="45" width="5" height="5" fill="#D4A01733"/>
-        <rect x="391" y="45" width="5" height="5" fill="#D4A01722"/>
-        <rect x="399" y="45" width="5" height="5" fill="#D4A01711"/>
-        <rect x="383" y="55" width="5" height="5" fill="#D4A01711"/>
-        <rect x="391" y="55" width="5" height="5" fill="#D4A01733"/>
-        <rect x="416" y="50" width="22" height="60" fill="#111"/>
-        <rect x="419" y="54" width="4" height="4" fill="#D4A01722"/>
-        <rect x="427" y="60" width="4" height="4" fill="#D4A01733"/>
-        <rect x="419" y="64" width="4" height="4" fill="#D4A01711"/>
-        <rect x="440" y="70" width="16" height="40" fill="#0f0f0f"/>
-        <rect x="443" y="73" width="4" height="4" fill="#D4A01722"/>
-        <line x1="0" y1="109" x2="460" y2="109" stroke="#D4A017" stroke-width="0.5" opacity="0.15"/>
-      </svg>
-
-      <div class="rr-brand">
-        <div class="rr-brand-name">Revage Roleplay</div>
-        <div class="rr-brand-sub">Войди в живой город</div>
-      </div>
-
-      <div class="rr-live-badge">
-        <div class="rr-live-dot"></div>
-        Онлайн
-      </div>
+        </div>
     </div>
+</div>
 
-    <div class="rr-stats-row">
-      <div class="rr-stat">
-        <div class="rr-stat-num">1 247</div>
-        <div class="rr-stat-label">Игроков</div>
-      </div>
-      <div class="rr-stat">
-        <div class="rr-stat-num">4.8★</div>
-        <div class="rr-stat-label">Рейтинг</div>
-      </div>
-      <div class="rr-stat">
-        <div class="rr-stat-num">3 года</div>
-        <div class="rr-stat-label">На рынке</div>
-      </div>
-    </div>
-
-    <div class="rr-body">
-      <div class="rr-tabs">
-        <div class="rr-tab active" onclick="switchTab('login')">Войти</div>
-        <div class="rr-tab" onclick="switchTab('register')">Регистрация</div>
-      </div>
-
-      <div id="page-login" class="rr-page active">
-        <div class="rr-field">
-          <div class="rr-field-label">Логин</div>
-          <input class="rr-input" type="text" id="login-name" placeholder="Ваш никнейм" />
-        </div>
-        <div class="rr-field">
-          <div class="rr-field-label">Пароль</div>
-          <input class="rr-input" type="password" id="login-pass" placeholder="••••••••" />
-        </div>
-        <div id="login-error" style="color:#ff4444;font-size:12px;margin-bottom:8px;display:none;text-align:center;"></div>
-        <button class="rr-btn" onclick="doLogin()">Войти в город</button>
-        <div class="rr-hint">Забыли пароль?</div>
-      </div>
-
-      <div id="page-register" class="rr-page">
-        <div class="rr-welcome-box">
-          <div class="rr-welcome-title">Добро пожаловать в Revage</div>
-          <div class="rr-welcome-text">Живой город, живые люди, живые последствия. Закон или хаос — выбор за тобой.</div>
-        </div>
-        <div class="rr-field">
-          <div class="rr-field-label">Придумайте логин</div>
-          <input class="rr-input" type="text" id="reg-name" placeholder="Ваше имя в городе" />
-        </div>
-        <div class="rr-divider">
-          <div class="rr-divider-line"></div>
-          <div class="rr-divider-text">пароль</div>
-          <div class="rr-divider-line"></div>
-        </div>
-        <div class="rr-field">
-          <input class="rr-input" type="password" id="reg-pass" placeholder="Минимум 8 символов" />
-        </div>
-        <div class="rr-field">
-          <input class="rr-input" type="password" id="reg-pass2" placeholder="Повторите пароль" />
-        </div>
-        <div id="reg-error" style="color:#ff4444;font-size:12px;margin-bottom:8px;display:none;text-align:center;"></div>
-        <button class="rr-btn" onclick="doRegister()">Начать историю</button>
-      </div>
-    </div>
-
-    <div class="rr-footer">revagerp.ru &nbsp;·&nbsp; 18+ &nbsp;·&nbsp; только RP</div>
-  </div>
+<div class="layout-right">
+    <div class="project-title">Revage Roleplay</div>
+    <img src="img/pers.png" alt="">
 </div>
 
 <script>
-function switchTab(tab) {
-  document.querySelectorAll('.rr-tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0) === (tab === 'login'));
-  });
-  document.getElementById('page-login').classList.toggle('active', tab === 'login');
-  document.getElementById('page-register').classList.toggle('active', tab === 'register');
+// ============================================================
+//  CEF API — samp-cef
+//  cef.on()   = слушаем событие с сервера (cef_emit_event)
+//  cef.emit() = отправляем событие на сервер (cef_subscribe)
+// ============================================================
+
+// ── Переключение страниц ──────────────────────────────────
+function switchPage(page) {
+    var card = document.getElementById('authCard');
+    card.classList.add('page-switching');
+    setTimeout(function() {
+        document.querySelectorAll('.page').forEach(function(p) {
+            p.classList.remove('active');
+        });
+        document.getElementById('page-' + page).classList.add('active');
+        clearErrors();
+        card.classList.remove('page-switching');
+    }, 125);
 }
 
-// Сервер говорит какой режим показать
+// ── Ошибки ───────────────────────────────────────────────
+function clearErrors() {
+    ['login-error', 'reg-error'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.textContent = '';
+        el.classList.remove('visible');
+    });
+}
+
+function showError(id, text) {
+    var el = document.getElementById(id);
+    el.textContent = text;
+    el.classList.add('visible');
+}
+
+// ── Сервер говорит какой режим показать ──────────────────
+// PAWN: cef_emit_event(playerid, "cef_init", CEFSTR(mode))
+// mode = "login" или "register"
 cef.on('cef_init', function(mode) {
-  if (mode === 'login') switchTab('login');
-  else switchTab('register');
+    if (mode === 'login') switchPage('login');
+    else switchPage('register');
 });
 
-// Ошибка с сервера
+// ── Ошибка с сервера ─────────────────────────────────────
+// PAWN: cef_emit_event(playerid, "cef_auth_error", CEFSTR("err_pass"))
 cef.on('cef_auth_error', function(code) {
-  var errors = {
-    'err_mode':  'Ошибка режима. Переподключитесь.',
-    'err_empty': 'Пароль не может быть пустым.',
-    'err_short': 'Пароль слишком короткий (минимум 6 символов).',
-    'err_long':  'Пароль слишком длинный (максимум 32 символа).',
-    'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
-  };
-  var loginActive = document.getElementById('page-login').classList.contains('active');
-  var el = document.getElementById(loginActive ? 'login-error' : 'reg-error');
-  el.textContent = errors[code] || code;
-  el.style.display = 'block';
+    var errors = {
+        'err_mode':         'Ошибка режима. Переподключитесь.',
+        'err_login_empty':  'Никнейм не может быть пустым.',
+        'err_login_short':  'Никнейм слишком короткий (минимум 3 символа).',
+        'err_login_long':   'Никнейм слишком длинный (максимум 20 символов).',
+        'err_empty':        'Пароль не может быть пустым.',
+        'err_short':        'Пароль слишком короткий (минимум 6 символов).',
+        'err_long':         'Пароль слишком длинный (максимум 32 символа).',
+        'err_pass':         'Неверный никнейм или пароль. Попробуйте ещё раз.'
+    };
+    var msg = errors[code] || code;
+    var loginActive = document.getElementById('page-login').classList.contains('active');
+    showError(loginActive ? 'login-error' : 'reg-error', msg);
 });
 
+// ── Кнопка "Войти" ───────────────────────────────────────
+// PAWN: cef_subscribe("cef_auth_login", "CefAuth_OnLogin")
+// Параметры: login, password
 function doLogin() {
-  var pass = document.getElementById('login-pass').value;
-  var err = document.getElementById('login-error');
-  err.style.display = 'none';
-  if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
-  cef.emit('cef_auth_login', pass);
+    clearErrors();
+    var name = document.getElementById('login-name').value.trim();
+    var pass = document.getElementById('login-pass').value;
+
+    if (!name) {
+        showError('login-error', 'Введите никнейм.');
+        return;
+    }
+    if (!pass) {
+        showError('login-error', 'Введите пароль.');
+        return;
+    }
+    if (pass.length < 6) {
+        showError('login-error', 'Минимум 6 символов.');
+        return;
+    }
+
+    cef.emit('cef_auth_login', name, pass);
 }
 
+// ── Кнопка "Зарегистрироваться" ──────────────────────────
+// PAWN: cef_subscribe("cef_auth_register", "CefAuth_OnRegister")
+// Параметры: login, password, gender
 function doRegister() {
-  var pass  = document.getElementById('reg-pass').value;
-  var pass2 = document.getElementById('reg-pass2').value;
-  var err   = document.getElementById('reg-error');
-  err.style.display = 'none';
-  if (!pass) { err.textContent = 'Введите пароль'; err.style.display = 'block'; return; }
-  if (pass.length < 6) { err.textContent = 'Минимум 6 символов'; err.style.display = 'block'; return; }
-  if (pass !== pass2) { err.textContent = 'Пароли не совпадают'; err.style.display = 'block'; return; }
-  cef.emit('cef_auth_register', pass, 'male');
+    clearErrors();
+    var name  = document.getElementById('reg-name').value.trim();
+    var pass  = document.getElementById('reg-pass').value;
+    var pass2 = document.getElementById('reg-pass2').value;
+
+    if (!name) {
+        showError('reg-error', 'Введите никнейм.');
+        return;
+    }
+    if (name.length < 3) {
+        showError('reg-error', 'Никнейм слишком короткий (минимум 3 символа).');
+        return;
+    }
+    if (name.length > 20) {
+        showError('reg-error', 'Никнейм слишком длинный (максимум 20 символов).');
+        return;
+    }
+    if (!pass) {
+        showError('reg-error', 'Введите пароль.');
+        return;
+    }
+    if (pass.length < 6) {
+        showError('reg-error', 'Минимум 6 символов.');
+        return;
+    }
+    if (pass.length > 32) {
+        showError('reg-error', 'Максимум 32 символа.');
+        return;
+    }
+    if (pass !== pass2) {
+        showError('reg-error', 'Пароли не совпадают.');
+        return;
+    }
+
+    // gender='male' по умолчанию, можно добавить выбор позже
+    cef.emit('cef_auth_register', name, pass, 'male');
 }
+
+// ── Enter для удобства ────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('page-login').classList.contains('active')) doLogin();
+    else doRegister();
+});
 </script>
+
+</body>
+</html>
