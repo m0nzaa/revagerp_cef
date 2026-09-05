@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="layout-left">
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-title">
+                Добро пожаловать на сервер.
+                <span>Вам необходимо пройти регистрацию.</span>
+            </div>
+            <div class="field">
+                <input type="text" placeholder="Введите логин">
+            </div>
+            <div class="field">
+                <input type="email" placeholder="Введите Email">
+            </div>
+            <div class="field">
+                <input type="password" placeholder="Введите пароль">
+            </div>
+            <div class="field">
+                <input type="password" placeholder="Повторите пароль">
+            </div>
+            <div class="field">
+                <input type="text" placeholder="Введите промокод">
+            </div>
+            <div class="buttons-row">
+                <button class="btn btn-primary">Зарегистрироваться</button>
+                <a href="auth.html" class="btn btn-secondary">Отмена</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="layout-right">
+    <div class="project-title">Название сервака</div>
+    <img src="img/pers.png" alt="">
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a').forEach(link => {
+            if(link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = link.href;
+                    document.body.classList.add('page-exit');
+                    setTimeout(() => {
+                        window.location.href = target;
+                    }, 400);
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
