@@ -25,12 +25,12 @@ body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden
 @keyframes cardSwitch{0%{opacity:1;transform:scale(1)}50%{opacity:0;transform:scale(.97)}100%{opacity:1;transform:scale(1)}}
 
 .tabs{display:flex;background:#212121;border-radius:10px;padding:4px;margin-bottom:32px;gap:4px}
-.tab{flex:1;height:40px;border-radius:7px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;color:#666;background:transparent}
+.tab{flex:1;height:40px;border-radius:7px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;color:#555;background:transparent;letter-spacing:.05em}
 .tab.active{background:#2e2e2e;color:#f1f1f1}
-.tab:hover:not(.active){color:#aaa}
+.tab:hover:not(.active){color:#999}
 
 .auth-title{font-size:20px;line-height:1.5;color:#e0e0e0;margin-bottom:28px}
-.auth-title span{display:block;font-size:14px;color:#666;margin-top:6px}
+.auth-title span{display:block;font-size:14px;color:#555;margin-top:6px}
 
 .field{margin-bottom:16px}
 .field input{width:100%;height:52px;background:#212121;border-radius:8px;border:none;outline:none;padding:0 18px;font-size:15px;color:#f5f5f5;user-select:text;-webkit-user-select:text;cursor:text;transition:background .15s}
@@ -43,11 +43,11 @@ body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden
 .buttons-row{display:flex;gap:12px;margin-top:24px}
 .btn{flex:1;height:52px;border-radius:8px;border:none;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s,opacity .15s;display:flex;align-items:center;justify-content:center}
 .btn-primary{background:#333;color:#f1f1f1}
-.btn-secondary{background:#222;color:#888}
+.btn-secondary{background:#222;color:#777}
 .btn:hover{opacity:.85}
 
-.forgot{margin-top:24px;text-align:center;font-size:13px;color:#555}
-.forgot a{margin-left:5px;color:#ccc;text-decoration:none;cursor:pointer}
+.forgot{margin-top:24px;text-align:center;font-size:13px;color:#444}
+.forgot a{margin-left:5px;color:#bbb;text-decoration:none;cursor:pointer}
 .forgot a:hover{text-decoration:underline}
 
 .page{display:none}
@@ -76,7 +76,6 @@ body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden
                     Добро пожаловать.
                     <span>Войдите под своим аккаунтом.</span>
                 </div>
-                <!-- поле ника есть, но при отправке не используется — сервер берёт PlayerName -->
                 <div class="field">
                     <input type="text" id="login-name" placeholder="Никнейм" autocomplete="off" />
                 </div>
@@ -123,6 +122,7 @@ body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden
 </div>
 
 <script>
+// ── Переключение табов ────────────────────────────────────
 function switchTab(tab) {
     var card = document.getElementById('authCard');
     card.classList.add('switching');
@@ -143,61 +143,58 @@ function clearErrors() {
         el.classList.remove('visible');
     });
 }
-
 function showError(id, text) {
     var el = document.getElementById(id);
     el.textContent = text;
     el.classList.add('visible');
 }
 
-// Сервер говорит какой таб открыть
+// ── Сервер говорит какой режим ────────────────────────────
+// PAWN: cef_emit_event(playerid, "cef_init", CEFSTR("login"/"register"))
 cef.on('cef_init', function(mode) {
     switchTab(mode === 'login' ? 'login' : 'register');
 });
 
-// Ошибка с сервера
+// ── Ошибка с сервера ─────────────────────────────────────
+// PAWN: cef_emit_event(playerid, "cef_auth_error", CEFSTR("..."))
 cef.on('cef_auth_error', function(code) {
     var errors = {
-        'err_mode':        'Ошибка режима. Переподключитесь.',
-        'err_login_empty': 'Введите никнейм.',
-        'err_login_short': 'Никнейм слишком короткий (мин. 3 символа).',
-        'err_login_long':  'Никнейм слишком длинный (макс. 20 символов).',
-        'err_empty':       'Введите пароль.',
-        'err_short':       'Пароль слишком короткий (мин. 6 символов).',
-        'err_long':        'Пароль слишком длинный (макс. 32 символа).',
-        'err_pass':        'Неверный пароль. Попробуйте ещё раз.'
+        'err_mode':  'Ошибка режима. Переподключитесь.',
+        'err_empty': 'Введите пароль.',
+        'err_short': 'Пароль слишком короткий (минимум 6 символов).',
+        'err_long':  'Пароль слишком длинный (максимум 32 символа).',
+        'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
     };
     var isLogin = document.getElementById('page-login').classList.contains('active');
     showError(isLogin ? 'login-error' : 'reg-error', errors[code] || code);
 });
 
-// ЛОГИН — ник из поля не шлём, сервер берёт PlayerName сам
-// Шлём только пароль
+// ── Войти ─────────────────────────────────────────────────
+// PAWN: cef_subscribe("cef_auth_login", "CefAuth_OnLogin")
+// Параметры: password   (ник берёт сервер из PlayerName)
 function doLogin() {
     clearErrors();
     var pass = document.getElementById('login-pass').value;
-    if (!pass)           { showError('login-error', 'Введите пароль.'); return; }
+    if (!pass) { showError('login-error', 'Введите пароль.'); return; }
     if (pass.length < 6) { showError('login-error', 'Минимум 6 символов.'); return; }
     cef.emit('cef_auth_login', pass);
 }
 
-// РЕГИСТРАЦИЯ — ник из поля шлём на сервер
+// ── Зарегистрироваться ────────────────────────────────────
+// PAWN: cef_subscribe("cef_auth_register", "CefAuth_OnRegister")
+// Параметры: password, gender   (ник берёт сервер из PlayerName)
 function doRegister() {
     clearErrors();
-    var name  = document.getElementById('reg-name').value.trim();
     var pass  = document.getElementById('reg-pass').value;
     var pass2 = document.getElementById('reg-pass2').value;
-    if (!name)            { showError('reg-error', 'Введите никнейм.'); return; }
-    if (name.length < 3)  { showError('reg-error', 'Никнейм слишком короткий (мин. 3 символа).'); return; }
-    if (name.length > 20) { showError('reg-error', 'Никнейм слишком длинный (макс. 20 символов).'); return; }
-    if (!pass)            { showError('reg-error', 'Введите пароль.'); return; }
-    if (pass.length < 6)  { showError('reg-error', 'Минимум 6 символов.'); return; }
-    if (pass.length > 32) { showError('reg-error', 'Максимум 32 символа.'); return; }
-    if (pass !== pass2)   { showError('reg-error', 'Пароли не совпадают.'); return; }
-    cef.emit('cef_auth_register', name, pass, 'male');
+    if (!pass)           { showError('reg-error', 'Введите пароль.'); return; }
+    if (pass.length < 6) { showError('reg-error', 'Минимум 6 символов.'); return; }
+    if (pass.length > 32){ showError('reg-error', 'Максимум 32 символа.'); return; }
+    if (pass !== pass2)  { showError('reg-error', 'Пароли не совпадают.'); return; }
+    cef.emit('cef_auth_register', pass, 'male');
 }
 
-// Enter
+// ── Enter ─────────────────────────────────────────────────
 document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
     if (document.getElementById('page-login').classList.contains('active')) doLogin();
