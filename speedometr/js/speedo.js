@@ -3,7 +3,6 @@ var deffuel  = 208.907;
 var defheal  = 118.296;
 var SPEED_MAX = 280;
 
-// ── Защита от undefined/NaN ──────────────────────────────────
 function setSpeed(speed) {
     speed = parseInt(speed) || 0;
     var clamped = Math.min(speed, SPEED_MAX);
@@ -36,7 +35,7 @@ function setHP(hp) {
     $("#healproc").text(hp + "%");
 }
 
-// ── Глобальные функции — CEF вызывает их напрямую ───────────
+// ── Основные функции ─────────────────────────────────────────
 function speedo_show() {
     $(".hud-speedometer").show();
     $(".hud-speedomter-footer").show();
@@ -58,12 +57,16 @@ function speedo_data(speed, fuel, hp, engine, doors, belt, lights) {
     $("#door").attr("class", "hud-speedomter-footer-item door "  + (doors  ? "on" : "off"));
 }
 
-// ── Явно вешаем на window — на случай если CEF ищет именно там
+// ── Вешаем на window явно (некоторые версии CEF ищут там) ───
 window.speedo_show = speedo_show;
 window.speedo_hide = speedo_hide;
 window.speedo_data = speedo_data;
 
-// ── CustomEvent fallback (если плагин шлёт через dispatchEvent) ─
+// ── Слушаем CustomEvent от samp-cef ─────────────────────────
+// Сервер шлёт данные одной JSON-строкой через cef_emit_event:
+// cef_emit_event(playerid, "speedo_data", "{...json...}")
+// Она приходит в e.detail — парсим и передаём в speedo_data()
+
 window.addEventListener("speedo_show", function() {
     speedo_show();
 });
@@ -73,13 +76,29 @@ window.addEventListener("speedo_hide", function() {
 });
 
 window.addEventListener("speedo_data", function(e) {
-    if (!e || !e.detail) return;
-    var d = e.detail;
+    if (!e || e.detail === undefined || e.detail === null) return;
+    try {
+        var raw = e.detail;
 
-    // detail может быть массивом, объектом или одним значением
-    if (Array.isArray(d)) {
-        speedo_data(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
-    } else if (typeof d === "object") {
-        speedo_data(d.speed, d.fuel, d.hp, d.engine, d.doors, d.belt, d.lights);
+        // Если это строка — парсим JSON
+        if (typeof raw === "string") {
+            var d = JSON.parse(raw);
+            speedo_data(d.speed, d.fuel, d.hp, d.engine, d.doors, d.belt, d.lights);
+            return;
+        }
+
+        // Если объект с именованными ключами {speed, fuel, ...}
+        if (typeof raw === "object" && raw.speed !== undefined) {
+            speedo_data(raw.speed, raw.fuel, raw.hp, raw.engine, raw.doors, raw.belt, raw.lights);
+            return;
+        }
+
+        // Фолбэк: объект с числовыми ключами {0: speed, 1: fuel, ...}
+        if (typeof raw === "object") {
+            speedo_data(raw[0], raw[1], raw[2], raw[3], raw[4], raw[5], raw[6]);
+            return;
+        }
+    } catch(err) {
+        // JSON.parse упал — игнорируем
     }
 });
