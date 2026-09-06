@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Государственный паспорт</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:   #0f2645;
+  --blue:   #1e4d8c;
+  --mid:    #2e6dc4;
+  --accent: #d4a843;
+  --muted:  #6b82a0;
+  --error:  #c0392b;
+  --border: #c2d0e3;
+  --r:      11px;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+  background: #e8eef6;
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Overlay ── */
+#overlay {
+  position: fixed; inset: 0;
+  background: rgba(8,18,38,.75);
+  display: flex; align-items: center; justify-content: center;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+#overlay { animation: fadeIn 200ms ease both; }
+
+/* ── Card ── */
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(16px) scale(.98); }
+  to   { opacity:1; transform:translateY(0)    scale(1);   }
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(15,38,69,.24), 0 2px 6px rgba(15,38,69,.1);
+  width: 460px;
+  max-width: calc(100vw - 20px);
+  overflow: hidden;
+  animation: cardIn 240ms cubic-bezier(.22,.68,0,1.1) both;
+  will-change: transform;
+}
+
+/* ── Header ── */
+.hd {
+  background: linear-gradient(135deg, #0f2645 0%, #1e4d8c 100%);
+  padding: 22px 26px 18px;
+  position: relative; overflow: hidden;
+}
+.hd::before {
+  content:''; position:absolute; top:-34px; right:-34px;
+  width:130px; height:130px;
+  border:2px solid rgba(255,255,255,.07); border-radius:50%;
+  pointer-events:none;
+}
+.hd-top {
+  display:flex; align-items:center; gap:11px;
+  margin-bottom:16px;
+}
+.hd-icon {
+  width:42px; height:42px; border-radius:9px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.14);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.hd-icon svg { width:22px; height:22px; }
+.hd-text h2  { font-size:15px; font-weight:700; color:#fff; }
+.hd-text p   { font-size:11px; color:rgba(255,255,255,.5); margin-top:2px; }
+
+.x-btn {
+  position:absolute; top:12px; right:12px;
+  width:26px; height:26px;
+  background:rgba(255,255,255,.08); border:none; border-radius:6px;
+  color:rgba(255,255,255,.6); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 130ms;
+}
+.x-btn:hover { background:rgba(255,255,255,.18); color:#fff; }
+
+/* ── Progress ── */
+.prog { display:flex; align-items:center; }
+.dot {
+  width:25px; height:25px; border-radius:50%;
+  background:rgba(255,255,255,.12);
+  border:2px solid rgba(255,255,255,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; color:rgba(255,255,255,.4);
+  flex-shrink:0; position:relative; z-index:1;
+  transition:background 200ms, border-color 200ms, color 200ms;
+}
+.dot.active {
+  background:var(--accent); border-color:var(--accent);
+  color:#0f2645; box-shadow:0 0 0 3px rgba(212,168,67,.28);
+}
+.dot.done {
+  background:rgba(255,255,255,.8); border-color:rgba(255,255,255,.8);
+  color:var(--blue);
+}
+.dot.done::after { content:'✓'; font-size:11px; }
+.dot.done span   { display:none; }
+.line {
+  flex:1; height:2px;
+  background:rgba(255,255,255,.13); overflow:hidden;
+}
+.line-fill {
+  height:100%; background:rgba(255,255,255,.5);
+  width:0%;
+  /* width-transition — не GPU, но разумная длина и нечастая смена */
+  transition:width 260ms ease;
+}
+
+/* ── Body ── */
+.body { padding:22px 26px 26px; }
+
+/*
+  НАДЁЖНЫЙ ПОДХОД ДЛЯ СТАРОГО CEF/CHROMIUM:
+  display:none / display:block — гарантирует что невидимые шаги
+  реально не существуют в layout. Плавность — через @keyframes
+  на animation, которая стартует при добавлении класса .vis.
+*/
+@keyframes stepIn {
+  from { opacity:0; transform:translateX(14px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.step { display:none; }
+.step.vis {
+  display:block;
+  animation: stepIn 180ms ease both;
+  /* will-change подсказывает браузеру заранее создать слой */
+  will-change: opacity, transform;
+}
+
+.lbl {
+  font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.07em;
+  color:var(--muted); margin-bottom:5px;
+}
+.ttl {
+  font-size:18px; font-weight:700;
+  color:var(--navy); margin-bottom:5px;
+}
+.dsc {
+  font-size:12px; color:var(--muted);
+  line-height:1.5; margin-bottom:18px;
+}
+
+/* ── Badge ── */
+.badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:#fdf5e0; border:1px solid #e3c87a;
+  border-radius:7px; padding:6px 11px;
+  font-size:12px; font-weight:700; color:#7a5c10;
+  margin-bottom:18px;
+}
+
+/* ── Gender ── */
+.g-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:18px; }
+.g-opt {
+  border:2px solid var(--border); border-radius:var(--r);
+  padding:13px 8px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  background:#f5f8fd;
+  transition:border-color 130ms, background 130ms;
+}
+.g-opt:hover    { border-color:var(--mid); background:#eaf2fb; }
+.g-opt.sel      { border-color:var(--mid); background:#e4eefa; }
+.g-ico          { font-size:24px; line-height:1; }
+.g-lbl          { font-size:12px; font-weight:700; color:var(--navy); }
+
+/* ── Input ── */
+.f-lbl {
+  display:block; font-size:10px; font-weight:700;
+  color:var(--muted); margin-bottom:6px;
+  text-transform:uppercase; letter-spacing:.05em;
+}
+input[type=number] {
+  width:100%; padding:11px 13px;
+  border:2px solid var(--border); border-radius:var(--r);
+  font-size:14px; font-weight:500; color:var(--navy);
+  background:#f5f8fd; outline:none; font-family:inherit;
+  transition:border-color 130ms, background 130ms;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
+input:focus { border-color:var(--mid); background:#fff; }
+input.err   { border-color:var(--error); }
+.f-hint  { font-size:11px; color:var(--muted); margin-top:4px; }
+.f-err   { font-size:11px; color:var(--error); margin-top:4px; display:none; }
+.f-err.show { display:block; }
+
+/* ── Cities ── */
+.c-list { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+.c-opt {
+  border:2px solid var(--border); border-radius:var(--r);
+  padding:10px 13px; cursor:pointer;
+  display:flex; align-items:center; gap:10px;
+  background:#f5f8fd;
+  transition:border-color 130ms, background 130ms;
+}
+.c-opt:hover  { border-color:var(--mid); background:#eaf2fb; }
+.c-opt.sel    { border-color:var(--mid); background:#e4eefa; }
+.c-radio {
+  width:16px; height:16px; border-radius:50%;
+  border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:border-color 130ms;
+}
+.c-opt.sel .c-radio { border-color:var(--mid); }
+.c-radio::after {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background:var(--mid);
+  transform:scale(0); transition:transform 120ms ease;
+}
+.c-opt.sel .c-radio::after { transform:scale(1); }
+.c-nm { font-size:13px; font-weight:600; color:var(--navy); }
+
+/* ── Confirm ── */
+.cf-list {
+  background:#f1f6ff; border:1px solid var(--border);
+  border-radius:var(--r); overflow:hidden; margin-bottom:18px;
+}
+.cf-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 13px; border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.cf-row:last-child { border-bottom:none; }
+.cf-k { color:var(--muted); font-size:12px; }
+.cf-v { color:var(--navy);  font-weight:700; }
+
+/* ── Success ── */
+.suc { text-align:center; padding:6px 0; }
+@keyframes popIn {
+  from { transform:scale(.2); opacity:0; }
+  to   { transform:scale(1);  opacity:1; }
+}
+.suc-icon {
+  width:64px; height:64px; border-radius:50%;
+  background:linear-gradient(135deg,#1a7a4a,#27ae60);
+  margin:0 auto 14px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 5px 18px rgba(26,122,74,.3);
+  animation:popIn 300ms cubic-bezier(.34,1.56,.64,1) both;
+  will-change:transform;
+}
+.suc-icon svg  { width:30px; height:30px; color:#fff; }
+.suc-title     { font-size:19px; font-weight:700; color:var(--navy); margin-bottom:6px; }
+.suc-desc      { font-size:12px; color:var(--muted); line-height:1.55; }
+
+/* ── Buttons ── */
+.btn-row { display:flex; gap:8px; margin-top:18px; }
+.btn {
+  flex:1; padding:12px; border:none; border-radius:var(--r);
+  font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;
+  transition:opacity 120ms, transform 100ms;
+  will-change:transform;
+}
+.btn:active  { transform:scale(.97); }
+.btn-p {
+  background:linear-gradient(135deg,#1e4d8c,#2e6dc4);
+  color:#fff; box-shadow:0 3px 10px rgba(30,77,140,.28);
+}
+.btn-p:hover { opacity:.9; }
+.btn-s { background:#e8eef8; color:var(--navy); }
+.btn-s:hover { background:#dae3f2; }
+.btn-ok {
+  background:linear-gradient(135deg,#1a7a4a,#27ae60);
+  color:#fff; flex:1; box-shadow:0 3px 10px rgba(26,122,74,.26);
+}
+.btn-ok:hover { opacity:.9; }
+</style>
+</head>
+<body>
+
+<div id="overlay">
+ <div class="card">
+
+  <!-- Header -->
+  <div class="hd">
+    <button class="x-btn" onclick="closePanel()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+    <div class="hd-top">
+      <div class="hd-icon">
+        <svg fill="none" stroke="white" stroke-width="1.8" viewBox="0 0 24 24">
+          <rect x="3" y="2" width="18" height="20" rx="2"/>
+          <circle cx="12" cy="10" r="3"/>
+          <path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+          <line x1="7" y1="5" x2="12" y2="5"/>
+        </svg>
+      </div>
+      <div class="hd-text">
+        <h2>Паспортный центр</h2>
+        <p>Официальный документ гражданина</p>
+      </div>
+    </div>
+    <div class="prog">
+      <div class="dot active" id="dot1"><span>1</span></div>
+      <div class="line"><div class="line-fill" id="fill1"></div></div>
+      <div class="dot" id="dot2"><span>2</span></div>
+      <div class="line"><div class="line-fill" id="fill2"></div></div>
+      <div class="dot" id="dot3"><span>3</span></div>
+      <div class="line"><div class="line-fill" id="fill3"></div></div>
+      <div class="dot" id="dot4"><span>4</span></div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- S1 -->
+    <div class="step vis" id="s1">
+      <div class="lbl">Шаг 1 из 4</div>
+      <div class="ttl">Оформление паспорта</div>
+      <div class="dsc">Паспорт подтверждает вашу личность и открывает доступ к государственным услугам.</div>
+      <div class="badge">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
+        Стоимость: <strong>500 руб.</strong>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-s" onclick="closePanel()">Отмена</button>
+        <button class="btn btn-p" onclick="go(2)">Продолжить →</button>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="step" id="s2">
+      <div class="lbl">Шаг 2 из 4</div>
+      <div class="ttl">Укажите пол</div>
+      <div class="dsc">Выберите пол для внесения в паспортные данные.</div>
+      <div class="g-grid">
+        <div class="g-opt sel" id="gM" onclick="pickGender(0)">
+          <span class="g-ico">👨</span>
+          <span class="g-lbl">Мужской</span>
+        </div>
+        <div class="g-opt" id="gF" onclick="pickGender(1)">
+          <span class="g-ico">👩</span>
+          <span class="g-lbl">Женский</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-s" onclick="go(1)">← Назад</button>
+        <button class="btn btn-p" onclick="go(3)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="step" id="s3">
+      <div class="lbl">Шаг 3 из 4</div>
+      <div class="ttl">Возраст</div>
+      <div class="dsc">Введите возраст. Паспорт выдаётся с 16 лет.</div>
+      <label class="f-lbl" for="ageIn">Возраст (лет)</label>
+      <input type="number" id="ageIn" min="16" max="99" placeholder="например, 24" oninput="clearE()">
+      <div class="f-hint">От 16 до 99 лет</div>
+      <div class="f-err" id="ageErr">Введите корректный возраст (16–99 лет)</div>
+      <div class="btn-row">
+        <button class="btn btn-s" onclick="go(2)">← Назад</button>
+        <button class="btn btn-p" onclick="checkAge()">Далее →</button>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="step" id="s4">
+      <div class="lbl">Шаг 4 из 4</div>
+      <div class="ttl">Город рождения</div>
+      <div class="dsc">Выберите город для указания в паспорте.</div>
+      <div class="c-list">
+        <div class="c-opt sel" id="c0" onclick="pickCity(0)"><div class="c-radio"></div><span class="c-nm">Арзамас</span></div>
+        <div class="c-opt"     id="c1" onclick="pickCity(1)"><div class="c-radio"></div><span class="c-nm">пгт. Батырево</span></div>
+        <div class="c-opt"     id="c2" onclick="pickCity(2)"><div class="c-radio"></div><span class="c-nm">Лыткарено</span></div>
+        <div class="c-opt"     id="c3" onclick="pickCity(3)"><div class="c-radio"></div><span class="c-nm">Южный берег</span></div>
+        <div class="c-opt"     id="c4" onclick="pickCity(4)"><div class="c-radio"></div><span class="c-nm">🇺🇸 Я из США</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-s" onclick="go(3)">← Назад</button>
+        <button class="btn btn-p" onclick="showConfirm()">Подтвердить →</button>
+      </div>
+    </div>
+
+    <!-- Confirm -->
+    <div class="step" id="sC">
+      <div class="lbl">Проверьте данные</div>
+      <div class="ttl">Всё верно?</div>
+      <div class="dsc">После подтверждения паспорт будет выдан, средства спишутся.</div>
+      <div class="cf-list">
+        <div class="cf-row"><span class="cf-k">Имя</span>    <span class="cf-v" id="cfN">—</span></div>
+        <div class="cf-row"><span class="cf-k">Пол</span>    <span class="cf-v" id="cfG">—</span></div>
+        <div class="cf-row"><span class="cf-k">Возраст</span><span class="cf-v" id="cfA">—</span></div>
+        <div class="cf-row"><span class="cf-k">Город</span>  <span class="cf-v" id="cfC">—</span></div>
+        <div class="cf-row">
+          <span class="cf-k">Стоимость</span>
+          <span class="cf-v" style="color:var(--accent)">500 руб.</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-s" onclick="go(4)">← Изменить</button>
+        <button class="btn btn-p" onclick="issue()">Оформить паспорт</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="step" id="sS">
+      <div class="suc">
+        <div class="suc-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="suc-title">Паспорт выдан!</div>
+        <div class="suc-desc">Документ оформлен и внесён в реестр граждан.<br>Добро пожаловать!</div>
+      </div>
+      <div class="btn-row" style="margin-top:20px">
+        <button class="btn btn-ok" onclick="closePanel()">Отлично, спасибо!</button>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+ </div><!-- /card -->
+</div><!-- /overlay -->
+
+<script>
+'use strict';
+
+// ── State ────────────────────────────────
+const ST = { gender:0, age:0, city:0, name:'Игрок' };
+const CITIES  = ['Арзамас','пгт. Батырево','Лыткарено','Южный берег','Я из США'];
+const GENDERS = ['Мужской','Женский'];
+
+// DOM-кэш
+const $ = id => document.getElementById(id);
+const STEPS = ['s1','s2','s3','s4','sC','sS'];
+
+// ── Навигация ────────────────────────────
+// Текущий шаг
+let cur = 's1';
+
+function showStep(id) {
+  // Скрываем текущий — просто убираем vis
+  const old = $(cur);
+  if (old) old.className = 'step';   // display:none
+
+  // Показываем новый — добавляем vis, animation сработает сама
+  const next = $(id);
+  if (!next) return;
+  next.className = 'step vis';        // display:block + @keyframes stepIn
+  cur = id;
+}
+
+// Маппинг числа → id шага
+function go(n) {
+  const map = {1:'s1',2:'s2',3:'s3',4:'s4'};
+  if (map[n]) {
+    showStep(map[n]);
+    updProg(n);
+  }
+}
+
+// ── Progress ─────────────────────────────
+function updProg(n) {
+  for (let i = 1; i <= 4; i++) {
+    const d = $('dot'+i);
+    d.className = 'dot';
+    if (i < n)  d.classList.add('done');
+    if (i === n) d.classList.add('active');
+  }
+  for (let i = 1; i <= 3; i++) {
+    $('fill'+i).style.width = (i < n ? '100' : '0') + '%';
+  }
+}
+
+// ── Confirm ──────────────────────────────
+function showConfirm() {
+  $('cfN').textContent = ST.name;
+  $('cfG').textContent = GENDERS[ST.gender];
+  $('cfA').textContent = ST.age + ' лет';
+  $('cfC').textContent = CITIES[ST.city];
+  showStep('sC');
+  updProg(4);
+}
+
+// ── Gender ───────────────────────────────
+function pickGender(g) {
+  ST.gender = g;
+  $('gM').className = 'g-opt' + (g===0?' sel':'');
+  $('gF').className = 'g-opt' + (g===1?' sel':'');
+}
+
+// ── Age ──────────────────────────────────
+function checkAge() {
+  const v = parseInt($('ageIn').value, 10);
+  if (isNaN(v) || v < 16 || v > 99) {
+    $('ageIn').classList.add('err');
+    $('ageErr').classList.add('show');
+    return;
+  }
+  ST.age = v;
+  go(4);
+}
+function clearE() {
+  $('ageIn').classList.remove('err');
+  $('ageErr').classList.remove('show');
+}
+
+// ── City ─────────────────────────────────
+function pickCity(i) {
+  ST.city = i;
+  for (let k = 0; k < 5; k++)
+    $('c'+k).className = 'c-opt' + (k===i?' sel':'');
+}
+
+// ── Issue ────────────────────────────────
+function issue() {
+  if (typeof mp !== 'undefined') {
+    mp.trigger('cef:passport:confirm', JSON.stringify({
+      gender: ST.gender, age: ST.age, city: ST.city
+    }));
+  } else {
+    console.log('[Passport]', ST);
+  }
+  showStep('sS');
+  // Прогресс: все выполнены
+  for (let i=1;i<=4;i++) { $('dot'+i).className='dot done'; }
+  for (let i=1;i<=3;i++) { $('fill'+i).style.width='100%'; }
+}
+
+// ── Close ────────────────────────────────
+function closePanel() {
+  const ov = $('overlay');
+  ov.style.transition = 'opacity 160ms ease';
+  ov.style.opacity = '0';
+  setTimeout(() => {
+    ov.style.display = 'none';
+    if (typeof mp !== 'undefined') mp.trigger('cef:passport:close');
+  }, 170);
+}
+
+// ── Pawn API ─────────────────────────────
+function setPlayerName(n) { ST.name = n; }
+
+// ── Keyboard ─────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePanel();
+}, {passive:true});
+</script>
+</body>
+</html>
