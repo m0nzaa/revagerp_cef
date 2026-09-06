@@ -156,17 +156,15 @@ function updateButtons(engine, doors, belt, lights) {
 
 // ================================================================
 //  CEF-события от сервера
+//  В браузере SAMP-CEF события приходят через window.addEventListener
 // ================================================================
 
-// Показать HUD (браузер уже создан с видимым контентом,
-// но на случай если сервер прячет и снова показывает)
-cef_subscribe("speedo_show", function() {
+window.addEventListener("speedo_show", function() {
     $(".hud-speedometer").css("display", "block");
     $(".hud-speedomter-footer").css("display", "flex");
 });
 
-// Скрыть HUD — вызывается когда игрок вышел из машины
-cef_subscribe("speedo_hide", function() {
+window.addEventListener("speedo_hide", function() {
     $(".hud-speedometer").css("display", "none");
     $(".hud-speedomter-footer").css("display", "none");
     updateSpeed(0);
@@ -174,16 +172,17 @@ cef_subscribe("speedo_hide", function() {
     updateHP(0);
 });
 
-// Данные с сервера: speedo_data(speed, fuel, hp, engine, doors, belt, lights)
-cef_subscribe("speedo_data", function(speed, fuel, hp, engine, doors, belt, lights) {
-    updateSpeed(speed);
-    updateFuel(fuel);
-    updateHP(hp);
-    updateButtons(engine, doors, belt, lights);
+// speedo_data(speed, fuel, hp, engine, doors, belt, lights)
+window.addEventListener("speedo_data", function(e) {
+    var d = e.detail;
+    updateSpeed(d[0]);
+    updateFuel(d[1]);
+    updateHP(d[2]);
+    updateButtons(d[3], d[4], d[5], d[6]);
 });
 
-// Круиз-контроль (если сервер шлёт отдельным событием)
-cef_subscribe("speedo_cruise", function(state) {
+window.addEventListener("speedo_cruise", function(e) {
+    var state = e.detail[0];
     $("#cruise").attr("class", "hud-speedomter-footer-item cruise " + (state ? "on" : "off"));
 });
 </script>
