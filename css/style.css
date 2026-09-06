@@ -16,12 +16,12 @@ body {
 	white-space: nowrap;
 	font-family: 'Roboto', sans-serif;
 }
-body,
-html {
+body, html {
 	width: 100%;
 	height: 100%;
-	
 }
+
+/* ── Верхний правый блок (время, онлайн, id) ────────── */
 .hud-container {
 	position: absolute;
 	top: 3%;
@@ -37,6 +37,7 @@ html {
 	right: 30px;
 	top: -5px;
 	position: absolute;
+	filter: drop-shadow(0 0 8px rgba(212,170,60,0.4));
 }
 .server-container {
 	display: flex;
@@ -45,270 +46,328 @@ html {
 	position: absolute;
 	right: 130px;
 	top: 10px;
+	background: rgba(10,8,0,0.75);
+	border: 1px solid rgba(212,170,60,0.18);
+	border-radius: 10px;
+	padding: 6px 16px;
+	gap: 20px;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,170,60,0.1);
 }
 .server-time {
 	display: flex;
 	align-items: center;
 	position: relative;
-	left: -50%;
+	left: 0;
+	font-size: 12px;
+	color: rgba(255,255,255,0.75);
+}
+.server-time svg {
+	fill: rgba(212,170,60,0.8);
+	margin-right: 7px;
+}
+.server-time_count {
+	line-height: 1.4;
+	font-size: 11px;
+	color: rgba(255,255,255,0.65);
 }
 .multiplier-container {
 	display: flex;
 	align-items: center;
 	position: relative;
-	left: -80%;
+	left: 0;
 }
-.server-time svg {
-	fill: white;
-	position: relative;
-	margin-right: 10px;
+.multiplier {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
+	font-size: 13px;
+	font-weight: 700;
+	background: linear-gradient(135deg, #c8a84b, #e8c870);
+	color: #111;
+	box-shadow: 0 0 10px rgba(212,170,60,0.4);
 }
-
 .server-playerid {
 	display: flex;
 	align-items: center;
 	position: relative;
-	left: -20%;
+	left: 0;
+	font-size: 12px;
+	color: rgba(255,255,255,0.5);
 }
-#hud-container::after {
-	content: '';
-	position: absolute;
-	width: 2px;
-	height: 80%;
-	background-color: #fff;
-	right: 130px;
+.server-playerid span {
+	color: rgba(212,170,60,0.85);
+	margin-left: 3px;
+	font-weight: 700;
 }
 .server-online {
 	display: flex;
 	align-items: center;
 	position: relative;
-	left: -35%;
-	top: 15%;
+	left: 0;
+	top: 0;
+	font-size: 12px;
+	color: rgba(255,255,255,0.5);
+}
+.server-online svg {
+	fill: rgba(212,170,60,0.8);
+	margin-right: 6px;
+}
+.server-online_count {
+	color: rgba(212,170,60,0.85);
+	font-weight: 700;
+	margin-left: 2px;
+}
+#hud-container::after {
+	content: '';
+	position: absolute;
+	width: 1px;
+	height: 70%;
+	background: rgba(212,170,60,0.25);
+	right: 130px;
 }
 
-.server-online svg {
-	fill: white;
-	position: relative;
-	margin-right: 10px;
-}
-.weapon-container {
+/* ── Обёртка оружия + звёзды ─────────────────────────── */
+.weapon-wrap {
 	position: absolute;
 	top: 100px;
-	right: 20px;
+	right: 16px;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	border-radius: 10px;
-	width: 120px;
-	height: 70px;
-	background-color: transparent;
-	font-size: 20px;
-	background-image: linear-gradient(to right, #0072ff, #00c6ff);
-
-	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	gap: 8px;
 }
-.multiplier {
-	position: absolute;
+
+/* ── Оружие — круглый ────────────────────────────────── */
+.weapon-container {
+	position: relative;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	width: 82px;
+	height: 82px;
 	border-radius: 50%;
-	width: 35px;
-	height: 35px;
-	background-color: transparent;
-	font-size: 15px;
-	background-image: linear-gradient(to right, #0072ff, #00c6ff);
-
-	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	background: rgba(10,8,0,0.82);
+	border: 1px solid rgba(212,170,60,0.25);
+	box-shadow:
+		0 0 0 3px rgba(212,170,60,0.07),
+		0 6px 24px rgba(0,0,0,0.6),
+		inset 0 1px 0 rgba(212,170,60,0.12);
 }
 .weapon-container img {
-	width: 60px;
-	height: 60px;
+	width: 44px;
+	height: 44px;
+	filter: drop-shadow(0 0 5px rgba(212,170,60,0.3));
 }
+.weapon-ammo {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	font-size: 11px;
+	color: rgba(255,255,255,0.45);
+	margin-top: 2px;
+	line-height: 1;
+}
+#weapon {
+	font-size: 12px;
+	font-weight: 700;
+	color: rgba(212,170,60,0.9);
+}
+.ammo-sep {
+	color: rgba(255,255,255,0.25);
+	font-size: 10px;
+}
+#max-weapon {
+	font-size: 11px;
+	color: rgba(255,255,255,0.4);
+}
+
+/* ── Блок баров — без фона, компактный ───────────────── */
 .users-container {
 	position: absolute;
 	top: 80px;
 	right: 180px;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	border-radius: 5px;
-	width: 220px;
+	align-items: flex-end;
+	width: auto;
 	height: auto;
-	font-size: 20px;
-	padding: 10px;
+	padding: 0;
+	background: none;
+	border: none;
+	box-shadow: none;
+	gap: 2px;
 }
-
 .hud__contentbar {
 	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
-	justify-content: space-around;
-	align-items: center;
-	width: 20vh;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0;
+	width: auto;
 }
 .hud__bar_item {
-	color: white;
-	font-weight: 500;
 	display: flex;
-	justify-content: space-between;
 	flex-direction: row;
 	align-items: center;
-	padding: 0.95vh 1vh;
+	justify-content: flex-end;
+	gap: 8px;
+	padding: 3px 0;
 }
+/* Иконка справа от бара */
 .hud__bar_img {
-	width: 2vh;
-	height: 1.5vh;
+	width: 14px;
+	height: 14px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	align-content: center;
-	margin-left: 10px;
+	opacity: 0.75;
+	flex-shrink: 0;
 }
+.hud__bar_img img {
+	width: 14px;
+	height: 14px;
+	object-fit: contain;
+}
+
+/* Трек бара */
 .hud__nbar {
-	width: 19vh;
-	height: 1.2vh;
-	border-radius: 0.4vh;
-	background-color: rgba(0, 0, 0, 0.1);
+	width: 16vh;
+	height: 4px;
+	border-radius: 2px;
+	background: rgba(255,255,255,0.08);
 	position: relative;
 }
 
+/* HP */
 .hud__nbar .hp {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 0; left: 0;
 	height: 100%;
-	transition: 0.3s;
-	border-radius: 0.4vh;
-	background-color: rgba(255, 51, 51, 1);
+	transition: width 0.3s;
+	border-radius: 2px;
+	background: linear-gradient(90deg, #c0392b, #ff5555);
+	box-shadow: 0 0 6px rgba(255,60,60,0.6);
 }
+/* Броня */
 .hud__nbar .ap {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 0; left: 0;
 	height: 100%;
-	transition: 0.3s;
-	border-radius: 0.4vh;
-	background-color: #0171ff;
+	transition: width 0.3s;
+	border-radius: 2px;
+	background: linear-gradient(90deg, #0056cc, #4da6ff);
+	box-shadow: 0 0 6px rgba(77,166,255,0.5);
 }
+/* Еда */
 .hud__nbar .ep {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 0; left: 0;
 	height: 100%;
-	transition: 0.3s;
-	border-radius: 0.4vh;
-	background-color: #78be25;
+	transition: width 0.3s;
+	border-radius: 2px;
+	background: linear-gradient(90deg, #5a9e1a, #90e030);
+	box-shadow: 0 0 6px rgba(120,190,37,0.5);
 }
+/* Дыхание */
 .hud__nbar .vp {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 0; left: 0;
 	height: 100%;
-	transition: 0.3s;
-	border-radius: 0.4vh;
-	background-color: #ddff33;
-}
-.weapon-ammo {
-	position: absolute;
-	top: 190px;
-	right: 45px;
-}
-.info-player {
-	position: absolute;
-	top: 22vh;
-	margin-left: 15vw;
-}
-.user-money,
-.user-bank {
-	font-family: 'Roboto', sans-serif;
-	font-size: 1.8vw;
-	font-weight: bold;
-	display: flex;
-	align-items: center;
-}
-.user-money img,
-.user-bank img {
-	width: 2.5vh;
-	height: 4vh;
-	margin-left: 10px;
-	order: 2;
-}
-.user-bank {
-	margin-top: 20px;
+	transition: width 0.3s;
+	border-radius: 2px;
+	background: linear-gradient(90deg, #c8a84b, #f0d060);
+	box-shadow: 0 0 6px rgba(212,170,60,0.6);
 }
 
+/* ── Звёзды розыска — под кругом оружия ─────────────── */
 .stars-info {
-	position: relative;
-	margin-top: 10px;
-	margin-right: 10px;
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	justify-content: center;
+	filter: drop-shadow(0 1px 3px rgba(0,0,0,0.9));
+}
+.stars-info img.stars {
+	width: 12px;
+	height: 12px;
+	opacity: 0.2;
 }
 .stars-active {
 	filter: invert(33%) sepia(100%) saturate(2000%) hue-rotate(190deg)
 		brightness(90%) contrast(100%);
-}
-.help-panel {
-	position: absolute;
-	top: 50%;
-	left: 20px;
-	transform: translateY(-50%);
-	font-family: 'Roboto', sans-serif;
-	font-size: 14px;
-	color: #fff;
-	text-shadow: 1px 1px 4px #000;
+	opacity: 1 !important;
 }
 
-.help-line {
-	margin-top: 5px;
+/* ── Деньги — встроены в тот же блок ────────────────── */
+.info-player {
+	position: static;
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 4px;
+}
+.user-money,
+.user-bank {
+	font-family: 'Roboto', sans-serif;
+	font-size: 1.1vw;
+	font-weight: 700;
 	display: flex;
 	align-items: center;
+	gap: 5px;
+	text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+	color: rgba(212,170,60,0.9);
+}
+.user-money img,
+.user-bank img {
+	width: 1.4vh;
+	height: 1.8vh;
+	order: 2;
+	opacity: 0.8;
+	filter: drop-shadow(0 0 3px rgba(212,170,60,0.5));
+}
+.user-bank {
+	margin-top: 0;
+	color: rgba(255,255,255,0.4);
+	font-size: 0.95vw;
 }
 
-.help-line:first-child {
-	margin-top: 0px;
-}
+/* ── Подсказки и FPS — скрыты ────────────────────────── */
+.help-panel { display: none; }
+#fps        { display: none; }
 
-.help-key {
-	min-width: 20px;
-	padding: 2px 4px;
-	margin-right: 5px;
-	background: rgba(0, 0, 0, 0.4);
-	border-radius: 5px;
-	text-transform: uppercase;
-	text-align: center;
-}
-#bottomInfoPanel {
-	position: absolute;
-	display: flex;
-}
-.fps {
-	position: absolute;
-	display: flex;
-}
+/* ── Локация ─────────────────────────────────────────── */
 #location {
 	width: auto;
 	height: 1.8vw;
 	margin-top: 0.7vw;
 	display: flex;
-	background-color: rgba(0, 0, 0, 0.5);
+	background: rgba(10,8,0,0.75);
+	border: 1px solid rgba(212,170,60,0.15);
+	border-radius: 6px;
 	padding: 0.5vw;
 	align-items: center;
 	justify-content: space-around;
 	box-sizing: border-box;
 }
 #location .city {
-	font-family: Montserrat;
+	font-family: 'Roboto', sans-serif;
 	font-size: 0.8vw;
-	color: white;
+	color: rgba(212,170,60,0.9);
 	font-weight: 800;
 	margin-right: 0.8vw;
 }
 #location .address {
-	font-family: Montserrat;
+	font-family: 'Roboto', sans-serif;
 	font-size: 0.7vw;
 	font-weight: 600;
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255,255,255,0.4);
 }
+
+/* ── Машина ──────────────────────────────────────────── */
 .animateOpacityOn {
 	opacity: 0;
 	animation: open 1s;
@@ -334,30 +393,31 @@ html {
 	height: 17.7vw;
 	margin: 0 -2.3vw;
 	transform: rotate(0deg);
-	font-family: 'Roboto', sans-serif;
 }
 .car-hud .fuel {
 	width: 3.5vw;
 	height: 17.7vw;
 	margin: 0 -2.3vw;
 	transform: rotate(161deg);
-	font-family: 'Roboto', sans-serif;
 }
 .car-hud .speed-info {
 	margin: 0 0 -12.5vw 0;
-	font-family: 'Roboto', sans-serif;
 	font-weight: 500;
-	color: white;
+	color: rgba(212,170,60,0.9);
 }
 .car-hud .speed-info .info {
 	line-height: 1.8vw;
 }
 .car-hud .speed-info .info p:first-child {
 	font-size: 2.3vw;
+	font-weight: 700;
+	color: #fff;
+	text-shadow: 0 0 12px rgba(212,170,60,0.4);
 }
 .car-hud .speed-info .info p:last-child {
 	font-size: 0.8vw;
 	opacity: 0.4;
+	color: #fff;
 }
 .car-hud .speed-info .info-car {
 	display: flex;
@@ -384,16 +444,16 @@ html {
 	height: 1.6vw;
 	position: absolute;
 	bottom: 1.3vw;
+	filter: drop-shadow(0 0 4px rgba(212,170,60,0.3));
 }
 .car-hud .fuel-icon {
 	width: 1.8vw;
 	height: 1.8vw;
 	position: absolute;
 	bottom: 1vw;
+	filter: drop-shadow(0 0 4px rgba(212,170,60,0.3));
 }
 
 @keyframes open {
-	100% {
-		opacity: 1;
-	}
+	100% { opacity: 1; }
 }
