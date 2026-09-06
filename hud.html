@@ -37,13 +37,21 @@
 			</div>
 			<div class='server-playerid'>ID: <span id='playerid'>2</span></div>
 		</div>
-		<div class='weapon-container'>
-			<img id="ammo" src='./img/guns/24.png'>
-		</div>
-		<div class='weapon-ammo'>
-			<span id="weapon">60 </span>
-			<span>/</span>
-			<span id='max-weapon'>150</span>
+		<div class='weapon-wrap'>
+			<div class='weapon-container'>
+				<img id="ammo" src='./img/guns/24.png'>
+				<div class='weapon-ammo'>
+					<span id="weapon">60</span><span class="ammo-sep">/</span><span id='max-weapon'>150</span>
+				</div>
+			</div>
+			<div class='stars-info' id='star'>
+				<img id="w0" class='stars' src='./img/stars.svg'>
+				<img id="w1" class='stars' src='./img/stars.svg'>
+				<img id="w2" class='stars' src='./img/stars.svg'>
+				<img id="w3" class='stars' src='./img/stars.svg'>
+				<img id="w4" class='stars' src='./img/stars.svg'>
+				<img id="w5" class='stars' src='./img/stars.svg'>
+			</div>
 		</div>
 		<div class='users-container'>
 
@@ -73,14 +81,7 @@
 				<div class="hud__bar_img"><img src="./img/vp.svg" alt="" srcset=""></div>
 			</div>
 
-			<div id='star' class='stars-info'>
-				<img id="w0" class='stars' src='./img/stars.svg'>
-				<img id="w1" class='stars' src='./img/stars.svg'>
-				<img id="w2" class='stars' src='./img/stars.svg'>
-				<img id="w3" class='stars' src='./img/stars.svg'>
-				<img id="w4" class='stars' src='./img/stars.svg'>
-				<img id="w5" class='stars' src='./img/stars.svg'>
-			</div>
+
 
 
 
@@ -98,21 +99,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="help-panel">
-		<div class="help-line"><span class="help-key">ALT</span> Взаимодействие</div>
-		<div class="help-line"><span class="help-key">NUM6</span> Инвентарь</div>
-		<div class="help-line"><span class="help-key">B</span> Микрофон</div>
-		<div class="help-line"><span class="help-key">T</span> Чат</div>
-		<div class="help-line"><span class="help-key">C</span> Поднять предмет</div>
-		<div class="help-line"><span class="help-key">Y</span> Дать разрешение</div>
-		<div class="help-line"><span class="help-key">N</span> Отказать</div>
-		<div class="help-line"><span class="help-key">ALT+W</span> Включить фары</div>
-		<div class="help-line"><span class="help-key">2</span> Завести машину</div>
-		<div class="help-line"><span class="help-key">Q</span> <span class="help-key">E</span> Поворотники
-		</div>
-	</div>
-
-	<div id="fps" style="position: absolute; bottom: 1.05vw; left: 1vw;">30 FPS</div>
+	<div id="fps" style="display:none;">30 FPS</div>
 
 
 	<div id="speeds" style='display: none;' class="car-hud animateOpacityOn">
