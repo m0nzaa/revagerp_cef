@@ -527,8 +527,8 @@ function pickCity(i) {
 
 // ── Issue ────────────────────────────────
 function issue() {
-  if (typeof mp !== 'undefined') {
-    mp.trigger('cef:passport:confirm', JSON.stringify({
+  if (typeof cef !== 'undefined') {
+    cef.emit('passport_request', JSON.stringify({
       gender: ST.gender, age: ST.age, city: ST.city
     }));
   } else {
@@ -547,7 +547,7 @@ function closePanel() {
   ov.style.opacity = '0';
   setTimeout(() => {
     ov.style.display = 'none';
-    if (typeof mp !== 'undefined') mp.trigger('cef:passport:close');
+    if (typeof cef !== 'undefined') cef.emit('passport_closed');
   }, 170);
 }
 
