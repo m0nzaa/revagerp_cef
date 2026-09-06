@@ -6,16 +6,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}
-body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden;cursor:default}
+body{
+    background:#0a0800;
+    color:#e5e5e5;
+    min-height:100vh;
+    display:flex;
+    overflow:hidden;
+    cursor:default;
+}
+
+/* ── Фон: золотое свечение снизу-справа + шум через SVG ── */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+        radial-gradient(ellipse 80% 60% at 75% 100%, rgba(180,130,30,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 20% 0%,   rgba(180,130,30,0.07) 0%, transparent 65%),
+        linear-gradient(160deg, #0e0b00 0%, #090700 40%, #0a0800 100%);
+    z-index:0;
+    pointer-events:none;
+}
+/* тонкая золотая полоска снизу */
+body::after{
+    content:"";
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent 0%, rgba(212,170,60,0.5) 30%, rgba(212,170,60,0.7) 50%, rgba(212,170,60,0.5) 70%, transparent 100%);
+    z-index:0;
+    pointer-events:none;
+}
 
 .layout-left{width:75%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;padding-right:15vw}
 .layout-right{width:25%;height:100vh;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
-.layout-right img{height:95%;width:auto;object-fit:contain;display:block;transform:translateX(-180px);filter:drop-shadow(0 0 20px rgba(0,0,0,.5));position:relative;z-index:1;animation:slideInImage .8s cubic-bezier(.2,.8,.2,1) forwards;opacity:0}
-.layout-right::after{content:"";position:absolute;top:0;right:0;width:70%;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,.8));z-index:2;pointer-events:none;animation:fadeIn 1.2s ease-out forwards;opacity:0}
-.project-title{position:absolute;bottom:8%;left:0;width:100%;text-align:center;font-size:64px;font-weight:900;font-style:italic;color:#fff;text-transform:uppercase;letter-spacing:2px;z-index:10;text-shadow:0 0 20px rgba(0,0,0,.5);pointer-events:none;font-family:"Arial Black","Segoe UI Black",sans-serif;transform:translateX(-60px);animation:fadeInTitle 1s ease-out .3s forwards;opacity:0}
+.layout-right img{height:95%;width:auto;object-fit:contain;display:block;transform:translateX(-180px);filter:drop-shadow(0 0 30px rgba(180,130,20,0.25)) drop-shadow(0 0 8px rgba(0,0,0,0.8));position:relative;z-index:1;animation:slideInImage .8s cubic-bezier(.2,.8,.2,1) forwards;opacity:0}
+.layout-right::after{content:"";position:absolute;top:0;right:0;width:70%;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,0.85));z-index:2;pointer-events:none;animation:fadeIn 1.2s ease-out forwards;opacity:0}
+
+.project-title{
+    position:absolute;bottom:8%;left:0;width:100%;
+    text-align:center;font-size:64px;font-weight:900;font-style:italic;
+    text-transform:uppercase;letter-spacing:2px;z-index:10;
+    pointer-events:none;
+    font-family:"Arial Black","Segoe UI Black",sans-serif;
+    transform:translateX(-60px);
+    animation:fadeInTitle 1s ease-out .3s forwards;opacity:0;
+    /* золотой градиент на тексте */
+    background:linear-gradient(135deg, #c8a84b 0%, #f0d060 40%, #c8a84b 70%, #a07828 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    filter:drop-shadow(0 2px 12px rgba(180,130,20,0.4));
+}
 
 .auth-wrapper{width:100%;max-width:560px;padding:0 20px}
-.auth-card{background:#171717;border-radius:20px;padding:50px 70px;box-shadow:0 25px 60px rgba(0,0,0,.6);animation:cardEntrance .6s cubic-bezier(.2,.8,.2,1) forwards;opacity:0;transform:translateY(20px)}
+.auth-card{
+    background:rgba(14,11,2,0.92);
+    border-radius:20px;
+    padding:50px 70px;
+    border:1px solid rgba(212,170,60,0.15);
+    box-shadow:
+        0 0 0 1px rgba(212,170,60,0.06),
+        0 25px 60px rgba(0,0,0,.8),
+        inset 0 1px 0 rgba(212,170,60,0.1);
+    animation:cardEntrance .6s cubic-bezier(.2,.8,.2,1) forwards;
+    opacity:0;transform:translateY(20px);
+    position:relative;overflow:hidden;
+}
+/* золотая полоска сверху карточки */
+.auth-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,rgba(212,170,60,0.7) 30%,rgba(212,170,60,0.7) 70%,transparent);
+}
 
 @keyframes slideInImage{0%{transform:translateX(100px);opacity:0}100%{transform:translateX(-180px);opacity:1}}
 @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
@@ -24,31 +86,47 @@ body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden
 .auth-card.switching{animation:cardSwitch .2s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes cardSwitch{0%{opacity:1;transform:scale(1)}50%{opacity:0;transform:scale(.97)}100%{opacity:1;transform:scale(1)}}
 
-.tabs{display:flex;background:#212121;border-radius:10px;padding:4px;margin-bottom:32px;gap:4px}
+.tabs{display:flex;background:rgba(255,255,255,0.03);border:1px solid rgba(212,170,60,0.1);border-radius:10px;padding:4px;margin-bottom:32px;gap:4px}
 .tab{flex:1;height:40px;border-radius:7px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;color:#555;background:transparent;letter-spacing:.05em}
-.tab.active{background:#2e2e2e;color:#f1f1f1}
-.tab:hover:not(.active){color:#999}
+.tab.active{background:rgba(212,170,60,0.12);color:rgba(212,170,60,0.9);}
+.tab:hover:not(.active){color:#888}
 
-.auth-title{font-size:20px;line-height:1.5;color:#e0e0e0;margin-bottom:28px}
+.auth-title{font-size:20px;line-height:1.5;color:#d4aa3c;margin-bottom:28px;opacity:.9}
 .auth-title span{display:block;font-size:14px;color:#555;margin-top:6px}
 
 .field{margin-bottom:16px}
-.field input{width:100%;height:52px;background:#212121;border-radius:8px;border:none;outline:none;padding:0 18px;font-size:15px;color:#f5f5f5;user-select:text;-webkit-user-select:text;cursor:text;transition:background .15s}
-.field input:focus{background:#262626}
-.field input::placeholder{color:#444}
+.field input{
+    width:100%;height:52px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(212,170,60,0.15);
+    border-radius:8px;border:1px solid rgba(212,170,60,0.12);
+    outline:none;padding:0 18px;font-size:15px;color:#f5f5f5;
+    user-select:text;-webkit-user-select:text;cursor:text;
+    transition:border-color .15s,background .15s;
+}
+.field input:focus{
+    background:rgba(212,170,60,0.05);
+    border-color:rgba(212,170,60,0.4);
+}
+.field input::placeholder{color:#3a3320}
 
-.error-msg{font-size:13px;color:#ff5555;min-height:18px;margin-bottom:10px;display:none;text-align:center}
+.error-msg{font-size:13px;color:#ff6666;min-height:18px;margin-bottom:10px;display:none;text-align:center}
 .error-msg.visible{display:block}
 
 .buttons-row{display:flex;gap:12px;margin-top:24px}
-.btn{flex:1;height:52px;border-radius:8px;border:none;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s,opacity .15s;display:flex;align-items:center;justify-content:center}
-.btn-primary{background:#333;color:#f1f1f1}
-.btn-secondary{background:#222;color:#777}
-.btn:hover{opacity:.85}
+.btn{flex:1;height:52px;border-radius:8px;border:none;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center}
+.btn:active{transform:scale(0.98)}
+.btn-primary{
+    background:linear-gradient(135deg,#c8a84b,#e8c870);
+    color:#111;font-weight:600;
+}
+.btn-primary:hover{opacity:.9}
+.btn-secondary{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#666}
+.btn-secondary:hover{background:rgba(255,255,255,0.07);color:#999}
 
-.forgot{margin-top:24px;text-align:center;font-size:13px;color:#444}
-.forgot a{margin-left:5px;color:#bbb;text-decoration:none;cursor:pointer}
-.forgot a:hover{text-decoration:underline}
+.forgot{margin-top:24px;text-align:center;font-size:13px;color:#3a3320}
+.forgot a{margin-left:5px;color:rgba(212,170,60,0.6);text-decoration:none;cursor:pointer}
+.forgot a:hover{color:rgba(212,170,60,0.9)}
 
 .page{display:none}
 .page.active{display:block}
@@ -122,7 +200,6 @@ body{background:#fff;color:#e5e5e5;min-height:100vh;display:flex;overflow:hidden
 </div>
 
 <script>
-// ── Переключение табов ────────────────────────────────────
 function switchTab(tab) {
     var card = document.getElementById('authCard');
     card.classList.add('switching');
@@ -149,14 +226,10 @@ function showError(id, text) {
     el.classList.add('visible');
 }
 
-// ── Сервер говорит какой режим ────────────────────────────
-// PAWN: cef_emit_event(playerid, "cef_init", CEFSTR("login"/"register"))
 cef.on('cef_init', function(mode) {
     switchTab(mode === 'login' ? 'login' : 'register');
 });
 
-// ── Ошибка с сервера ─────────────────────────────────────
-// PAWN: cef_emit_event(playerid, "cef_auth_error", CEFSTR("..."))
 cef.on('cef_auth_error', function(code) {
     var errors = {
         'err_mode':  'Ошибка режима. Переподключитесь.',
@@ -169,9 +242,6 @@ cef.on('cef_auth_error', function(code) {
     showError(isLogin ? 'login-error' : 'reg-error', errors[code] || code);
 });
 
-// ── Войти ─────────────────────────────────────────────────
-// PAWN: cef_subscribe("cef_auth_login", "CefAuth_OnLogin")
-// Параметры: password   (ник берёт сервер из PlayerName)
 function doLogin() {
     clearErrors();
     var pass = document.getElementById('login-pass').value;
@@ -180,9 +250,6 @@ function doLogin() {
     cef.emit('cef_auth_login', pass);
 }
 
-// ── Зарегистрироваться ────────────────────────────────────
-// PAWN: cef_subscribe("cef_auth_register", "CefAuth_OnRegister")
-// Параметры: password, gender   (ник берёт сервер из PlayerName)
 function doRegister() {
     clearErrors();
     var pass  = document.getElementById('reg-pass').value;
@@ -194,7 +261,6 @@ function doRegister() {
     cef.emit('cef_auth_register', pass, 'male');
 }
 
-// ── Enter ─────────────────────────────────────────────────
 document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
     if (document.getElementById('page-login').classList.contains('active')) doLogin();
