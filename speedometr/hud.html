@@ -8,11 +8,6 @@
     <link rel="stylesheet" href="css/speedometer.css">
     <link rel="stylesheet" href="css/hud_data.css">
     <link rel="stylesheet" href="css/other.css">
-
-    <style>
-        /* Видимость управляется через cef_emit_event("speedo_show" / "speedo_hide") */
-        /* В браузере (тест) — всё показывается сразу */
-    </style>
 </head>
 <body style="background-color: #0009;">
 
@@ -26,35 +21,35 @@
         <svg id="test" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
              width="27.5vh" height="22.4vh" viewBox="-4 -10 275 214" preserveAspectRatio="xMaxYMin meet">
 
-            <!-- Фоновая дуга движка/HP -->
+            <!-- Фон: HP/движок -->
             <path fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="0.6vh"
                   stroke-linecap="butt" stroke-linejoin="miter" opacity="0.4" fill="none"
                   d="M17.319,170.926 C-0.528,135.060 -1.246,92.839 15.164,56.462"></path>
-            <!-- Активная дуга движка/HP -->
+            <!-- Активная: HP/движок -->
             <path id="hud-engine" fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="1vh"
                   stroke-linecap="butt" stroke-linejoin="miter" opacity="1" fill="none"
                   d="M17.319,170.926 C-0.528,135.060 -1.246,92.839 15.164,56.462"
-                  style="stroke-dasharray: 118.296, 118.296; stroke-dashoffset: 118.296;"></path>
+                  style="stroke-dasharray:118.296,118.296;stroke-dashoffset:118.296;"></path>
 
-            <!-- Фоновая дуга топлива -->
+            <!-- Фон: топливо -->
             <path fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="0.6vh"
                   stroke-linecap="butt" stroke-linejoin="miter" opacity="0.4" fill="none"
                   d="M224.989,204.006 C276.978,152.089 276.978,67.914 224.989,15.997"></path>
-            <!-- Активная дуга топлива -->
+            <!-- Активная: топливо -->
             <path id="hud-fuel" fill-rule="evenodd" stroke="#fa6f71" stroke-width="1vh"
                   stroke-linecap="butt" stroke-linejoin="miter" opacity="1" fill="none"
                   d="M224.989,204.006 C276.978,152.089 276.978,67.914 224.989,15.997"
-                  style="stroke-dasharray: 208.907, 208.907; stroke-dashoffset: 208.907;"></path>
+                  style="stroke-dasharray:208.907,208.907;stroke-dashoffset:208.907;"></path>
 
-            <!-- Фоновая дуга спидометра -->
+            <!-- Фон: спидометр -->
             <path fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="0.6vh"
                   stroke-linecap="butt" stroke-linejoin="miter" opacity="0.4" fill="none"
                   d="M60.340,185.660 C18.553,143.874 18.553,76.126 60.340,34.340 C102.126,-7.447 169.874,-7.447 211.660,34.340 C253.446,76.126 253.446,143.874 211.660,185.660"></path>
-            <!-- Активная дуга спидометра -->
+            <!-- Активная: спидометр -->
             <path id="hud-speedometer" fill-rule="evenodd" stroke="rgb(255,232,19)" stroke-width="1vh"
                   stroke-linecap="butt" stroke-linejoin="miter" opacity="1" fill="none"
                   d="M60.340,185.660 C18.553,143.874 18.553,76.126 60.340,34.340 C102.126,-7.447 169.874,-7.447 211.660,34.340 C253.446,76.126 253.446,143.874 211.660,185.660"
-                  style="stroke-dasharray: 504.295, 504.295; stroke-dashoffset: 504.295;"></path>
+                  style="stroke-dasharray:504.295,504.295;stroke-dashoffset:504.295;"></path>
         </svg>
 
         <div class="hud-speed-text">
@@ -81,112 +76,8 @@
     </div>
 </div>
 
-<!-- jQuery -->
 <script src="js/jquery-3_2_1_min.js"></script>
+<script src="js/speedo.js"></script>
 
-<script>
-// ================================================================
-//  Константы длин SVG-дуг (из viewBox путей)
-// ================================================================
-var SPEEDO_LEN = 504.295;   // спидометр  — макс. км/ч = 280 (можно менять)
-var FUEL_LEN   = 208.907;   // топливо    — 0..100%
-var HP_LEN     = 118.296;   // здоровье   — 0..100%
-var SPEED_MAX  = 280;       // максимальная скорость на шкале
-
-// ================================================================
-//  Вспомогательная функция: считает stroke-dashoffset
-//  value  — текущее значение (0..max)
-//  max    — максимум шкалы
-//  len    — полная длина дуги
-//  Когда value=0   → offset=len   (дуга скрыта)
-//  Когда value=max → offset=0     (дуга заполнена)
-// ================================================================
-function calcOffset(value, max, len) {
-    var clamped = Math.max(0, Math.min(value, max));
-    return len - (len * clamped / max);
-}
-
-// ================================================================
-//  Обновление спидометра
-// ================================================================
-function updateSpeed(speed) {
-    var offset = calcOffset(speed, SPEED_MAX, SPEEDO_LEN);
-    $("#hud-speedometer").css({
-        "stroke-dasharray":  SPEEDO_LEN + ", " + SPEEDO_LEN,
-        "stroke-dashoffset": offset
-    });
-    $("#textspeed").text(speed);
-}
-
-// ================================================================
-//  Обновление топлива
-// ================================================================
-function updateFuel(fuel) {
-    var offset = calcOffset(fuel, 100, FUEL_LEN);
-    $("#hud-fuel").css({
-        "stroke-dasharray":  FUEL_LEN + ", " + FUEL_LEN,
-        "stroke-dashoffset": offset
-    });
-}
-
-// ================================================================
-//  Обновление HP / движка
-// ================================================================
-function updateHP(hp) {
-    var offset = calcOffset(hp, 100, HP_LEN);
-    $("#hud-engine").css({
-        "stroke-dasharray":  HP_LEN + ", " + HP_LEN,
-        "stroke-dashoffset": offset
-    });
-    $("#healproc").text(hp + "%");
-}
-
-// ================================================================
-//  Обновление кнопок статуса
-//  engine  — 1/0 (двигатель)
-//  doors   — 0=закрыты 1=открыты  (GetVehicleParamsEx)
-//  belt    — 1/0 (ремень)
-//  lights  — 1/0 (фары)
-// ================================================================
-function updateButtons(engine, doors, belt, lights) {
-    // Круиз-контроль — управляется отдельным событием, здесь не трогаем
-    $("#eng").attr("class",  "hud-speedomter-footer-item ctrl "  + (engine ? "on" : "off"));
-    $("#door").attr("class", "hud-speedomter-footer-item door "  + (doors  ? "on" : "off"));
-}
-
-// ================================================================
-//  CEF-события от сервера
-//  В браузере SAMP-CEF события приходят через window.addEventListener
-// ================================================================
-
-window.addEventListener("speedo_show", function() {
-    $(".hud-speedometer").css("display", "block");
-    $(".hud-speedomter-footer").css("display", "flex");
-});
-
-window.addEventListener("speedo_hide", function() {
-    $(".hud-speedometer").css("display", "none");
-    $(".hud-speedomter-footer").css("display", "none");
-    updateSpeed(0);
-    updateFuel(0);
-    updateHP(0);
-});
-
-// speedo_data(speed, fuel, hp, engine, doors, belt, lights)
-window.addEventListener("speedo_data", function(e) {
-    var d = e.detail;
-    updateSpeed(d[0]);
-    updateFuel(d[1]);
-    updateHP(d[2]);
-    updateButtons(d[3], d[4], d[5], d[6]);
-});
-
-window.addEventListener("speedo_cruise", function(e) {
-    var state = e.detail[0];
-    $("#cruise").attr("class", "hud-speedomter-footer-item cruise " + (state ? "on" : "off"));
-});
-</script>
-
-<script src="https://kit.fontawesome.com/c552bfdf6a.js" crossorigin="anonymous"></script>
 </body>
 </html>
