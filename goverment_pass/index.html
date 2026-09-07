@@ -399,6 +399,7 @@ input.err   { border-color:var(--error); }
       <div class="lbl">Проверьте данные</div>
       <div class="ttl">Всё верно?</div>
       <div class="dsc">После подтверждения паспорт будет выдан, средства спишутся.</div>
+      <div id="cfErr" style="display:none; margin-bottom:14px; padding:10px 14px; border-radius:8px; background:#fdecea; border:1px solid var(--error); color:var(--error); font-size:14px; font-weight:600;"></div>
       <div class="cf-list">
         <div class="cf-row"><span class="cf-k">Имя</span>    <span class="cf-v" id="cfN">—</span></div>
         <div class="cf-row"><span class="cf-k">Пол</span>    <span class="cf-v" id="cfG">—</span></div>
@@ -528,6 +529,8 @@ function pickCity(i) {
 // ── Issue ────────────────────────────────
 function issue() {
   console.log('[Passport][DEBUG] issue() called, typeof cef =', typeof cef);
+  var err = $('cfErr');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
   if (typeof cef !== 'undefined') {
     // Блокируем кнопку, чтобы не отправить дважды
     const btn = document.querySelector('#sC .btn-p');
@@ -582,22 +585,42 @@ if (typeof cef !== 'undefined') {
   // Сервер подтвердил выдачу — показываем экран успеха
   cef.on('passport_issued', function(json) {
     console.log('[Passport][DEBUG] passport_issued received:', json);
+    $('sS').querySelector('.suc-title').textContent = 'Паспорт выдан!';
+    $('sS').querySelector('.suc-desc').innerHTML = 'Документ оформлен и внесён в реестр граждан.<br>Добро пожаловать!';
     showStep('sS');
     for (var i = 1; i <= 4; i++) $('dot'+i).className = 'dot done';
     for (var i = 1; i <= 3; i++) $('fill'+i).style.width = '100%';
   });
 
-  // Сервер вернул ошибку — показываем alert и возвращаем на подтверждение
+  // Сервер вернул ошибку.
+  // native alert() не рендерится в offscreen CEF-браузере — используем
+  // inline-баннер на шаге подтверждения. Если ошибка — "уже есть паспорт",
+  // сразу показываем экран успеха с соответствующим текстом (по просьбе:
+  // это не должно выглядеть как сбой, а как штатное продолжение).
   cef.on('passport_error', function(json) {
     console.log('[Passport][DEBUG] passport_error received:', json);
+    var msg = 'Ошибка оформления паспорта';
     try {
       var data = JSON.parse(json);
-      alert(data.msg || 'Ошибка оформления паспорта');
-    } catch(e) { alert('Ошибка оформления паспорта'); }
-    // Кнопка была заблокирована в issue() — без разблокировки
-    // форма выглядит "зависшей" на "Оформляем..." навсегда.
+      if (data && data.msg) msg = data.msg;
+    } catch(e) {}
+
+    // Кнопка была заблокирована в issue() — возвращаем в исходное состояние.
     var btn = document.querySelector('#sC .btn-p');
     if (btn) { btn.disabled = false; btn.textContent = 'Оформить паспорт'; }
+
+    var already = /уже есть паспорт/i.test(msg);
+    if (already) {
+      $('sS').querySelector('.suc-title').textContent = 'Паспорт уже оформлен';
+      $('sS').querySelector('.suc-desc').innerHTML = 'У вас уже есть паспорт гражданина.<br>Повторная выдача не требуется.';
+      showStep('sS');
+      for (var i = 1; i <= 4; i++) $('dot'+i).className = 'dot done';
+      for (var i = 1; i <= 3; i++) $('fill'+i).style.width = '100%';
+      return;
+    }
+
+    var err = $('cfErr');
+    if (err) { err.textContent = msg; err.style.display = 'block'; }
     showStep('sC');
     updProg(4);
   });
