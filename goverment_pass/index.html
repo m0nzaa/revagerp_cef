@@ -527,14 +527,15 @@ function pickCity(i) {
 
 // ── Issue ────────────────────────────────
 function issue() {
+  console.log('[Passport][DEBUG] issue() called, typeof cef =', typeof cef);
   if (typeof cef !== 'undefined') {
     // Блокируем кнопку, чтобы не отправить дважды
     const btn = document.querySelector('#sC .btn-p');
     if (btn) { btn.disabled = true; btn.textContent = 'Оформляем...'; }
 
-    cef.emit('passport_request', JSON.stringify({
-      gender: ST.gender, age: ST.age, city: ST.city
-    }));
+    var payload = JSON.stringify({ gender: ST.gender, age: ST.age, city: ST.city });
+    console.log('[Passport][DEBUG] emitting passport_request with payload:', payload);
+    cef.emit('passport_request', payload);
     // Экран успеха покажет cef.on('passport_issued', ...)
     // Ошибку покажет cef.on('passport_error', ...) и вернёт на подтверждение
   } else {
@@ -566,7 +567,9 @@ document.addEventListener('keydown', e => {
 }, {passive:true});
 
 // ── CEF-события от сервера ───────────────
+console.log('[Passport][DEBUG] page loaded, typeof cef at subscribe-time =', typeof cef);
 if (typeof cef !== 'undefined') {
+  console.log('[Passport][DEBUG] subscribing to passport_show / passport_issued / passport_error');
 
   // Сервер прислал данные игрока — подставляем имя
   cef.on('passport_show', function(json) {
@@ -578,6 +581,7 @@ if (typeof cef !== 'undefined') {
 
   // Сервер подтвердил выдачу — показываем экран успеха
   cef.on('passport_issued', function(json) {
+    console.log('[Passport][DEBUG] passport_issued received:', json);
     showStep('sS');
     for (var i = 1; i <= 4; i++) $('dot'+i).className = 'dot done';
     for (var i = 1; i <= 3; i++) $('fill'+i).style.width = '100%';
@@ -585,6 +589,7 @@ if (typeof cef !== 'undefined') {
 
   // Сервер вернул ошибку — показываем alert и возвращаем на подтверждение
   cef.on('passport_error', function(json) {
+    console.log('[Passport][DEBUG] passport_error received:', json);
     try {
       var data = JSON.parse(json);
       alert(data.msg || 'Ошибка оформления паспорта');
