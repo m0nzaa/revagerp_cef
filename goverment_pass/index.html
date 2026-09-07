@@ -589,6 +589,10 @@ if (typeof cef !== 'undefined') {
       var data = JSON.parse(json);
       alert(data.msg || 'Ошибка оформления паспорта');
     } catch(e) { alert('Ошибка оформления паспорта'); }
+    // Кнопка была заблокирована в issue() — без разблокировки
+    // форма выглядит "зависшей" на "Оформляем..." навсегда.
+    var btn = document.querySelector('#sC .btn-p');
+    if (btn) { btn.disabled = false; btn.textContent = 'Оформить паспорт'; }
     showStep('sC');
     updProg(4);
   });
