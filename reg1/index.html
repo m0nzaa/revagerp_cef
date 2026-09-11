@@ -361,6 +361,7 @@ if (typeof cef !== 'undefined') {
     });
 
     cef.on('cef_auth_error', function(code) {
+        authSubmitting = false;
         var errors = {
             'err_mode':  'Ошибка режима. Переподключитесь.',
             'err_empty': 'Введите пароль.',
@@ -379,15 +380,20 @@ if (typeof cef !== 'undefined') {
     });
 }
 
+var authSubmitting = false;
+
 function doLogin() {
+    if (authSubmitting) return;
     clearErrors();
     var pass = document.getElementById('login-pass').value;
     if (!pass) { showError('login-error', 'Введите пароль.'); return; }
     if (pass.length < 6) { showError('login-error', 'Минимум 6 символов.'); return; }
+    authSubmitting = true;
     if (typeof cef !== 'undefined') cef.emit('cef_auth_login', pass);
 }
 
 function doRegister() {
+    if (authSubmitting) return;
     clearErrors();
     var pass  = document.getElementById('reg-pass').value;
     var pass2 = document.getElementById('reg-pass2').value;
@@ -395,11 +401,13 @@ function doRegister() {
     if (pass.length < 6) { showError('reg-error', 'Минимум 6 символов.'); return; }
     if (pass.length > 32){ showError('reg-error', 'Максимум 32 символа.'); return; }
     if (pass !== pass2)  { showError('reg-error', 'Пароли не совпадают.'); return; }
+    authSubmitting = true;
     if (typeof cef !== 'undefined') cef.emit('cef_auth_register', pass, 'male');
 }
 
 document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
+    if (e.repeat) return; // игнорируем автоповтор при зажатой клавише
     if (document.getElementById('page-login').classList.contains('active')) doLogin();
     else if (document.getElementById('page-register').classList.contains('active')) doRegister();
 });
