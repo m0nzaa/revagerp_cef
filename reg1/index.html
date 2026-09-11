@@ -15,7 +15,6 @@ body{
     cursor:default;
 }
 
-/* ── Фон: золотое свечение снизу-справа + шум через SVG ── */
 body::before{
     content:"";
     position:fixed;
@@ -27,7 +26,6 @@ body::before{
     z-index:0;
     pointer-events:none;
 }
-/* тонкая золотая полоска снизу */
 body::after{
     content:"";
     position:fixed;
@@ -51,7 +49,6 @@ body::after{
     font-family:"Arial Black","Segoe UI Black",sans-serif;
     transform:translateX(-60px);
     animation:fadeInTitle 1s ease-out .3s forwards;opacity:0;
-    /* золотой градиент на тексте */
     background:linear-gradient(135deg, #c8a84b 0%, #f0d060 40%, #c8a84b 70%, #a07828 100%);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
@@ -73,7 +70,6 @@ body::after{
     opacity:0;transform:translateY(20px);
     position:relative;overflow:hidden;
 }
-/* золотая полоска сверху карточки */
 .auth-card::before{
     content:"";position:absolute;top:0;left:0;right:0;height:2px;
     background:linear-gradient(90deg,transparent,rgba(212,170,60,0.7) 30%,rgba(212,170,60,0.7) 70%,transparent);
@@ -91,8 +87,10 @@ body::after{
 .tab.active{background:rgba(212,170,60,0.12);color:rgba(212,170,60,0.9);}
 .tab:hover:not(.active){color:#888}
 
-.auth-title{font-size:20px;line-height:1.5;color:#d4aa3c;margin-bottom:28px;opacity:.9}
+.auth-title{font-size:20px;line-height:1.5;color:#d4aa3c;margin-bottom:6px;opacity:.9}
+.auth-title.spaced{margin-bottom:28px}
 .auth-title span{display:block;font-size:14px;color:#555;margin-top:6px}
+.auth-subtitle{font-size:14px;color:#555;margin-bottom:28px}
 
 .field{margin-bottom:16px}
 .field input{
@@ -116,11 +114,12 @@ body::after{
 .buttons-row{display:flex;gap:12px;margin-top:24px}
 .btn{flex:1;height:52px;border-radius:8px;border:none;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center}
 .btn:active{transform:scale(0.98)}
+.btn:disabled{opacity:.35;cursor:default}
 .btn-primary{
     background:linear-gradient(135deg,#c8a84b,#e8c870);
     color:#111;font-weight:600;
 }
-.btn-primary:hover{opacity:.9}
+.btn-primary:hover:not(:disabled){opacity:.9}
 .btn-secondary{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#666}
 .btn-secondary:hover{background:rgba(255,255,255,0.07);color:#999}
 
@@ -130,6 +129,40 @@ body::after{
 
 .page{display:none}
 .page.active{display:block}
+
+/* ── Выбор пола ── */
+.gender-row{display:flex;gap:16px;margin-bottom:8px}
+.gender-card{
+    flex:1;height:140px;border-radius:12px;
+    border:1px solid rgba(212,170,60,0.15);
+    background:rgba(255,255,255,0.03);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    cursor:pointer;transition:border-color .15s,background .15s,transform .1s;
+}
+.gender-card:hover{background:rgba(212,170,60,0.06);border-color:rgba(212,170,60,0.3)}
+.gender-card:active{transform:scale(.98)}
+.gender-card.selected{background:rgba(212,170,60,0.12);border-color:rgba(212,170,60,0.6)}
+.gender-icon{font-size:38px;color:rgba(212,170,60,0.8)}
+.gender-label{font-size:14px;font-weight:600;color:#e5e5e5}
+
+/* ── Выбор скина ── */
+.skin-grid{
+    display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;
+    max-height:280px;overflow-y:auto;margin-bottom:8px;padding-right:4px;
+}
+.skin-grid::-webkit-scrollbar{width:4px}
+.skin-grid::-webkit-scrollbar-thumb{border-radius:10px;background:rgba(212,170,60,0.3)}
+.skin-card{
+    padding:16px;border-radius:10px;
+    border:1px solid rgba(212,170,60,0.12);
+    background:rgba(255,255,255,0.03);
+    cursor:pointer;font-size:13px;color:#ccc;
+    transition:border-color .15s,background .15s,transform .1s;
+    text-align:left;
+}
+.skin-card:hover{background:rgba(212,170,60,0.06);border-color:rgba(212,170,60,0.3)}
+.skin-card:active{transform:scale(.98)}
+.skin-card.selected{background:rgba(212,170,60,0.12);border-color:rgba(212,170,60,0.6);color:#f0d060}
 
 @media(min-width:1921px){.auth-wrapper{transform:scale(1.15)}.project-title{font-size:80px}}
 @media(max-height:800px){.auth-wrapper{transform:scale(.88)}}
@@ -143,14 +176,15 @@ body::after{
     <div class="auth-wrapper">
         <div class="auth-card" id="authCard">
 
-            <div class="tabs">
+            <!-- Вкладки видны только на этапе логина/регистрации -->
+            <div class="tabs" id="tabsRow">
                 <button class="tab active" id="tab-login"    onclick="switchTab('login')">Войти</button>
                 <button class="tab"        id="tab-register" onclick="switchTab('register')">Регистрация</button>
             </div>
 
             <!-- ЛОГИН -->
             <div class="page active" id="page-login">
-                <div class="auth-title">
+                <div class="auth-title spaced">
                     Добро пожаловать.
                     <span>Войдите под своим аккаунтом.</span>
                 </div>
@@ -170,7 +204,7 @@ body::after{
 
             <!-- РЕГИСТРАЦИЯ -->
             <div class="page" id="page-register">
-                <div class="auth-title">
+                <div class="auth-title spaced">
                     Новый аккаунт.
                     <span>Придумайте никнейм и пароль.</span>
                 </div>
@@ -190,6 +224,36 @@ body::after{
                 </div>
             </div>
 
+            <!-- ШАГ 3 (после успешной регистрации): ПОЛ -->
+            <div class="page" id="page-gender">
+                <div class="auth-title">Создание персонажа.</div>
+                <div class="auth-subtitle">Выберите пол вашего персонажа.</div>
+                <div class="gender-row">
+                    <div class="gender-card" id="g-male" onclick="pickGender(1)">
+                        <div class="gender-icon">♂</div>
+                        <div class="gender-label">Мужской</div>
+                    </div>
+                    <div class="gender-card" id="g-female" onclick="pickGender(0)">
+                        <div class="gender-icon">♀</div>
+                        <div class="gender-label">Женский</div>
+                    </div>
+                </div>
+                <div class="buttons-row">
+                    <button class="btn btn-primary" id="genderNext" onclick="goToSkin()" disabled>Далее →</button>
+                </div>
+            </div>
+
+            <!-- ШАГ 4: СКИН -->
+            <div class="page" id="page-skin">
+                <div class="auth-title">Внешность.</div>
+                <div class="auth-subtitle">Выберите стартовый образ персонажа.</div>
+                <div class="skin-grid" id="skinGrid"></div>
+                <div class="buttons-row">
+                    <button class="btn btn-secondary" onclick="switchTab('gender')">← Назад</button>
+                    <button class="btn btn-primary" id="skinConfirm" onclick="confirmSelection()" disabled>Начать игру</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -200,14 +264,32 @@ body::after{
 </div>
 
 <script>
+var ST = { gender: null, skinIndex: null };
+
+// Соответствуют g_MaleBumSkins / g_FemaleBumSkins в auth.inc —
+// индекс в списке = listitem, который сервер применяет к нужному массиву.
+var SKIN_NAMES = {
+    1: ['Бомж (белый) 1','Бомж (белый) 2','Бомж (чёрный) 1','Бомж (чёрный) 2','Бомж (белый) 3',
+        'Бомж (чёрный), молодой','Бомж (белый) 4','Бомж, потрёпанный 1','Бомж, потрёпанный 2','Бомж (белый) 5'],
+    0: ['Бедная девушка (чёрная)','Бедная девушка (латина)','Бедная девушка (белая)','Бедная девушка (др.)']
+};
+
+var ALL_PAGES = ['login','register','gender','skin'];
+
 function switchTab(tab) {
     var card = document.getElementById('authCard');
     card.classList.add('switching');
     setTimeout(function() {
-        ['login','register'].forEach(function(t) {
+        ALL_PAGES.forEach(function(t) {
             document.getElementById('page-' + t).classList.toggle('active', t === tab);
-            document.getElementById('tab-'  + t).classList.toggle('active', t === tab);
         });
+        // Вкладки "Войти/Регистрация" показываем только на первых двух шагах
+        document.getElementById('tabsRow').style.display =
+            (tab === 'login' || tab === 'register') ? 'flex' : 'none';
+        if (tab === 'login' || tab === 'register') {
+            document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+            document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+        }
         clearErrors();
         card.classList.remove('switching');
     }, 100);
@@ -226,28 +308,83 @@ function showError(id, text) {
     el.classList.add('visible');
 }
 
-cef.on('cef_init', function(mode) {
-    switchTab(mode === 'login' ? 'login' : 'register');
-});
+// ── Пол / скин ───────────────
+function pickGender(g) {
+    ST.gender = g;
+    document.getElementById('g-male').classList.toggle('selected', g === 1);
+    document.getElementById('g-female').classList.toggle('selected', g === 0);
+    document.getElementById('genderNext').disabled = false;
+}
 
-cef.on('cef_auth_error', function(code) {
-    var errors = {
-        'err_mode':  'Ошибка режима. Переподключитесь.',
-        'err_empty': 'Введите пароль.',
-        'err_short': 'Пароль слишком короткий (минимум 6 символов).',
-        'err_long':  'Пароль слишком длинный (максимум 32 символа).',
-        'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
-    };
-    var isLogin = document.getElementById('page-login').classList.contains('active');
-    showError(isLogin ? 'login-error' : 'reg-error', errors[code] || code);
-});
+function goToSkin() {
+    if (ST.gender === null) return;
+    renderSkins();
+    switchTab('skin');
+}
+
+function renderSkins() {
+    var grid = document.getElementById('skinGrid');
+    grid.innerHTML = '';
+    ST.skinIndex = null;
+    document.getElementById('skinConfirm').disabled = true;
+
+    var names = SKIN_NAMES[ST.gender] || [];
+    names.forEach(function(name, i) {
+        var el = document.createElement('div');
+        el.className = 'skin-card';
+        el.textContent = name;
+        el.onclick = function() {
+            ST.skinIndex = i;
+            document.querySelectorAll('.skin-card').forEach(function(c) { c.classList.remove('selected'); });
+            el.classList.add('selected');
+            document.getElementById('skinConfirm').disabled = false;
+        };
+        grid.appendChild(el);
+    });
+}
+
+function confirmSelection() {
+    if (ST.gender === null || ST.skinIndex === null) return;
+    var btn = document.getElementById('skinConfirm');
+    btn.disabled = true;
+    btn.textContent = 'Загрузка...';
+    if (typeof cef !== 'undefined') {
+        // arguments = "<gender 0|1> <skinIndex>", разделитель — пробел
+        cef.emit('cef_character_select', ST.gender + ' ' + ST.skinIndex);
+    }
+}
+
+// ── CEF-события от сервера ───────────────
+if (typeof cef !== 'undefined') {
+    cef.on('cef_init', function(mode) {
+        switchTab(mode === 'login' ? 'login' : 'register');
+    });
+
+    cef.on('cef_auth_error', function(code) {
+        var errors = {
+            'err_mode':  'Ошибка режима. Переподключитесь.',
+            'err_empty': 'Введите пароль.',
+            'err_short': 'Пароль слишком короткий (минимум 6 символов).',
+            'err_long':  'Пароль слишком длинный (максимум 32 символа).',
+            'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
+        };
+        var isLogin = document.getElementById('page-login').classList.contains('active');
+        showError(isLogin ? 'login-error' : 'reg-error', errors[code] || code);
+    });
+
+    // Регистрация прошла успешно — плавно переходим к выбору персонажа
+    // ВНУТРИ ТОГО ЖЕ браузера, без пересоздания CEF-окна.
+    cef.on('cef_show_skin_select', function() {
+        switchTab('gender');
+    });
+}
 
 function doLogin() {
     clearErrors();
     var pass = document.getElementById('login-pass').value;
     if (!pass) { showError('login-error', 'Введите пароль.'); return; }
     if (pass.length < 6) { showError('login-error', 'Минимум 6 символов.'); return; }
-    cef.emit('cef_auth_login', pass);
+    if (typeof cef !== 'undefined') cef.emit('cef_auth_login', pass);
 }
 
 function doRegister() {
@@ -258,13 +395,13 @@ function doRegister() {
     if (pass.length < 6) { showError('reg-error', 'Минимум 6 символов.'); return; }
     if (pass.length > 32){ showError('reg-error', 'Максимум 32 символа.'); return; }
     if (pass !== pass2)  { showError('reg-error', 'Пароли не совпадают.'); return; }
-    cef.emit('cef_auth_register', pass, 'male');
+    if (typeof cef !== 'undefined') cef.emit('cef_auth_register', pass, 'male');
 }
 
 document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
     if (document.getElementById('page-login').classList.contains('active')) doLogin();
-    else doRegister();
+    else if (document.getElementById('page-register').classList.contains('active')) doRegister();
 });
 </script>
 
