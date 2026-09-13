@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Мой транспорт</title>
+<style>
+  :root{
+    --bg-0: rgba(14,15,17,.72);
+    --bg-1: rgba(22,23,26,.86);
+    --bg-2: rgba(30,31,35,.92);
+    --line: rgba(255,255,255,.07);
+    --line-soft: rgba(255,255,255,.045);
+    --text-0: #f2f2f3;
+    --text-1: #b8b9bd;
+    --text-2: #7d7e84;
+    --accent: #29d6c8;
+    --accent-dim: rgba(41,214,200,.14);
+    --danger: #e0546a;
+    --danger-dim: rgba(224,84,106,.14);
+    --green: #33c26b;
+    --gold: #e0a92b;
+    --blue: #3d8bf0;
+    --radius: 0px;
+    --radius-sm: 3px;
+    font-size: 16px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:transparent;
+    font-family:"Segoe UI","PT Sans","Arial",sans-serif;
+    color:var(--text-0);
+    -webkit-font-smoothing:antialiased;
+    user-select:none;
+    overflow:hidden;
+  }
+  ::-webkit-scrollbar{ width:6px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.14); border-radius:6px; }
+
+  #app{
+    position:fixed; inset:0;
+    display:none;
+  }
+  #app.visible{ display:block; }
+
+  /* subtle left-edge falloff so the panel doesn't look like a hard cut over the game view */
+  .backdrop{
+    position:absolute; top:0; right:44%; bottom:0; left:0;
+    min-width:0;
+    background:linear-gradient(90deg, transparent 85%, rgba(0,0,0,.25));
+    pointer-events:none;
+  }
+
+  .panel{
+    position:absolute;
+    top:0; right:0;
+    width:44%;
+    min-width:560px;
+    height:100%;
+    background:linear-gradient(180deg, var(--bg-1), var(--bg-0));
+    border-left:1px solid var(--line);
+    box-shadow:-40px 0 70px rgba(0,0,0,.45);
+    backdrop-filter: blur(22px);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .panel::before{
+    content:"";
+    position:absolute; top:0; left:0; bottom:0; width:3px;
+    background:linear-gradient(180deg, var(--accent), transparent 60%);
+    opacity:.8;
+  }
+  .panel::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:220px;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.015) 0 1px, transparent 1px 26px),
+      linear-gradient(0deg, rgba(41,214,200,.04), transparent);
+    pointer-events:none;
+  }
+
+  /* ---------- Header ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+    flex:0 0 auto;
+  }
+  .icon-btn{
+    width:34px; height:34px;
+    border-radius:9px;
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color:var(--text-1);
+    flex:0 0 auto;
+    transition:background .12s ease, color .12s ease;
+  }
+  .icon-btn:hover{ background:rgba(255,255,255,.11); color:var(--text-0); }
+  .icon-btn svg{ width:16px; height:16px; }
+
+  .title-block{ display:flex; flex-direction:column; gap:2px; flex:1 1 auto; min-width:0; }
+  .title-block h1{
+    margin:0; font-size:19px; font-weight:700; letter-spacing:.2px; color:var(--text-0);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .title-block .sub{ font-size:12.5px; color:var(--text-2); }
+  .title-block .sub b{ color:var(--text-1); font-weight:600; }
+
+  .esc-pill{
+    display:flex; align-items:center; gap:8px;
+    padding:0 6px 0 12px;
+    height:34px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:rgba(255,255,255,.04);
+    color:var(--text-1);
+    font-size:12.5px;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  .esc-pill .key{
+    background:#fff; color:#111; font-weight:700; font-size:11.5px;
+    padding:5px 8px; border-radius:6px;
+  }
+  .esc-pill:hover{ color:var(--text-0); }
+
+  /* ---------- List screen ---------- */
+  .body-scroll{
+    overflow-y:auto;
+    padding:16px 20px 20px;
+    display:flex; flex-direction:column; gap:12px;
+    flex:1 1 auto;
+  }
+
+  .car-card{
+    position:relative;
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-left:2px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:15px 16px 16px;
+    cursor:pointer;
+    overflow:hidden;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .car-card:hover{ border-color:rgba(255,255,255,.16); border-left-color:var(--accent); background:rgba(255,255,255,.035); }
+  .car-card.impounded{ opacity:.6; }
+  .car-card.impounded:hover{ border-left-color:var(--danger); }
+
+  .car-card-top{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    min-height:32px;
+  }
+  .car-card-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .car-card-head h3{
+    margin:0; font-size:17px; font-weight:700; letter-spacing:.2px;
+  }
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:600;
+    padding:3px 8px 3px 6px;
+    border-radius:3px;
+  }
+  .status-pill .dot{ width:5px; height:5px; border-radius:50%; }
+  .status-pill.online{ color:#7fe3a4; background:rgba(51,194,107,.12); }
+  .status-pill.online .dot{ background:var(--green); }
+  .status-pill.impound{ color:#f1899a; background:rgba(224,84,106,.12); }
+  .status-pill.impound .dot{ background:var(--danger); }
+
+  .car-thumb{
+    width:96px; height:56px;
+    object-fit:contain;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));
+    flex:0 0 auto;
+  }
+
+  .badges{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .impound-note{
+    margin-top:10px; padding-top:10px;
+    border-top:1px solid var(--line-soft);
+    font-size:12px; color:var(--text-2);
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    height:26px; padding:0 10px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--line-soft);
+    border-radius:7px;
+    font-size:12.5px; color:var(--text-1);
+    white-space:nowrap;
+  }
+  .badge svg{ width:13px; height:13px; opacity:.75; flex:0 0 auto; }
+  .badge.muted{ color:var(--text-2); }
+
+  .slots-line{
+    padding:2px 20px 18px;
+    font-size:12.5px; color:var(--text-2);
+    flex:0 0 auto;
+  }
+  .slots-line b{ color:var(--text-0); }
+
+  /* ---------- Passport screen ---------- */
+  .passport-scroll{
+    overflow-y:auto;
+    padding:18px 20px 22px;
+    flex:1 1 auto;
+  }
+  .p-title{
+    font-size:23px; font-weight:800; letter-spacing:.2px; margin:2px 0 14px;
+  }
+
+  .p-badges{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .p-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    height:30px; padding:0 12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--line-soft);
+    border-radius:8px;
+    font-size:13px; color:var(--text-1);
+  }
+  .p-badge svg{ width:14px; height:14px; opacity:.75; }
+  .p-badge.rank{
+    background:rgba(224,169,43,.14);
+    border-color:rgba(224,169,43,.25);
+    color:var(--gold);
+    font-weight:700;
+    gap:8px;
+  }
+  .p-badge.rank .info-dot{
+    width:15px; height:15px; border-radius:50%;
+    background:rgba(224,169,43,.22);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:800; color:var(--gold);
+  }
+
+  .action-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .action-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    height:40px;
+    background:rgba(255,255,255,.045);
+    border:1px solid var(--line-soft);
+    border-radius:9px;
+    color:var(--text-1);
+    font-size:13px; font-weight:600;
+    cursor:pointer;
+    transition:background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .action-btn svg{ width:15px; height:15px; flex:0 0 auto; opacity:.85; }
+  .action-btn:hover{ background:rgba(255,255,255,.08); color:var(--text-0); border-color:rgba(255,255,255,.14); }
+  .action-btn.primary{
+    background:var(--accent-dim);
+    border-color:rgba(41,214,200,.32);
+    color:#8fe9e1;
+  }
+  .action-btn.primary:hover{ background:rgba(41,214,200,.24); color:#c3f5f0; }
+  .action-btn.danger{
+    background:var(--danger-dim);
+    border-color:rgba(224,84,106,.24);
+    color:#f1899a;
+  }
+  .action-btn.danger:hover{ background:rgba(224,84,106,.2); color:#ffc2cb; }
+  .action-btn.wide{ grid-column: span 3; }
+  .action-btn.disabled{
+    opacity:.4; cursor:not-allowed; pointer-events:none;
+  }
+
+  .toggles-row{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .toggle-card{
+    display:flex; align-items:center; justify-content:space-between;
+    height:44px; padding:0 12px;
+    background:var(--bg-2);
+    border:1px solid var(--line-soft);
+    border-radius:9px;
+    font-size:13px; color:var(--text-1);
+  }
+  .switch{
+    position:relative; width:36px; height:20px; flex:0 0 auto;
+    border-radius:20px; cursor:pointer;
+    background:rgba(255,255,255,.12);
+    transition:background .15s ease;
+  }
+  .switch.on{ background:var(--accent); }
+  .switch::after{
+    content:""; position:absolute; top:2px; left:2px;
+    width:16px; height:16px; border-radius:50%;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.4);
+    transition:left .15s ease;
+  }
+  .switch.on::after{ left:18px; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:18px 12px;
+    margin-bottom:22px;
+  }
+  .stat{ text-align:center; }
+  .stat .ring-wrap{
+    width:58px; height:58px; margin:0 auto 8px;
+    position:relative;
+  }
+  .stat svg{ width:58px; height:58px; transform:rotate(-90deg); }
+  .stat svg circle{ fill:none; stroke-width:5; }
+  .stat svg circle.track{ stroke:rgba(255,255,255,.08); }
+  .stat svg circle.value{ stroke-linecap:round; transition:stroke-dashoffset .3s ease; }
+  .stat .ring-icon{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  }
+  .stat .ring-icon svg{ width:18px; height:18px; transform:none; opacity:.9; }
+  .stat .stat-label{ font-size:11.5px; color:var(--text-2); margin-bottom:2px; }
+  .stat .stat-value{ font-size:13.5px; font-weight:700; color:var(--text-0); }
+
+  .info-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px 12px;
+  }
+  .info-cell .v{ font-size:15px; font-weight:700; color:var(--text-0); margin-bottom:2px; }
+  .info-cell .l{ font-size:12px; color:var(--text-2); }
+  .info-cell .v.accent-red{ color:#f1899a; }
+  .info-cell .v.accent-green{ color:#7fe3a4; }
+  .info-cell .v.small{ font-size:13px; color:var(--text-1); font-weight:600; }
+
+  .divider{ height:1px; background:var(--line); margin:16px 0; }
+
+  /* context menu for sort */
+  .menu{
+    position:absolute; z-index:20;
+    min-width:190px;
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:0 14px 30px rgba(0,0,0,.5);
+    padding:6px;
+    display:none;
+  }
+  .menu.open{ display:block; }
+  .menu-item{
+    padding:9px 10px; border-radius:7px;
+    font-size:13px; color:var(--text-1);
+    cursor:pointer;
+  }
+  .menu-item:hover{ background:rgba(255,255,255,.06); color:var(--text-0); }
+  .menu-item.active{ color:var(--accent); }
+
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="backdrop"></div>
+
+  <div class="panel">
+
+    <!-- ============ LIST SCREEN ============ -->
+    <div id="screen-list">
+      <div class="topbar">
+        <div class="title-block">
+          <h1>Мой транспорт</h1>
+          <div class="sub">Занято слотов <b id="slotsUsed">0</b> / <b id="slotsTotal">18</b></div>
+        </div>
+        <div class="icon-btn" id="sortBtn" title="Сортировка">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        </div>
+        <div class="esc-pill" id="closeBtn"><span class="key">Esc</span><span>Закрыть</span></div>
+      </div>
+
+      <div class="body-scroll" id="carList"></div>
+    </div>
+
+    <!-- ============ PASSPORT SCREEN ============ -->
+    <div id="screen-passport" class="hidden">
+      <div class="topbar">
+        <div class="icon-btn" id="backBtn" title="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div class="title-block">
+          <h1>Мой транспорт</h1>
+        </div>
+        <div class="esc-pill" id="closeBtn2"><span class="key">Esc</span><span>Закрыть</span></div>
+      </div>
+
+      <div class="passport-scroll" id="passportBody"></div>
+    </div>
+
+  </div>
+
+  <div class="menu" id="sortMenu">
+    <div class="menu-item active" data-sort="default">По умолчанию</div>
+    <div class="menu-item" data-sort="name">По названию</div>
+    <div class="menu-item" data-sort="state">По состоянию</div>
+    <div class="menu-item" data-sort="fuel">По топливу</div>
+    <div class="menu-item" data-sort="cost">По стоимости</div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   /cars — CEF interface
+   Мост: SAMP.Events (стандартный CEF browser)
+   ============================================================ */
+
+const ICONS = {
+  plate:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 11h20"/></svg>',
+  fuel:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V6a2 2 0 012-2h6a2 2 0 012 2v15M4 21h10M4 10h10"/><path d="M14 8l3 3v6a1.5 1.5 0 003 0v-4l-3-3"/></svg>',
+  key:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L20 3m0 0v4m0-4h-4"/></svg>',
+  id:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M15 9h3M15 13h3M6 17h12"/></svg>',
+  none:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  passport:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M8 17c1-2 7-2 8 0"/></svg>',
+  find:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21 7.5 13.5 2 9h7z"/></svg>',
+  park:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9.5 16V8h3.2a2.6 2.6 0 010 5.2H9.5"/></svg>',
+  rent:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M17 8h4M19 6v4"/></svg>',
+  swap:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 2l4 4-4 4M3 11V9a4 4 0 014-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/></svg>',
+  hide:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.4 5.1A9.5 9.5 0 0112 5c5 0 9 4 10 7-.4 1.2-1.3 2.7-2.6 4M6.6 6.6C4.4 8 2.9 10 2 12c1 3 5 7 10 7 1.3 0 2.6-.3 3.8-.7"/></svg>',
+  sellP:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M18 9l2 2 4-4"/></svg>',
+  sellG:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>',
+  family: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M2 21c0-3.6 2.7-6 6-6s6 2.4 6 6M15.5 21c.2-2.7 1.6-4.6 4-5"/></svg>',
+  sort:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  ringFuel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V6a2 2 0 012-2h6a2 2 0 012 2v15M4 21h10M4 10h10"/><path d="M14 8l3 3v6a1.5 1.5 0 003 0v-4l-3-3"/></svg>',
+  ringState:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>',
+  ringOil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></svg>',
+};
+
+/* ---------------- state ---------------- */
+let cars = [];
+let sortMode = 'default';
+let currentCar = null;
+
+/* ---------------- helpers ---------------- */
+function rankInfo(rank){
+  // rank: number (0-1000) or null for impounded/unknown
+  if(rank === null || rank === undefined) return null;
+  if(rank >= 900) return {label:`Идеальное (${rank})`, cls:'ideal'};
+  if(rank >= 500) return {label:`Хорошее (${rank})`, cls:'good'};
+  return {label:`Изношенное (${rank})`, cls:'worn'};
+}
+
+function pct(val, max){ return Math.max(0, Math.min(100, (val/max)*100)); }
+
+function ringCircle(colorVar, percent){
+  const r = 24, c = 2*Math.PI*r;
+  const off = c - (percent/100)*c;
+  return `
+    <svg viewBox="0 0 58 58">
+      <circle class="track" cx="29" cy="29" r="${r}"></circle>
+      <circle class="value" cx="29" cy="29" r="${r}" stroke="${colorVar}" stroke-dasharray="${c}" stroke-dashoffset="${off}"></circle>
+    </svg>`;
+}
+
+function escapeHtml(str){
+  if(str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+/* ---------------- render: list ---------------- */
+function renderList(){
+  const listEl = document.getElementById('carList');
+  document.getElementById('slotsUsed').textContent = cars.length;
+
+  let arr = [...cars];
+  if(sortMode === 'name') arr.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sortMode === 'state') arr.sort((a,b)=>(b.rank??-1)-(a.rank??-1));
+  else if(sortMode === 'fuel') arr.sort((a,b)=>(b.fuel/b.fuelMax)-(a.fuel/a.fuelMax));
+  else if(sortMode === 'cost') arr.sort((a,b)=>(b.price||0)-(a.price||0));
+
+  listEl.innerHTML = arr.map(car => {
+    const impounded = car.status === 'impound';
+
+    const badges = [];
+    badges.push(`<span class="badge${!car.plate ? ' muted' : ''}">${ICONS.plate}${car.plate ? escapeHtml(car.plate) : 'Без номеров'}</span>`);
+    badges.push(`<span class="badge">${ICONS.fuel}${escapeHtml(car.fuelStation || '—')}</span>`);
+    if(car.key !== undefined && car.key !== null){
+      badges.push(`<span class="badge">${ICONS.key}${car.key ? 'Есть' : 'Нет'}</span>`);
+    }
+    if(car.carId !== undefined && !impounded){
+      badges.push(`<span class="badge">${ICONS.id}${car.carId}</span>`);
+    }
+
+    return `
+    <div class="car-card ${impounded?'impounded':''}" data-id="${car.id}">
+      <div class="car-card-top">
+        <div class="car-card-head">
+          <h3>${escapeHtml(car.name)}</h3>
+          ${impounded
+            ? `<span class="status-pill impound"><span class="dot"></span>Штрафстоянка</span>`
+            : `<span class="status-pill online"><span class="dot"></span>${car.loaded===false?'Не загружено':'Загружено'}</span>`}
+        </div>
+        ${car.image ? `<img class="car-thumb" src="${car.image}" onerror="this.remove()">` : ''}
+      </div>
+      <div class="badges">${badges.join('')}</div>
+      ${impounded ? `<div class="impound-note">Обратитесь на штрафстоянку для возврата</div>` : ''}
+    </div>`;
+  }).join('');
+
+  listEl.querySelectorAll('.car-card').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const car = cars.find(c=>String(c.id)===el.dataset.id);
+      if(car) openPassport(car);
+    });
+  });
+}
+
+/* ---------------- render: passport ---------------- */
+function openPassport(car){
+  currentCar = car;
+  document.getElementById('screen-list').classList.add('hidden');
+  document.getElementById('screen-passport').classList.remove('hidden');
+  renderPassport();
+}
+
+function closePassport(){
+  currentCar = null;
+  document.getElementById('screen-passport').classList.add('hidden');
+  document.getElementById('screen-list').classList.remove('hidden');
+  renderList();
+}
+
+function renderPassport(){
+  const car = currentCar;
+  const body = document.getElementById('passportBody');
+  const impounded = car.status === 'impound';
+  const rk = rankInfo(impounded ? null : car.rank);
+
+  const badges = [];
+  badges.push(`<span class="p-badge">${ICONS.plate}${car.plate ? escapeHtml(car.plate) : 'Без номеров'}</span>`);
+  badges.push(`<span class="p-badge">${ICONS.fuel}${escapeHtml(car.fuelStation || '—')}</span>`);
+  badges.push(`<span class="p-badge">${ICONS.key}${car.serial ? escapeHtml(car.serial) : '—'}</span>`);
+  badges.push(`<span class="p-badge">${ICONS.id}${car.carId ?? '—'}</span>`);
+  if(!impounded){
+    badges.push(`<span class="p-badge rank"><span class="info-dot">i</span>${rk.label}</span>`);
+  }
+
+  const actionsDisabled = impounded;
+
+  body.innerHTML = `
+    <div class="p-title">${escapeHtml(car.name)}</div>
+    <div class="p-badges">${badges.join('')}</div>
+
+    <div class="action-grid">
+      <div class="action-btn primary" data-act="passport">${ICONS.passport}Паспорт</div>
+      <div class="action-btn ${actionsDisabled?'disabled':''}" data-act="find">${ICONS.find}Найти</div>
+      <div class="action-btn ${actionsDisabled?'disabled':''}" data-act="park">${ICONS.park}Парковка</div>
+
+      <div class="action-btn ${actionsDisabled?'disabled':''}" data-act="rent">${ICONS.rent}Сдать в аренду</div>
+      <div class="action-btn ${actionsDisabled?'disabled':''}" data-act="swap">${ICONS.swap}Обменять</div>
+      <div class="action-btn ${actionsDisabled?'disabled':''}" data-act="hide">${ICONS.hide}Скрыть</div>
+
+      <div class="action-btn danger ${actionsDisabled?'disabled':''}" data-act="sellPlayer">${ICONS.sellP}Продать игроку</div>
+      <div class="action-btn danger ${actionsDisabled?'disabled':''}" data-act="sellState">${ICONS.sellG}Продать гос-ву</div>
+      <div class="action-btn ${actionsDisabled?'disabled':''}" data-act="family">${ICONS.family}Сделать семейной</div>
+
+      <div class="action-btn wide ${actionsDisabled?'disabled':''}" data-act="sort">${ICONS.sort}Сортировка</div>
+    </div>
+
+    <div class="toggles-row">
+      <div class="toggle-card">
+        <span>Двери</span>
+        <div class="switch ${car.doors?'on':''}" data-toggle="doors"></div>
+      </div>
+      <div class="toggle-card">
+        <span>Сигнализация</span>
+        <div class="switch ${car.alarm?'on':''}" data-toggle="alarm"></div>
+      </div>
+      <div class="toggle-card">
+        <span>Двигатель</span>
+        <div class="switch ${car.engine?'on':''}" data-toggle="engine"></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="ring-wrap">
+          ${ringCircle('var(--blue)', pct(car.fuel, car.fuelMax))}
+          <div class="ring-icon">${ICONS.ringFuel}</div>
+        </div>
+        <div class="stat-label">Запас топлива</div>
+        <div class="stat-value">${car.fuel} / ${car.fuelMax} л.</div>
+      </div>
+      <div class="stat">
+        <div class="ring-wrap">
+          ${ringCircle('var(--green)', car.condition)}
+          <div class="ring-icon">${ICONS.ringState}</div>
+        </div>
+        <div class="stat-label">Состояние Т/С</div>
+        <div class="stat-value">${car.condition} / 100 %</div>
+      </div>
+      <div class="stat">
+        <div class="ring-wrap">
+          ${ringCircle('var(--gold)', car.oil)}
+          <div class="ring-icon">${ICONS.ringOil}</div>
+        </div>
+        <div class="stat-label">Уровень масла</div>
+        <div class="stat-value">${car.oil} / 100 %</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="info-grid">
+      <div class="info-cell"><div class="v small">${escapeHtml(car.owner || '—')}</div><div class="l">Владелец</div></div>
+      <div class="info-cell"><div class="v small">${car.plate ? escapeHtml(car.plate) : '—'}</div><div class="l">Государственный номер</div></div>
+      <div class="info-cell"><div class="v small">${(car.mileage ?? 0).toLocaleString('ru-RU')} км</div><div class="l">Пробег</div></div>
+
+      <div class="info-cell"><div class="v">${(car.price ?? 0).toLocaleString('ru-RU')} руб.</div><div class="l">Гос. стоимость</div></div>
+      <div class="info-cell"><div class="v small">${car.serial ? escapeHtml(car.serial) : '—'}</div><div class="l">Серийный номер</div></div>
+      <div class="info-cell"><div class="v small">${car.upgrades ?? 0}</div><div class="l">Количество улучшений</div></div>
+
+      <div class="info-cell"><div class="v small">${(car.taxPaid ?? 0).toLocaleString('ru-RU')} / ${(car.taxTotal ?? 0).toLocaleString('ru-RU')} руб.</div><div class="l">Налоги</div></div>
+      <div class="info-cell"><div class="v small ${car.fines ? 'accent-red' : ''}">${(car.fines ?? 0).toLocaleString('ru-RU')} руб.</div><div class="l">Штрафы</div></div>
+      <div class="info-cell"><div class="v small">${escapeHtml(car.consumption || 'Средний')}</div><div class="l">Расход</div></div>
+    </div>
+  `;
+
+  body.querySelectorAll('.action-btn[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(btn.classList.contains('disabled')) return;
+      const act = btn.dataset.act;
+      if(act === 'sort'){
+        toggleSortMenu(btn);
+        return;
+      }
+      // PAWN (CefVeh_OnAction) парсит "<id> <action>" через пробел - не JSON
+      callClient('cef_veh_action', `${car.id} ${act}`);
+    });
+  });
+
+  body.querySelectorAll('.switch[data-toggle]').forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      if(impounded) return;
+      const key = sw.dataset.toggle;
+      const newVal = !sw.classList.contains('on');
+      sw.classList.toggle('on', newVal);
+      car[key] = newVal;
+      // PAWN (CefVeh_OnToggle) парсит "<id> <toggle> <0|1>" через пробел
+      callClient('cef_veh_toggle', `${car.id} ${key} ${newVal ? 1 : 0}`);
+    });
+  });
+}
+
+/* ---------------- sort menu ---------------- */
+function toggleSortMenu(anchor){
+  const menu = document.getElementById('sortMenu');
+  const rect = anchor.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 6) + 'px';
+  menu.style.left = rect.left + 'px';
+  menu.classList.toggle('open');
+}
+document.getElementById('sortBtn').addEventListener('click', (e)=>{
+  toggleSortMenu(e.currentTarget);
+});
+document.getElementById('sortMenu').querySelectorAll('.menu-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    sortMode = item.dataset.sort;
+    document.querySelectorAll('#sortMenu .menu-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('sortMenu').classList.remove('open');
+    renderList();
+  });
+});
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('sortMenu');
+  if(!menu.contains(e.target) && e.target.id !== 'sortBtn' && !e.target.closest('#sortBtn')){
+    menu.classList.remove('open');
+  }
+});
+
+/* ---------------- nav buttons ---------------- */
+document.getElementById('backBtn').addEventListener('click', closePassport);
+document.getElementById('closeBtn').addEventListener('click', closeUI);
+document.getElementById('closeBtn2').addEventListener('click', closeUI);
+
+function closeUI(){
+  document.getElementById('app').classList.remove('visible');
+  callClient('cef_veh_close', '');
+}
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    closeUI();
+  }
+});
+
+/* ============================================================
+   CEF bridge adapter (под плагин cef.inc: cef_emit_event / cef_subscribe)
+   ------------------------------------------------------------
+   PAWN шлёт события через cef_emit_event(playerid, "cars:open", CEFSTR(json)).
+   Этот плагин обычно инжектирует в браузер один из вариантов глобального
+   JS-объекта для приёма событий. Т.к. точное имя зависит от сборки
+   плагина, слушаем сразу несколько наиболее частых вариантов - сработает
+   тот, что реально есть в этой версии клиента. Если ни один не сработает,
+   в консоли браузера (F12 в CEF devtools) будет видно, что события не
+   доходят - тогда узнай точное имя API у автора плагина cef.inc и
+   поправь ТОЛЬКО секцию "ВАРИАНТЫ ПОДПИСКИ" ниже.
+
+   Отправка в PAWN (cef_subscribe側) не требует адаптера - плагин сам
+   слушает window.cef.emit(...) или аналогичный метод, см. callClient().
+   ============================================================ */
+
+(function(){
+  // ---- ВАРИАНТЫ ПОДПИСКИ (PAWN -> JS) ----
+  // Пробуем зарегистрироваться на все правдоподобные точки входа.
+  // handleClientEvent(name, payload) уже умеет доставать JSON из payload.
+
+  function tryBind(){
+    let bound = false;
+
+    // Вариант 1: window.cef.on(name, cb) - частый паттерн для cef.samp-подобных плагинов
+    if(window.cef && typeof window.cef.on === 'function'){
+      ['cars:open','cars:close','cars:update','cars:setList'].forEach(evt=>{
+        window.cef.on(evt, data => handleClientEvent(evt, data));
+      });
+      bound = true;
+    }
+
+    // Вариант 2: глобальная функция window.onCefEvent(name, payload), которую
+    // дергает сам плагин из C++ (часто встречается в самописных cef.inc мостах)
+    if(typeof window.onCefEvent !== 'function'){
+      window.onCefEvent = function(name, payload){
+        handleClientEvent(name, payload);
+      };
+      bound = true;
+    }
+
+    // Вариант 3: window.SAMP.events (уже поддержан ниже штатно) - оставляем как есть.
+
+    return bound;
+  }
+
+  tryBind();
+
+  // Если плагин инициализируется чуть позже загрузки страницы (частый случай
+  // с CEF), повторяем попытку подписки через небольшую задержку.
+  setTimeout(tryBind, 300);
+  setTimeout(tryBind, 1000);
+})();
+
+/* ============================================================
+   SAMP.Events bridge
+   ============================================================ */
+
+// Отправка событий клиенту (moonloader/cleo слушает через samp.cef.emit)
+function callClient(eventName, data){
+  const payload = (typeof data === 'string') ? data : JSON.stringify(data);
+  try{
+    if(window.SAMP && typeof window.SAMP.events?.trigger === 'function'){
+      window.SAMP.events.trigger(eventName, payload);
+    } else if(window.cef && typeof window.cef.emit === 'function'){
+      // cef.inc плагин: JS -> PAWN через cef_subscribe("cef_veh_action", "CefVeh_OnAction")
+      // Событие приходит в PAWN одной строкой arguments[], поэтому передаём
+      // данные как плоскую строку "id action", а не JSON-объект.
+      window.cef.emit(eventName, payload);
+    } else if(typeof window.cefEvent === 'function'){
+      // fallback for custom bridges
+      window.cefEvent(eventName, payload);
+    } else {
+      console.log('[carsUI -> client]', eventName, data);
+    }
+  }catch(err){
+    console.log('[carsUI] callClient error', err);
+  }
+}
+
+// Приём событий от клиента
+function handleClientEvent(name, payload){
+  let data = payload;
+  if(typeof payload === 'string'){
+    try{ data = JSON.parse(payload); }catch(e){ data = {}; }
+  }
+
+  switch(name){
+    case 'cars:open':
+      cars = data.cars || [];
+      document.getElementById('slotsTotal').textContent = data.slotsTotal ?? 18;
+      document.getElementById('app').classList.add('visible');
+      document.getElementById('screen-passport').classList.add('hidden');
+      document.getElementById('screen-list').classList.remove('hidden');
+      renderList();
+      break;
+
+    case 'cars:close':
+      document.getElementById('app').classList.remove('visible');
+      break;
+
+    case 'cars:update':
+      // partial update of one car (e.g. after server response)
+      if(data.car){
+        const idx = cars.findIndex(c=>String(c.id)===String(data.car.id));
+        if(idx !== -1) cars[idx] = {...cars[idx], ...data.car};
+        else cars.push(data.car);
+
+        if(currentCar && String(currentCar.id) === String(data.car.id)){
+          currentCar = {...currentCar, ...data.car};
+          if(!document.getElementById('screen-passport').classList.contains('hidden')){
+            renderPassport();
+          }
+        }
+        if(!document.getElementById('screen-list').classList.contains('hidden')){
+          renderList();
+        }
+      }
+      break;
+
+    case 'cars:setList':
+      cars = data.cars || [];
+      if(!document.getElementById('screen-list').classList.contains('hidden')){
+        renderList();
+      }
+      break;
+  }
+}
+
+// Регистрация в SAMP.Events, если мост доступен
+if(window.SAMP && window.SAMP.events && typeof window.SAMP.events.on === 'function'){
+  window.SAMP.events.on('cars:open', d => handleClientEvent('cars:open', d));
+  window.SAMP.events.on('cars:close', d => handleClientEvent('cars:close', d));
+  window.SAMP.events.on('cars:update', d => handleClientEvent('cars:update', d));
+  window.SAMP.events.on('cars:setList', d => handleClientEvent('cars:setList', d));
+}
+
+// Универсальный глобальный вход на случай, если клиент дергает window.* напрямую
+window.carsUI = { handleClientEvent };
+
+/* ============================================================
+   DEMO DATA — только для предпросмотра верстки в браузере.
+   Удали блок ниже при подключении к реальному клиенту:
+   он сработает только если SAMP.Events недоступен.
+   ============================================================ */
+if(!window.SAMP){
+  const demo = {
+    cars: [
+      {
+        id:1, carId:308, name:'BMW M5 MANSORY',
+        plate:'X030AM', fuelStation:'A-98', key:true,
+        status:'active', loaded:true, rank:1000,
+        fuel:10, fuelMax:75, condition:64, oil:56,
+        doors:true, alarm:true, engine:true,
+        owner:'Сакура Монза', mileage:1200, price:50000000,
+        serial:'—', upgrades:9, taxPaid:0, taxTotal:60000, fines:11000,
+        consumption:'Средний', image:''
+      },
+      {
+        id:2, carId:null, name:'ВАЗ 2107 4x4',
+        plate:null, fuelStation:'A-98', key:false,
+        status:'impound', loaded:false, rank:null,
+        fuel:0, fuelMax:60, condition:0, oil:0,
+        doors:false, alarm:false, engine:false,
+        owner:'—', mileage:0, price:0,
+        serial:'—', upgrades:0, taxPaid:0, taxTotal:0, fines:0,
+        consumption:'—', image:''
+      }
+    ],
+    slotsTotal: 18
+  };
+  handleClientEvent('cars:open', demo);
+}
+</script>
+</body>
+</html>
