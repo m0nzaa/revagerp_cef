@@ -839,11 +839,12 @@ if(window.SAMP && window.SAMP.events && typeof window.SAMP.events.on === 'functi
 window.carsUI = { handleClientEvent };
 
 /* ============================================================
-   DEMO DATA — только для предпросмотра верстки в браузере.
-   Удали блок ниже при подключении к реальному клиенту:
-   он сработает только если SAMP.Events недоступен.
+   DEMO DATA — только для предпросмотра верстки в обычном браузере
+   (не в игре). Срабатывает, только если НИ ОДИН реальный мост не
+   найден: ни window.SAMP, ни window.cef, ни window.onCefEvent.
+   В игре (реальный CEF-клиент) этот блок никогда не выполнится.
    ============================================================ */
-if(!window.SAMP){
+if(!window.SAMP && !window.cef && typeof window.onCefEvent !== 'function'){
   const demo = {
     cars: [
       {
