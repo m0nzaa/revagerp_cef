@@ -454,17 +454,21 @@
   }
 
   // ============================================================
-  //  Подключение к SA:MP CEF (samp-cef). События приходят через
-  //  window.cefEvent(name, data) — так принято в samp-cef клиентском
-  //  SDK; поддержан также fallback на cef_subscribe, если проект
-  //  использует более старую обвязку.
+  //  Подключение к SA:MP CEF (плагин samp-cef / Pycckue-Bnepeg).
+  //  Официальный JS API плагина - глобальный объект `cef`:
+  //    cef.on(event_name, callback)   - подписка на событие от сервера
+  //    cef.emit(event_name, ...args)  - отправка события на сервер
+  //  (см. https://github.com/Pycckue-Bnepeg/samp-cef/blob/master/docs/main_ru.md)
   //
   //  Pawn-сторона (cef_speedometer.inc) шлёт:
   //    cef_emit_event(playerid, "speedo_show");
   //    cef_emit_event(playerid, "speedo_hide");
   //    cef_emit_event(playerid, "speedo_data", json);
   //      json = {"speed":N,"fuel":N,"hp":N,"engine":0|1,
-  //              "doors":N,"belt":0|1,"lights":N}
+  //              "doors":N,"belt":0|1,"lights":N} (одна JSON-строка)
+  //
+  //  cef.on передаёт аргументы события как обычные параметры callback'а,
+  //  поэтому speedo_data придёт как callback(jsonString).
   // ============================================================
   function handleEvent(name, data){
     if(name === 'speedo_show'){ show(); return; }
@@ -479,37 +483,42 @@
     }
   }
 
-  // samp-cef стандартный способ
-  window.cefEvent = function(name, data){
-    handleEvent(name, data);
-  };
-
-  // fallback: некоторые сборки используют cef_subscribe(eventName, cb) на стороне клиента
-  if(typeof window.cef_subscribe === 'function'){
-    window.cef_subscribe('speedo_show', function(){ handleEvent('speedo_show'); });
-    window.cef_subscribe('speedo_hide', function(){ handleEvent('speedo_hide'); });
-    window.cef_subscribe('speedo_data', function(d){ handleEvent('speedo_data', d); });
+  if(typeof window.cef !== 'undefined' && typeof window.cef.on === 'function'){
+    window.cef.on('speedo_show', function(){ handleEvent('speedo_show'); });
+    window.cef.on('speedo_hide', function(){ handleEvent('speedo_hide'); });
+    window.cef.on('speedo_data', function(d){ handleEvent('speedo_data', d); });
   }
+
+  // Доп. совместимость: некоторые сборки/форки пробрасывают события
+  // и через window.cefEvent(name, data) напрямую - безвредный fallback.
+  window.cefEvent = function(name, data){ handleEvent(name, data); };
 
   // ============================================================
   //  Локальный тест в обычном браузере (без SA:MP) -
   //  открой файл напрямую и смотри демо-анимацию.
-  //  В проде этот блок безвреден: он не трогает ничего, если
-  //  within 1.5s реальный speedo_show/speedo_data не пришли.
+  //  В проде demo ОБЯЗАН заглохнуть при первом реальном событии,
+  //  даже если он пришёл уже ПОСЛЕ старта demo-интервала - иначе
+  //  demo-числа продолжат перезаписывать реальные данные от игры
+  //  (именно так получались "плавающие 200" на спидометре).
   // ============================================================
-  var gotRealEvent = false;
+  var demoIntervalId = null;
+  var hasRealData = false; // true сразу при первом реальном событии, даже если оно раньше таймера ниже
   var origHandle = handleEvent;
   handleEvent = function(name, data){
-    gotRealEvent = true;
+    hasRealData = true;
+    if(demoIntervalId !== null){
+      clearInterval(demoIntervalId);
+      demoIntervalId = null;
+    }
     origHandle(name, data);
   };
 
   setTimeout(function(){
-    if(gotRealEvent) return;
-    // demo режим
+    if(hasRealData) return; // реальные данные уже пришли (пусть даже раньше этого таймера) - demo не нужен
+    // demo режим — запускаем, но handleEvent выше в любой момент его оборвёт
     show();
     var t = 0;
-    setInterval(function(){
+    demoIntervalId = setInterval(function(){
       t += 0.05;
       var demoSpeed = Math.max(0, Math.round(110 + 100 * Math.sin(t)));
       var demoFuel  = Math.round(50 + 45 * Math.sin(t / 3));
