@@ -470,14 +470,30 @@
   //  cef.on передаёт аргументы события как обычные параметры callback'а,
   //  поэтому speedo_data придёт как callback(jsonString).
   // ============================================================
+  // [DEBUG] временный оверлей - показывает что реально приходит от CEF,
+  // чтобы понять на чём именно рвётся цепочка данных.
+  var dbgEl = document.createElement('div');
+  dbgEl.style.cssText = 'position:fixed;left:4px;top:4px;z-index:99999;background:rgba(0,0,0,.85);color:#0f0;font:10px monospace;padding:6px;max-width:400px;white-space:pre-wrap;pointer-events:none;';
+  document.body.appendChild(dbgEl);
+  var dbgLines = [];
+  function dbgLog(msg){
+    dbgLines.unshift('[' + new Date().toISOString().substr(11,8) + '] ' + msg);
+    dbgLines = dbgLines.slice(0, 12);
+    dbgEl.textContent = dbgLines.join('\n');
+  }
+  dbgLog('script loaded, waiting for cef events...');
+  dbgLog('window.cef defined: ' + (typeof window.cef !== 'undefined') + ', cef.on: ' + (typeof window.cef !== 'undefined' && typeof window.cef.on));
+
   function handleEvent(name, data){
+    dbgLog('EVENT "' + name + '" typeof(data)=' + typeof data + ' raw=' + JSON.stringify(data).slice(0,150));
     if(name === 'speedo_show'){ show(); return; }
     if(name === 'speedo_hide'){ hide(); return; }
     if(name === 'speedo_data'){
       var payload = data;
       if(typeof payload === 'string'){
-        try{ payload = JSON.parse(payload); } catch(e){ return; }
+        try{ payload = JSON.parse(payload); } catch(e){ dbgLog('JSON.parse FAILED: ' + e.message); return; }
       }
+      dbgLog('parsed payload: ' + JSON.stringify(payload));
       if(payload) render(payload);
       return;
     }
