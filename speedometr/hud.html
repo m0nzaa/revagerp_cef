@@ -1,82 +1,528 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>NA</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/speed_icon.css">
-    <link rel="stylesheet" href="css/speedometer.css">
-    <link rel="stylesheet" href="css/hud_data.css">
-    <link rel="stylesheet" href="css/other.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speedometer HUD</title>
+<style>
+  :root{
+    --dial-bg-1:#2b1d16;
+    --dial-bg-2:#1a110c;
+    --dial-ring:#4a332a;
+    --dial-ring-dark:#120b08;
+    --red:#e2342d;
+    --red-dim:#5c2420;
+    --amber:#e8a93a;
+    --amber-dim:#5c4a22;
+    --text-main:#f5ece2;
+    --text-dim:#c9b9ab;
+    --text-faint:#8a776a;
+    --hp-green:#5fae57;
+    --hp-amber:#e0a93c;
+    --hp-red:#d8453c;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    width:100%; height:100%;
+    background:transparent;
+    overflow:hidden;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+
+  #root{
+    position:fixed;
+    left:24px; bottom:22px;
+    width:230px; height:230px;
+    opacity:0;
+    transform:translateY(12px) scale(.96);
+    transition:opacity .28s ease, transform .28s ease;
+    pointer-events:none;
+  }
+  #root.visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+
+  .dial{
+    position:relative;
+    width:100%; height:100%;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 38%, var(--dial-bg-1) 0%, var(--dial-bg-2) 72%, #0d0806 100%);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,.6),
+      0 10px 26px rgba(0,0,0,.55),
+      inset 0 0 0 7px var(--dial-ring-dark),
+      inset 0 0 0 9px rgba(120,86,68,.25);
+  }
+
+  svg.gauge{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    transform:rotate(0deg);
+  }
+
+  .track{
+    fill:none;
+    stroke-linecap:round;
+  }
+  .track-bg{ stroke:rgba(255,255,255,.05); }
+
+  .arc-speed-bg{ stroke:var(--red-dim); }
+  .arc-speed-val{
+    stroke:var(--red);
+    filter:drop-shadow(0 0 3px rgba(226,52,45,.55));
+    transition:stroke-dasharray .18s linear;
+  }
+
+  .arc-fuel-bg{ stroke:var(--amber-dim); }
+  .arc-fuel-val{
+    stroke:var(--amber);
+    filter:drop-shadow(0 0 3px rgba(232,169,58,.5));
+    transition:stroke-dasharray .25s ease;
+  }
+
+  .tick{
+    stroke:var(--text-faint);
+    stroke-width:1.4;
+    opacity:.55;
+  }
+  .tick.major{
+    stroke:var(--text-dim);
+    stroke-width:2;
+    opacity:.85;
+  }
+
+  .scale-num{
+    fill:var(--text-faint);
+    font-size:9px;
+    font-weight:600;
+    text-anchor:middle;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+  }
+
+  .center{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    width:118px;
+    pointer-events:none;
+  }
+
+  .gear-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:5px;
+    height:14px;
+    margin-bottom:1px;
+  }
+  .gear{
+    font-size:13px;
+    font-weight:700;
+    color:var(--text-dim);
+    letter-spacing:.5px;
+  }
+  .gear.active{
+    color:var(--text-main);
+  }
+
+  .speed-value{
+    font-size:46px;
+    font-weight:800;
+    color:var(--text-main);
+    line-height:1;
+    letter-spacing:-1px;
+    text-shadow:0 1px 3px rgba(0,0,0,.5);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .speed-unit{
+    font-size:11px;
+    font-weight:600;
+    color:var(--text-faint);
+    letter-spacing:1.5px;
+    margin-top:1px;
+  }
+
+  .odo-row{
+    margin-top:5px;
+    font-size:10.5px;
+    font-weight:600;
+    color:var(--text-dim);
+    letter-spacing:.3px;
+  }
+
+  .side-icon{
+    position:absolute;
+    width:15px; height:15px;
+    opacity:.35;
+    transition:opacity .2s ease, filter .2s ease;
+  }
+  .side-icon svg{ width:100%; height:100%; display:block; }
+  .side-icon.on{ opacity:1; }
+
+  .icon-fuel{
+    right:17px; top:50%;
+    transform:translateY(14px);
+    color:var(--amber);
+  }
+  .icon-fuel.warn{
+    opacity:1;
+    filter:drop-shadow(0 0 3px rgba(232,169,58,.8));
+    animation:blink 1s infinite;
+  }
+
+  .icon-hp{
+    left:17px; top:50%;
+    transform:translateY(14px);
+    color:var(--hp-green);
+  }
+  .icon-hp.warn{
+    color:var(--hp-red);
+    opacity:1;
+    filter:drop-shadow(0 0 3px rgba(216,69,60,.8));
+    animation:blink .8s infinite;
+  }
+
+  .hp-num{
+    position:absolute;
+    left:32px; top:50%;
+    transform:translateY(14px);
+    font-size:9px;
+    font-weight:700;
+    color:var(--text-faint);
+  }
+
+  @keyframes blink{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.25; }
+  }
+
+  .glass{
+    position:absolute; inset:0;
+    border-radius:50%;
+    background:linear-gradient(155deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 32%);
+    pointer-events:none;
+  }
+</style>
 </head>
-<body style="background-color: #0009;">
+<body>
 
-<div class="hud-right-bot">
-    <div class="hud-date">
-        <p class="hud-date-time">00:00</p>
-        <p class="hud-date-year">01.01.1970</p>
+<div id="root">
+  <div class="dial">
+    <svg class="gauge" viewBox="0 0 230 230">
+      <!-- фон дуги скорости (слева, 220° -> 130° через низ) -->
+      <path class="track track-bg" id="arcSpeedBg" />
+      <path class="track arc-speed-val" id="arcSpeedVal" />
+
+      <!-- фон дуги топлива (справа) -->
+      <path class="track track-bg" id="arcFuelBg" />
+      <path class="track arc-fuel-val" id="arcFuelVal" />
+
+      <g id="ticks"></g>
+      <g id="scaleNums"></g>
+    </svg>
+
+    <div class="glass"></div>
+
+    <div class="side-icon icon-hp" id="iconHp" title="Состояние">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/>
+      </svg>
+    </div>
+    <div class="hp-num" id="hpNum">100</div>
+
+    <div class="center">
+      <div class="gear-row" id="gearRow"></div>
+      <div class="speed-value" id="speedValue">0</div>
+      <div class="speed-unit">km/h</div>
+      <div class="odo-row" id="odoRow">0 km</div>
     </div>
 
-    <div class="hud-speedometer">
-        <svg id="test" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-             width="27.5vh" height="22.4vh" viewBox="-4 -10 275 214" preserveAspectRatio="xMaxYMin meet">
-
-            <!-- Фон: HP/движок -->
-            <path fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="0.6vh"
-                  stroke-linecap="butt" stroke-linejoin="miter" opacity="0.4" fill="none"
-                  d="M17.319,170.926 C-0.528,135.060 -1.246,92.839 15.164,56.462"></path>
-            <!-- Активная: HP/движок -->
-            <path id="hud-engine" fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="1vh"
-                  stroke-linecap="butt" stroke-linejoin="miter" opacity="1" fill="none"
-                  d="M17.319,170.926 C-0.528,135.060 -1.246,92.839 15.164,56.462"
-                  style="stroke-dasharray:118.296,118.296;stroke-dashoffset:118.296;"></path>
-
-            <!-- Фон: топливо -->
-            <path fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="0.6vh"
-                  stroke-linecap="butt" stroke-linejoin="miter" opacity="0.4" fill="none"
-                  d="M224.989,204.006 C276.978,152.089 276.978,67.914 224.989,15.997"></path>
-            <!-- Активная: топливо -->
-            <path id="hud-fuel" fill-rule="evenodd" stroke="#fa6f71" stroke-width="1vh"
-                  stroke-linecap="butt" stroke-linejoin="miter" opacity="1" fill="none"
-                  d="M224.989,204.006 C276.978,152.089 276.978,67.914 224.989,15.997"
-                  style="stroke-dasharray:208.907,208.907;stroke-dashoffset:208.907;"></path>
-
-            <!-- Фон: спидометр -->
-            <path fill-rule="evenodd" stroke="rgb(255,255,255)" stroke-width="0.6vh"
-                  stroke-linecap="butt" stroke-linejoin="miter" opacity="0.4" fill="none"
-                  d="M60.340,185.660 C18.553,143.874 18.553,76.126 60.340,34.340 C102.126,-7.447 169.874,-7.447 211.660,34.340 C253.446,76.126 253.446,143.874 211.660,185.660"></path>
-            <!-- Активная: спидометр -->
-            <path id="hud-speedometer" fill-rule="evenodd" stroke="rgb(255,232,19)" stroke-width="1vh"
-                  stroke-linecap="butt" stroke-linejoin="miter" opacity="1" fill="none"
-                  d="M60.340,185.660 C18.553,143.874 18.553,76.126 60.340,34.340 C102.126,-7.447 169.874,-7.447 211.660,34.340 C253.446,76.126 253.446,143.874 211.660,185.660"
-                  style="stroke-dasharray:504.295,504.295;stroke-dashoffset:504.295;"></path>
-        </svg>
-
-        <div class="hud-speed-text">
-            <div><span id="textspeed">0</span></div>
-            <p>км/ч</p>
-        </div>
-        <div class="hud-engine-text" id="healproc"></div>
-        <i class="hud-engine-ico"></i>
+    <div class="side-icon icon-fuel" id="iconFuel" title="Топливо">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 22V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16"/>
+        <path d="M3 10h8"/>
+        <path d="M16 7l3 3v7a1.5 1.5 0 0 0 3 0v-6l-3-4"/>
+      </svg>
     </div>
-
-    <div class="hud-speedomter-footer">
-        <div id="cruise" class="hud-speedomter-footer-item cruise off">
-            <span class="hud-circle-key">x</span>
-        </div>
-        <div id="eng" class="hud-speedomter-footer-item ctrl off">
-            <span class="hud-circle-key">ctrl</span>
-        </div>
-        <div id="door" class="hud-speedomter-footer-item door off">
-            <span class="hud-circle-key">l</span>
-        </div>
-        <div class="hud-speedomter-footer-item">
-            <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgdmlld0JveD0iMCAwIDg2LjY2NjY2NCA4NS4zMzMzMzYiCiAgIGhlaWdodD0iODUuMzMzMzM2IgogICB3aWR0aD0iODYuNjY2NjY0IgogICB4bWw6c3BhY2U9InByZXNlcnZlIgogICBpZD0ic3ZnMiIKICAgdmVyc2lvbj0iMS4xIj48bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGE4Ij48cmRmOlJERj48Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+PGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+PGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPjwvY2M6V29yaz48L3JkZjpSREY+PC9tZXRhZGF0YT48ZGVmcwogICAgIGlkPSJkZWZzNiI+PGNsaXBQYXRoCiAgICAgICBpZD0iY2xpcFBhdGgxOCIKICAgICAgIGNsaXBQYXRoVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aAogICAgICAgICBpZD0icGF0aDE2IgogICAgICAgICBkPSJNIDAsNjQgSCA2NSBWIDAgSCAwIFoiIC8+PC9jbGlwUGF0aD48L2RlZnM+PGcKICAgICB0cmFuc2Zvcm09Im1hdHJpeCgxLjMzMzMzMzMsMCwwLC0xLjMzMzMzMzMsMCw4NS4zMzMzMzMpIgogICAgIGlkPSJnMTAiPjxnCiAgICAgICBpZD0iZzEyIj48ZwogICAgICAgICBjbGlwLXBhdGg9InVybCgjY2xpcFBhdGgxOCkiCiAgICAgICAgIGlkPSJnMTQiPjxwYXRoCiAgICAgICAgICAgaWQ9InBhdGgyMCIKICAgICAgICAgICBzdHlsZT0iZmlsbDojZmE2ZjcxO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpub256ZXJvO3N0cm9rZTpub25lIgogICAgICAgICAgIGQ9Im0gNjEsNDkgaCAtNCB2IDQgaCA0IHogTSA0MCw0MCBIIDEyIFYgNTYgSCA0MCBaIE0gNjEsNjIgViA1NyBIIDUzIFYgNDUgaCA4IFYgMTIgYyAwLC0xLjEwMyAtMC44OTYsLTIgLTIsLTIgLTEuMTA0LDAgLTIsMC44OTcgLTIsMiB2IDE4LjA4MyBjIDAsNS41MTQgLTQuNDg2LDEwIC0xMCwxMCBWIDU2IGMgMCw0LjQgLTMuNiw4IC04LDggSCAxMyBDIDguNiw2NCA1LDYwLjQgNSw1NiBWIDYgSCAwIFYgMCBoIDUyIHYgNiBoIC01IHYgMzAuMDgzIGMgMy4zMDksMCA2LC0yLjY5MSA2LC02IFYgMTIgYyAwLC0zLjMwOSAyLjY5MSwtNiA2LC02IDMuMzA5LDAgNiwyLjY5MSA2LDYgdiA1MCB6IiAvPjwvZz48L2c+PC9nPjwvc3ZnPg==">
-        </div>
-    </div>
+  </div>
 </div>
 
-<script src="js/jquery-3.2.1.min.js"></script>
-<script src="js/speedo.js"></script>
+<script>
+(function(){
+
+  // ============================================================
+  //  Геометрия циферблата
+  // ============================================================
+  var CX = 115, CY = 115;
+  var R_SPEED = 100;   // радиус дуги скорости (внешняя, красная)
+  var R_FUEL  = 100;   // радиус дуги топлива (тот же радиус, другой угловой сектор)
+  var R_TICK_OUT = 88;
+  var R_TICK_IN  = 82;
+  var R_TICK_IN_MAJOR = 78;
+  var R_NUM = 70;
+
+  // Углы считаются от 12 часов (0°), по часовой стрелке, в "часовом" эквиваленте:
+  // 7ч=210° 8ч=240° 9ч=270° 10ч=300° 11ч=330°  и  1ч=30° 2ч=60° 3ч=90° 4ч=120° 5ч=150°
+  //
+  // Красная дуга скорости: от низа-слева (7ч/215°) вверх до верха-слева (11ч/330°),
+  //   проходя через 9 часов — т.е. угол РАСТЁТ (sweep по часовой = 1).
+  // Жёлтая дуга топлива: от низа-справа (5ч/150°) вверх до верха-справа (1ч/35°),
+  //   проходя через 3 часа — т.е. угол УБЫВАЕТ (sweep против часовой = 0).
+  // Обе дуги по ~115°, симметричны относительно вертикальной оси.
+  var SPD_START = 215, SPD_END = 330, SPD_SWEEP = 1;
+  var FUEL_START = 150, FUEL_END = 35, FUEL_SWEEP = 0;
+
+  var MAX_SPEED = 240; // верхняя граница шкалы (км/ч) чисто визуальная
+
+  function polar(cx, cy, r, angleDeg){
+    var a = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  }
+
+  // sweep=1 -> идём от a0 к a1 по часовой (угол растёт)
+  // sweep=0 -> идём от a0 к a1 против часовой (угол убывает)
+  // large-arc-flag считается от РЕАЛЬНОГО пройденного углового пути в этом направлении,
+  // а не от модульной разницы - иначе короткая дуга может превратиться в длинную.
+  function arcPath(cx, cy, r, a0, a1, sweep){
+    var start = polar(cx, cy, r, a0);
+    var end   = polar(cx, cy, r, a1);
+    var span  = sweep === 1 ? (((a1 - a0) % 360) + 360) % 360
+                             : (((a0 - a1) % 360) + 360) % 360;
+    var large = span > 180 ? 1 : 0;
+    return "M " + start.x.toFixed(2) + " " + start.y.toFixed(2) +
+           " A " + r + " " + r + " 0 " + large + " " + sweep + " " + end.x.toFixed(2) + " " + end.y.toFixed(2);
+  }
+
+  // ============================================================
+  //  Отрисовка статичных частей (шкала, фон дуг)
+  // ============================================================
+  var arcSpeedBg  = document.getElementById('arcSpeedBg');
+  var arcSpeedVal = document.getElementById('arcSpeedVal');
+  var arcFuelBg   = document.getElementById('arcFuelBg');
+  var arcFuelVal  = document.getElementById('arcFuelVal');
+  var ticksG      = document.getElementById('ticks');
+  var numsG       = document.getElementById('scaleNums');
+
+  var STROKE = 7;
+  [arcSpeedBg, arcSpeedVal].forEach(function(el){ el.setAttribute('stroke-width', STROKE); });
+  [arcFuelBg, arcFuelVal].forEach(function(el){ el.setAttribute('stroke-width', STROKE); });
+
+  arcSpeedBg.setAttribute('d', arcPath(CX, CY, R_SPEED, SPD_START, SPD_END, SPD_SWEEP));
+  arcFuelBg.setAttribute('d',  arcPath(CX, CY, R_FUEL,  FUEL_START, FUEL_END, FUEL_SWEEP));
+
+  // Тики скорости: подписи 0,40,80,120,160,200,240 вдоль красной дуги.
+  // SPD_SWEEP=1 (угол растёт от SPD_START к SPD_END), поэтому интерполяция прямая.
+  var SPEED_LABELS = [0, 40, 80, 120, 160, 200, 240];
+  SPEED_LABELS.forEach(function(v){
+    var t = v / MAX_SPEED;
+    var ang = SPD_START + t * (SPD_END - SPD_START);
+    var isMajor = (v % 80 === 0);
+
+    var p1 = polar(CX, CY, R_TICK_OUT, ang);
+    var p2 = polar(CX, CY, isMajor ? R_TICK_IN_MAJOR : R_TICK_IN, ang);
+    var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', p1.x); line.setAttribute('y1', p1.y);
+    line.setAttribute('x2', p2.x); line.setAttribute('y2', p2.y);
+    line.setAttribute('class', 'tick' + (isMajor ? ' major' : ''));
+    ticksG.appendChild(line);
+
+    if(isMajor){
+      var pn = polar(CX, CY, R_NUM, ang);
+      var txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', pn.x); txt.setAttribute('y', pn.y + 3);
+      txt.setAttribute('class', 'scale-num');
+      txt.textContent = v;
+      numsG.appendChild(txt);
+    }
+  });
+
+  // ============================================================
+  //  Передачи (N, 1..6) — упрощённо вычисляется из скорости
+  // ============================================================
+  var gearRow = document.getElementById('gearRow');
+  var GEARS = ['N','1','2','3','4','5','6'];
+  var gearEls = {};
+  GEARS.forEach(function(g){
+    var span = document.createElement('span');
+    span.className = 'gear';
+    span.textContent = g;
+    gearRow.appendChild(span);
+    gearEls[g] = span;
+  });
+
+  function gearFromSpeed(speed){
+    var s = Math.abs(speed);
+    if(s < 2)   return 'N';
+    if(s < 20)  return '1';
+    if(s < 45)  return '2';
+    if(s < 75)  return '3';
+    if(s < 110) return '4';
+    if(s < 150) return '5';
+    return '6';
+  }
+
+  var lastGear = null;
+  function setGear(g){
+    if(g === lastGear) return;
+    lastGear = g;
+    GEARS.forEach(function(k){
+      gearEls[k].classList.toggle('active', k === g);
+    });
+  }
+
+  // ============================================================
+  //  Обновление показаний
+  // ============================================================
+  var speedValueEl = document.getElementById('speedValue');
+  var odoRowEl      = document.getElementById('odoRow');
+  var hpNumEl       = document.getElementById('hpNum');
+  var iconHpEl      = document.getElementById('iconHp');
+  var iconFuelEl    = document.getElementById('iconFuel');
+
+  var odoKm = 0; // локальный пробег, копится пока открыт HUD (нет отдельного поля в JSON)
+  var lastTickTs = null;
+
+  function arcLen(r, a0, a1, sweep){
+    var span = sweep === 1 ? (((a1 - a0) % 360) + 360) % 360
+                            : (((a0 - a1) % 360) + 360) % 360;
+    return span * Math.PI / 180 * r;
+  }
+
+  // Заливка всегда растёт от a0 (стартовая/нижняя точка) к a1 (конечная/верхняя),
+  // независимо от sweep - stroke-dasharray режет путь с его начала (a0), что нам и нужно.
+  function setArc(el, r, a0, a1, sweep, t){
+    t = Math.max(0, Math.min(1, t));
+    var full = arcLen(r, a0, a1, sweep);
+    var dash = full * t;
+    el.setAttribute('d', arcPath(CX, CY, r, a0, a1, sweep));
+    el.setAttribute('stroke-dasharray', dash.toFixed(1) + ' ' + (full * 2).toFixed(1));
+  }
+
+  function render(data){
+    var speed = Math.max(0, data.speed | 0);
+    var fuel  = Math.max(0, Math.min(100, data.fuel | 0));
+    var hp    = Math.max(0, Math.min(100, data.hp | 0));
+
+    // Скорость
+    speedValueEl.textContent = speed;
+    setArc(arcSpeedVal, R_SPEED, SPD_START, SPD_END, SPD_SWEEP, speed / MAX_SPEED);
+    setGear(gearFromSpeed(speed));
+
+    // Пробег: копим локально по времени движения (сек * скорость / 3600)
+    var now = Date.now();
+    if(lastTickTs !== null){
+      var dtH = (now - lastTickTs) / 3600000;
+      odoKm += speed * dtH;
+    }
+    lastTickTs = now;
+    odoRowEl.textContent = odoKm.toFixed(1) + ' km';
+
+    // Топливо
+    setArc(arcFuelVal, R_FUEL, FUEL_START, FUEL_END, FUEL_SWEEP, fuel / 100);
+    iconFuelEl.classList.toggle('warn', fuel <= 15);
+
+    // HP / состояние авто
+    hpNumEl.textContent = hp;
+    iconHpEl.classList.remove('warn');
+    if(hp <= 25){
+      iconHpEl.classList.add('warn');
+    }
+    if(hp > 60)      iconHpEl.style.color = 'var(--hp-green)';
+    else if(hp > 25) iconHpEl.style.color = 'var(--hp-amber)';
+    else             iconHpEl.style.color = 'var(--hp-red)';
+  }
+
+  // ============================================================
+  //  Показ / скрытие
+  // ============================================================
+  var root = document.getElementById('root');
+  function show(){
+    root.classList.add('visible');
+    lastTickTs = null; // не копим пробег за время когда HUD был скрыт
+  }
+  function hide(){
+    root.classList.remove('visible');
+  }
+
+  // ============================================================
+  //  Подключение к SA:MP CEF (samp-cef). События приходят через
+  //  window.cefEvent(name, data) — так принято в samp-cef клиентском
+  //  SDK; поддержан также fallback на cef_subscribe, если проект
+  //  использует более старую обвязку.
+  //
+  //  Pawn-сторона (cef_speedometer.inc) шлёт:
+  //    cef_emit_event(playerid, "speedo_show");
+  //    cef_emit_event(playerid, "speedo_hide");
+  //    cef_emit_event(playerid, "speedo_data", json);
+  //      json = {"speed":N,"fuel":N,"hp":N,"engine":0|1,
+  //              "doors":N,"belt":0|1,"lights":N}
+  // ============================================================
+  function handleEvent(name, data){
+    if(name === 'speedo_show'){ show(); return; }
+    if(name === 'speedo_hide'){ hide(); return; }
+    if(name === 'speedo_data'){
+      var payload = data;
+      if(typeof payload === 'string'){
+        try{ payload = JSON.parse(payload); } catch(e){ return; }
+      }
+      if(payload) render(payload);
+      return;
+    }
+  }
+
+  // samp-cef стандартный способ
+  window.cefEvent = function(name, data){
+    handleEvent(name, data);
+  };
+
+  // fallback: некоторые сборки используют cef_subscribe(eventName, cb) на стороне клиента
+  if(typeof window.cef_subscribe === 'function'){
+    window.cef_subscribe('speedo_show', function(){ handleEvent('speedo_show'); });
+    window.cef_subscribe('speedo_hide', function(){ handleEvent('speedo_hide'); });
+    window.cef_subscribe('speedo_data', function(d){ handleEvent('speedo_data', d); });
+  }
+
+  // ============================================================
+  //  Локальный тест в обычном браузере (без SA:MP) -
+  //  открой файл напрямую и смотри демо-анимацию.
+  //  В проде этот блок безвреден: он не трогает ничего, если
+  //  within 1.5s реальный speedo_show/speedo_data не пришли.
+  // ============================================================
+  var gotRealEvent = false;
+  var origHandle = handleEvent;
+  handleEvent = function(name, data){
+    gotRealEvent = true;
+    origHandle(name, data);
+  };
+
+  setTimeout(function(){
+    if(gotRealEvent) return;
+    // demo режим
+    show();
+    var t = 0;
+    setInterval(function(){
+      t += 0.05;
+      var demoSpeed = Math.max(0, Math.round(110 + 100 * Math.sin(t)));
+      var demoFuel  = Math.round(50 + 45 * Math.sin(t / 3));
+      var demoHp    = Math.round(60 + 35 * Math.cos(t / 5));
+      render({speed: demoSpeed, fuel: demoFuel, hp: demoHp, engine:1, doors:0, belt:1, lights:0});
+    }, 200);
+  }, 1500);
+
+  // Начальное состояние
+  render({speed:0, fuel:0, hp:100, engine:0, doors:0, belt:0, lights:0});
+
+})();
+</script>
+
 </body>
 </html>
