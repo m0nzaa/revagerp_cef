@@ -8,68 +8,208 @@
 </head>
 <body>
     <div class="phone">
-        <div class="screen main-menu">
+        <div class="notch"></div>
+
+        <div class="status-bar">
+            <span class="time">21:47</span>
+            <div class="status-icons">
+                <span class="si">▂▄▆█</span>
+                <span class="si">📶</span>
+                <span class="si">🔋</span>
+            </div>
+        </div>
+
+        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <div class="screen main-menu active" data-screen="main">
             <header>
                 <div class="header-left">
-                    <img src="img/Avatar.png" alt="" class="avatar">
+                    <div class="avatar-circle">V</div>
                     <div class="header-name">Valdemar</div>
                 </div>
                 <div class="header-right">
-                    <img src="img/Search.png" alt="">
-                    <img src="img/Folder.png" alt="">
+                    <span class="hicon">🔍</span>
+                    <span class="hicon">📁</span>
                 </div>
             </header>
-            <div class="bank-content">
+
+            <div class="bank-content" data-open="bank">
                 <div class="bank-balance">
-                    <img src="img/$.png" alt="" class="img">
+                    <div class="bank-card-chip"></div>
                     <div class="bank-title text">Баланс карты</div>
                     <div class="bank-money text">$44.444,13</div>
                 </div>
             </div>
-            <div class="apps">
-                    <div class="icon-grid">
-                        <div class="icon-card">
-                            <div class="icon-image">
-                            <img src="img/home_alt_fill.svg" alt="">
-                            </div>
-                            <p class="text">Дом</p>
-                        </div>
-                        <div class="icon-card">
-                            <div class="icon-image">
-                            <img src="img/taxi.png" alt="Иконка 2">
-                            </div>
-                            <p>Такси</p>
-                        </div>
-                        <div class="icon-card">
-                            <div class="icon-image">
-                            <img src="img/location_outline.svg" alt="Иконка 3">
-                            </div>
-                            <p>GPS</p>
-                        </div>
-                        <div class="icon-card">
-                            <div class="icon-image">
-                            <img src="img/emergency-call-svgrepo-com.svg" alt="Иконка 4">
-                            </div>
-                            <p>Помощь</p>
-                        </div>
-                        <div class="icon-card">
-                            <div class="icon-image">
-                            <img src="img/users.png" alt="Иконка 5">
-                            </div>
-                            <p>Контакты</p>
-                        </div>
-                        <div class="icon-card">
-                            <div class="icon-image">
-                            <img src="img/dollar-symbol.png" alt="Иконка 6">
-                            </div>
-                            <p>Банк</p>
-                        </div>
 
+            <div class="apps">
+                <div class="icon-grid">
+                    <div class="icon-card">
+                        <div class="icon-image icon-home">🏠</div>
+                        <p>Дом</p>
                     </div>
+                    <div class="icon-card">
+                        <div class="icon-image icon-taxi">🚕</div>
+                        <p>Такси</p>
+                    </div>
+                    <div class="icon-card">
+                        <div class="icon-image icon-gps">📍</div>
+                        <p>GPS</p>
+                    </div>
+                    <div class="icon-card">
+                        <div class="icon-image icon-sos">🆘</div>
+                        <p>Помощь</p>
+                    </div>
+                    <div class="icon-card">
+                        <div class="icon-image icon-contacts">👥</div>
+                        <p>Контакты</p>
+                    </div>
+                    <div class="icon-card" data-open="bank">
+                        <div class="icon-image icon-bank">💳</div>
+                        <p>Банк</p>
+                    </div>
+                    <div class="icon-card" data-open="settings">
+                        <div class="icon-image icon-settings">⚙️</div>
+                        <p>Настройки</p>
+                    </div>
+                </div>
             </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН БАНКА -->
+        <div class="screen bank-screen" data-screen="bank">
+            <div class="app-header">
+                <span class="back-btn" data-close="bank">‹</span>
+                <span class="app-title">Банк</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="bank-hero-card">
+                <div class="bank-hero-top">
+                    <span class="bank-hero-label">Основная карта</span>
+                    <div class="bank-card-chip light"></div>
+                </div>
+                <div class="bank-hero-balance">$44.444,13</div>
+                <div class="bank-hero-number">•••• •••• •••• 4471</div>
+            </div>
+
+            <div class="bank-actions">
+                <div class="bank-action">
+                    <div class="bank-action-icon">↑</div>
+                    <span>Перевести</span>
+                </div>
+                <div class="bank-action">
+                    <div class="bank-action-icon">↓</div>
+                    <span>Пополнить</span>
+                </div>
+                <div class="bank-action">
+                    <div class="bank-action-icon">💱</div>
+                    <span>Обмен</span>
+                </div>
+                <div class="bank-action">
+                    <div class="bank-action-icon">⋯</div>
+                    <span>Ещё</span>
+                </div>
+            </div>
+
+            <div class="bank-section-title">История операций</div>
+
+            <div class="bank-history">
+                <div class="bank-tx">
+                    <div class="bank-tx-icon">🏪</div>
+                    <div class="bank-tx-info">
+                        <div class="bank-tx-name">24/7 Магазин</div>
+                        <div class="bank-tx-date">Сегодня, 21:32</div>
+                    </div>
+                    <div class="bank-tx-sum minus">-$120</div>
+                </div>
+                <div class="bank-tx">
+                    <div class="bank-tx-icon">💼</div>
+                    <div class="bank-tx-info">
+                        <div class="bank-tx-name">Зарплата</div>
+                        <div class="bank-tx-date">Сегодня, 18:00</div>
+                    </div>
+                    <div class="bank-tx-sum plus">+$3.500</div>
+                </div>
+                <div class="bank-tx">
+                    <div class="bank-tx-icon">⛽</div>
+                    <div class="bank-tx-info">
+                        <div class="bank-tx-name">АЗС</div>
+                        <div class="bank-tx-date">Вчера, 14:12</div>
+                    </div>
+                    <div class="bank-tx-sum minus">-$85</div>
+                </div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН НАСТРОЕК -->
+        <div class="screen settings-screen" data-screen="settings">
+            <div class="app-header">
+                <span class="back-btn" data-close="settings">‹</span>
+                <span class="app-title">Настройки</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="settings-profile">
+                <div class="settings-avatar">V</div>
+                <div>
+                    <div class="settings-name">Valdemar</div>
+                    <div class="settings-sub">Apple ID, iCloud и т.д.</div>
+                </div>
+                <span class="settings-chevron">›</span>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-row">
+                    <span class="settings-row-icon wifi">📶</span>
+                    <span class="settings-row-label">Wi-Fi</span>
+                    <span class="settings-row-value">RevageRP</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row-icon bt">🔵</span>
+                    <span class="settings-row-label">Bluetooth</span>
+                    <span class="settings-row-value">Вкл.</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row-icon cell">📡</span>
+                    <span class="settings-row-label">Сотовая связь</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-row">
+                    <span class="settings-row-icon sound">🔊</span>
+                    <span class="settings-row-label">Звуки, тактильные сигналы</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row-icon bright">🔆</span>
+                    <span class="settings-row-label">Экран и яркость</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row-icon wall">🖼️</span>
+                    <span class="settings-row-label">Обои</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-row">
+                    <span class="settings-row-icon priv">🔒</span>
+                    <span class="settings-row-label">Конфиденциальность</span>
+                    <span class="settings-chevron">›</span>
+                </div>
+            </div>
+
+            <div class="home-indicator"></div>
         </div>
     </div>
-
 
     <script src="index.js"></script>
 </body>
