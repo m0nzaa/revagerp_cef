@@ -23,8 +23,8 @@
         <div class="screen main-menu active" data-screen="main">
             <header>
                 <div class="header-left">
-                    <div class="avatar-circle">V</div>
-                    <div class="header-name">Valdemar</div>
+                    <div class="avatar-circle" id="avatarLetter">V</div>
+                    <div class="header-name" id="playerName">Valdemar</div>
                 </div>
                 <div class="header-right">
                     <span class="hicon">🔍</span>
@@ -36,7 +36,7 @@
                 <div class="bank-balance">
                     <div class="bank-card-chip"></div>
                     <div class="bank-title text">Баланс карты</div>
-                    <div class="bank-money text">$44.444,13</div>
+                    <div class="bank-money text" id="bankBalanceMain">$0</div>
                 </div>
             </div>
 
@@ -73,6 +73,23 @@
                 </div>
             </div>
 
+            <div class="dock">
+                <div class="dock-icon dock-calls">
+                    <div class="icon-image icon-calls">📞</div>
+                    <span class="dock-badge" id="callsBadge">2</span>
+                </div>
+                <div class="dock-icon dock-sms">
+                    <div class="icon-image icon-sms">💬</div>
+                    <span class="dock-badge" id="smsBadge">5</span>
+                </div>
+                <div class="dock-icon dock-camera">
+                    <div class="icon-image icon-camera">📷</div>
+                </div>
+                <div class="dock-icon dock-music">
+                    <div class="icon-image icon-music">🎵</div>
+                </div>
+            </div>
+
             <div class="home-indicator"></div>
         </div>
 
@@ -89,7 +106,7 @@
                     <span class="bank-hero-label">Основная карта</span>
                     <div class="bank-card-chip light"></div>
                 </div>
-                <div class="bank-hero-balance">$44.444,13</div>
+                <div class="bank-hero-balance" id="bankBalanceHero">$0</div>
                 <div class="bank-hero-number">•••• •••• •••• 4471</div>
             </div>
 
@@ -153,9 +170,9 @@
             </div>
 
             <div class="settings-profile">
-                <div class="settings-avatar">V</div>
+                <div class="settings-avatar" id="settingsAvatarLetter">V</div>
                 <div>
-                    <div class="settings-name">Valdemar</div>
+                    <div class="settings-name" id="settingsPlayerName">Valdemar</div>
                     <div class="settings-sub">Apple ID, iCloud и т.д.</div>
                 </div>
                 <span class="settings-chevron">›</span>

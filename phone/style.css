@@ -10,6 +10,9 @@ html, body {
 
 * {
     box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
 }
 
 /* ============ КОРПУС ТЕЛЕФОНА (iPhone 15) ============ */
@@ -192,6 +195,68 @@ header {
 .apps {
     margin-top: 28px;
     padding: 0 20px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+/* ============ DOCK (нижняя панель быстрого доступа, как на iOS) ============ */
+
+.dock {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 30px;
+    height: 80px;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(14px);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.dock-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.dock-icon:active {
+    transform: scale(0.9);
+}
+
+.dock .icon-image {
+    width: 54px;
+    height: 54px;
+    font-size: 24px;
+}
+
+.icon-calls  { background: linear-gradient(135deg, #34d399, #0ea35f); }
+.icon-sms    { background: linear-gradient(135deg, #4ade80, #22c55e); }
+.icon-camera { background: linear-gradient(135deg, #71717a, #3f3f46); }
+.icon-music  { background: linear-gradient(135deg, #fb7185, #e11d48); }
+
+.dock-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #ff3b30;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #E2F4FF;
 }
 
 .icon-grid {

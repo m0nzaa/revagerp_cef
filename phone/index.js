@@ -2,6 +2,32 @@ const phone = document.querySelector('.phone');
 
 let phoneOpen = false;
 
+// блокируем правый клик (контекстное меню "Копировать" и т.д.) по всему телефону —
+// вместе с user-select: none в CSS это убирает возможность скопировать текст
+phone.addEventListener('contextmenu', (e) => e.preventDefault());
+
+function formatMoney(amount) {
+    // 44444 -> "$44.444"
+    const n = Number(amount) || 0;
+    return '$' + n.toLocaleString('ru-RU').replace(/,/g, '.');
+}
+
+function setPlayerName(name) {
+    const safe = name && name.length ? name : '—';
+    document.getElementById('playerName').textContent = safe;
+    document.getElementById('settingsPlayerName').textContent = safe;
+
+    const letter = safe.charAt(0).toUpperCase();
+    document.getElementById('avatarLetter').textContent = letter;
+    document.getElementById('settingsAvatarLetter').textContent = letter;
+}
+
+function setBankBalance(amount) {
+    const formatted = formatMoney(amount);
+    document.getElementById('bankBalanceMain').textContent = formatted;
+    document.getElementById('bankBalanceHero').textContent = formatted;
+}
+
 function showScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const target = document.querySelector(`.screen[data-screen="${name}"]`);
@@ -44,4 +70,10 @@ document.addEventListener('keydown', (e) => {
 if (typeof cef !== 'undefined') {
     cef.on('phone:show', () => openPhone());
     cef.on('phone:hide', () => closePhone());
+
+    // сервер присылает актуальные данные игрока при каждом открытии телефона
+    cef.on('phone:data', (name, bankMoney) => {
+        setPlayerName(name);
+        setBankBalance(bankMoney);
+    });
 }
