@@ -1,5 +1,8 @@
-body {
-    background-color: #737dfb;
+html, body {
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 * {
@@ -8,20 +11,21 @@ body {
     box-sizing: border-box;
 }
 
+/* телефон прижат к правому нижнему углу экрана, скрыт по умолчанию — показывается по P */
 .phone {
   width: 375px;
   height: 800px;
   background: #249ccf;
   border-radius: 40px;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  position: relative;
-  margin: 20px auto;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: none;
 }
 
-h1 {
-    color: #fff;
-    font-size: 48px;
-    font-family: Bold;
+.phone.open {
+  display: block;
 }
 
 .screen {
@@ -33,19 +37,10 @@ h1 {
     box-sizing: border-box;
 }
 
-.screen-start {
-    display: block;
-    color: white;
-    font-family: 'Bold', sans-serif;
-    font-size: 48px;
-    text-align: center;
-    padding-top: 300px;
-    cursor: pointer;
-}
-
 .main-menu {
     background-color: #E2F4FF;
     padding-top: 85px;
+    display: block;
 }
 
 header {
