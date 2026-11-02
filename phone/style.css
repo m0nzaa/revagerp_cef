@@ -1,0 +1,192 @@
+body {
+    background-color: #737dfb;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.phone {
+  width: 375px;
+  height: 800px;
+  background: #249ccf;
+  border-radius: 40px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  position: relative;
+  margin: 20px auto;
+}
+
+h1 {
+    color: #fff;
+    font-size: 48px;
+    font-family: Bold;
+}
+
+.screen {
+    border-radius: 40px;
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 0 20px 20px 20px;
+    box-sizing: border-box;
+}
+
+.screen-start {
+    display: block;
+    color: white;
+    font-family: 'Bold', sans-serif;
+    font-size: 48px;
+    text-align: center;
+    padding-top: 300px;
+    cursor: pointer;
+}
+
+.main-menu {
+    background-color: #E2F4FF;
+    padding-top: 85px;
+}
+
+header {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #249ccf;
+    box-sizing: border-box;
+    padding: 0 20px;
+    margin-top: -20px;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    color: #FFFFFF;
+}
+
+/* Было: картинка без width/height — раздувалась на весь контейнер при broken image */
+.header-left img.avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.header-name {
+    padding-left: 15px;
+    font-size: 20px;
+    font-family: 'Semibold';
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-right img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    padding-left: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.bank-content {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    max-width: 240px;
+    max-height: 135px;
+}
+
+.bank-balance .img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.bank-title {
+    margin-top: 5px;
+    color: #5F676D;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.bank-money {
+    margin-top: 5px;
+    color: #9DAEBD;
+    font-size: 14px;
+}
+
+.apps {
+    margin-top: 30px;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.icon-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.icon-card:hover {
+  transform: scale(1.05);
+}
+
+.icon-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  padding: 4px;
+  background-color: #F2FAFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* страхует от раздувания сломанной картинки за пределы карточки */
+}
+
+.icon-image img {
+  width: 36px;
+  height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.icon-card:hover .icon-image {
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.icon-card p {
+  margin-top: 6px;
+  font-size: 12px;
+  text-align: center;
+  color: #656E74; /* было "color: 656E74;" без # — невалидное значение, браузер его игнорировал */
+}
+
+.scroll-line {
+  width: 200px;
+  border-top: 3px solid #262431;
+  margin-top: 10px;
+}
