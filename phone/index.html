@@ -70,17 +70,21 @@
                         <div class="icon-image icon-settings">⚙️</div>
                         <p>Настройки</p>
                     </div>
+                    <div class="icon-card" data-open="tradex">
+                        <div class="icon-image icon-tradex">₿</div>
+                        <p>TradeX</p>
+                    </div>
                 </div>
             </div>
 
             <div class="dock">
-                <div class="dock-icon dock-calls">
+                <div class="dock-icon dock-calls" data-open="calls">
                     <div class="icon-image icon-calls">📞</div>
-                    <span class="dock-badge" id="callsBadge">2</span>
+                    <span class="dock-badge hidden" id="callsBadge">0</span>
                 </div>
-                <div class="dock-icon dock-sms">
+                <div class="dock-icon dock-sms" data-open="sms">
                     <div class="icon-image icon-sms">💬</div>
-                    <span class="dock-badge" id="smsBadge">5</span>
+                    <span class="dock-badge hidden" id="smsBadge">0</span>
                 </div>
                 <div class="dock-icon dock-camera">
                     <div class="icon-image icon-camera">📷</div>
@@ -222,6 +226,225 @@
                     <span class="settings-row-label">Конфиденциальность</span>
                     <span class="settings-chevron">›</span>
                 </div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН TRADEX -->
+        <div class="screen tradex-screen" data-screen="tradex">
+            <div class="app-header tx-header">
+                <span class="back-btn tx-back" data-close="tradex">‹</span>
+                <span class="app-title tx-title">TradeX</span>
+                <span class="tx-history-btn" data-open="tradexHistory">🕑</span>
+            </div>
+
+            <div class="tx-body">
+                <!-- Выбор валюты -->
+                <div class="tx-tabs" id="txTabs">
+                    <div class="tx-tab active" data-currency="BTC">
+                        <span class="tx-tab-icon">₿</span> BTC
+                    </div>
+                    <div class="tx-tab" data-currency="USD">
+                        <span class="tx-tab-icon">$</span> USD
+                    </div>
+                    <div class="tx-tab" data-currency="EUR">
+                        <span class="tx-tab-icon">€</span> EUR
+                    </div>
+                    <div class="tx-tab" data-currency="UAH">
+                        <span class="tx-tab-icon">₴</span> UAH
+                    </div>
+                </div>
+
+                <!-- Карточка текущей цены -->
+                <div class="tx-price-card">
+                    <div class="tx-price-top">
+                        <div>
+                            <div class="tx-coin-name" id="txCoinName">Bitcoin</div>
+                            <div class="tx-coin-code" id="txCoinCode">BTC/RUB</div>
+                        </div>
+                        <div class="tx-price-change" id="txPriceChange">+0.00%</div>
+                    </div>
+                    <div class="tx-price-value" id="txPriceValue">—</div>
+                    <svg class="tx-sparkline" id="txSparkline" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
+                </div>
+
+                <!-- Баланс игрока по выбранной валюте -->
+                <div class="tx-balance-row">
+                    <span>Ваш баланс:</span>
+                    <span class="tx-balance-value" id="txBalanceValue">0</span>
+                </div>
+
+                <!-- Переключатель покупка/продажа/вывод -->
+                <div class="tx-action-tabs">
+                    <div class="tx-action-tab active" data-action="buy">Купить</div>
+                    <div class="tx-action-tab" data-action="sell">Продать</div>
+                    <div class="tx-action-tab" data-action="withdraw">Вывести</div>
+                </div>
+
+                <!-- Поле ввода суммы -->
+                <div class="tx-input-block">
+                    <input type="text" inputmode="decimal" class="tx-amount-input" id="txAmountInput" placeholder="0" autocomplete="off">
+                    <span class="tx-input-suffix" id="txInputSuffix">₽</span>
+                </div>
+
+                <!-- Подсказка расчёта -->
+                <div class="tx-calc-hint" id="txCalcHint">Введите сумму</div>
+
+                <!-- Блок комиссий, появляется для вывода -->
+                <div class="tx-fee-box hidden" id="txFeeBox">
+                    <div class="tx-fee-row">
+                        <span>Конвертация валюты</span>
+                        <span>3%</span>
+                    </div>
+                    <div class="tx-fee-row">
+                        <span>Вывод на банковский счёт</span>
+                        <span>2%</span>
+                    </div>
+                    <div class="tx-fee-row tx-fee-total">
+                        <span>Всего на вывод:</span>
+                        <span id="txWithdrawTotal">0 ₽</span>
+                    </div>
+                </div>
+
+                <button class="tx-submit-btn" id="txSubmitBtn">Купить</button>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ИСТОРИИ TRADEX -->
+        <div class="screen tradex-history-screen" data-screen="tradexHistory">
+            <div class="app-header tx-header">
+                <span class="back-btn tx-back" data-close="tradexHistory">‹</span>
+                <span class="app-title tx-title">История операций</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="tx-history-list" id="txHistoryList">
+                <div class="tx-history-empty">Операций пока нет</div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ЗВОНКОВ (список / набор номера) -->
+        <div class="screen calls-screen" data-screen="calls">
+            <div class="app-header">
+                <span class="back-btn" data-close="calls">‹</span>
+                <span class="app-title">Звонки</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="dial-display">
+                <input type="text" id="dialInput" class="dial-input" placeholder="Введите номер" readonly>
+            </div>
+
+            <div class="dial-pad">
+                <div class="dial-key" data-key="1">1</div>
+                <div class="dial-key" data-key="2">2<span>ABC</span></div>
+                <div class="dial-key" data-key="3">3<span>DEF</span></div>
+                <div class="dial-key" data-key="4">4<span>GHI</span></div>
+                <div class="dial-key" data-key="5">5<span>JKL</span></div>
+                <div class="dial-key" data-key="6">6<span>MNO</span></div>
+                <div class="dial-key" data-key="7">7<span>PQRS</span></div>
+                <div class="dial-key" data-key="8">8<span>TUV</span></div>
+                <div class="dial-key" data-key="9">9<span>WXYZ</span></div>
+                <div class="dial-key dial-key-dash" data-key="-">—</div>
+                <div class="dial-key" data-key="0">0</div>
+                <div class="dial-key dial-key-back" id="dialBackspace">⌫</div>
+            </div>
+
+            <div class="dial-call-btn" id="dialCallBtn">📞</div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ВХОДЯЩЕГО/ИСХОДЯЩЕГО ЗВОНКА -->
+        <div class="screen call-active-screen" data-screen="callActive">
+            <div class="call-bg"></div>
+
+            <div class="call-info">
+                <div class="call-avatar" id="callAvatarLetter">?</div>
+                <div class="call-name" id="callPeerName">Неизвестный</div>
+                <div class="call-status" id="callStatus">Вызов...</div>
+                <div class="call-timer hidden" id="callTimer">00:00</div>
+            </div>
+
+            <!-- Мини-чат во время разговора -->
+            <div class="call-chat hidden" id="callChat">
+                <div class="call-chat-messages" id="callChatMessages"></div>
+                <div class="call-chat-input-row">
+                    <input type="text" id="callChatInput" class="call-chat-input" placeholder="Сообщение собеседнику..." autocomplete="off">
+                    <span class="call-chat-send" id="callChatSend">➤</span>
+                </div>
+            </div>
+
+            <div class="call-buttons">
+                <div class="call-btn call-btn-accept hidden" id="callAcceptBtn">✓</div>
+                <div class="call-btn call-btn-decline" id="callDeclineBtn">✕</div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН SMS (список переписок) -->
+        <div class="screen sms-screen" data-screen="sms">
+            <div class="app-header">
+                <span class="back-btn" data-close="sms">‹</span>
+                <span class="app-title">Сообщения</span>
+                <span class="sms-new-btn" id="smsNewBtn">✎</span>
+            </div>
+
+            <div class="sms-operator-notice">
+                📡 <b>Уведомление оператора</b><br>
+                В настоящее время наблюдаются технические ограничения в работе службы SMS.<br>
+                Все сообщения сохраняются до 05:00, после чего автоматически удаляются.<br>
+                Рекомендуем своевременно проверять входящие сообщения. Приносим извинения за временные неудобства!
+            </div>
+
+            <div class="sms-chat-list" id="smsChatList">
+                <div class="sms-chat-empty">Нет переписок</div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ПОИСКА ПО ID (новая переписка) -->
+        <div class="screen sms-search-screen" data-screen="smsSearch">
+            <div class="app-header">
+                <span class="back-btn" data-close="smsSearch">‹</span>
+                <span class="app-title">Новое сообщение</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="sms-search-row">
+                <span class="sms-search-label">Кому:</span>
+                <input type="text" id="smsSearchInput" class="sms-search-input" placeholder="ID игрока" inputmode="numeric" autocomplete="off">
+                <button class="sms-search-btn" id="smsSearchBtn">Найти</button>
+            </div>
+
+            <div class="sms-search-result" id="smsSearchResult"></div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ПЕРЕПИСКИ -->
+        <div class="screen sms-chat-screen" data-screen="smsChat">
+            <div class="app-header">
+                <span class="back-btn" data-close="smsChat">‹</span>
+                <div class="sms-chat-peer">
+                    <div class="sms-chat-peer-avatar" id="smsChatAvatar">?</div>
+                    <span class="app-title" id="smsChatName">Игрок</span>
+                </div>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="sms-chat-messages" id="smsChatMessages"></div>
+
+            <div class="sms-chat-input-row">
+                <input type="text" id="smsChatInput" class="sms-chat-input" placeholder="Сообщение..." autocomplete="off">
+                <span class="sms-chat-send" id="smsChatSend">➤</span>
             </div>
 
             <div class="home-indicator"></div>

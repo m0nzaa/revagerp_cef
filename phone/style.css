@@ -575,3 +575,838 @@ header {
     color: #c7cbd1;
     font-size: 16px;
 }
+
+/* ============================================================
+   TRADEX — стиль биржи (чёрный фон, зелёный/красный, анимации)
+   ============================================================ */
+
+.icon-tradex { background: linear-gradient(135deg, #f0b90b, #d89d00); color: #0b0e11; font-weight: 700; }
+
+.hidden { display: none !important; }
+
+.dock-badge.hidden { display: none !important; }
+
+.tradex-screen,
+.tradex-history-screen {
+    background: #0b0e11;
+}
+
+.tx-header {
+    background: #0b0e11;
+    border-bottom: 1px solid #1e2329;
+}
+
+.tx-back, .tx-title { color: #eaecef; }
+
+.tx-history-btn {
+    font-size: 18px;
+    width: 40px;
+    text-align: right;
+    cursor: pointer;
+    color: #eaecef;
+}
+
+.tx-body {
+    padding: 14px 16px 0 16px;
+    height: calc(100% - 95px - 30px);
+    overflow-y: auto;
+}
+
+.tx-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.tx-tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 0;
+    border-radius: 10px;
+    background: #1e2329;
+    color: #848e9c;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tx-tab.active {
+    background: #f0b90b;
+    color: #0b0e11;
+}
+
+.tx-tab-icon {
+    margin-right: 2px;
+}
+
+.tx-price-card {
+    background: #181a20;
+    border-radius: 16px;
+    padding: 16px;
+    animation: txFadeIn 0.25s ease;
+}
+
+@keyframes txFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tx-price-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.tx-coin-name {
+    color: #eaecef;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.tx-coin-code {
+    color: #848e9c;
+    font-size: 11.5px;
+    margin-top: 2px;
+}
+
+.tx-price-change {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.tx-price-change.up   { color: #0ecb81; background: rgba(14,203,129,0.12); }
+.tx-price-change.down { color: #f6465d; background: rgba(246,70,93,0.12); }
+
+.tx-price-value {
+    margin-top: 12px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #eaecef;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s ease;
+}
+
+.tx-price-value.flash-up   { animation: flashGreen 0.6s ease; }
+.tx-price-value.flash-down { animation: flashRed 0.6s ease; }
+
+@keyframes flashGreen {
+    0%   { color: #0ecb81; }
+    100% { color: #eaecef; }
+}
+@keyframes flashRed {
+    0%   { color: #f6465d; }
+    100% { color: #eaecef; }
+}
+
+.tx-sparkline {
+    width: 100%;
+    height: 50px;
+    margin-top: 10px;
+}
+
+.tx-balance-row {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: #181a20;
+    border-radius: 12px;
+    color: #848e9c;
+    font-size: 13px;
+}
+
+.tx-balance-value {
+    color: #eaecef;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.tx-action-tabs {
+    margin-top: 16px;
+    display: flex;
+    background: #181a20;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.tx-action-tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 0;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #848e9c;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tx-action-tab.active {
+    background: #2b3139;
+    color: #eaecef;
+}
+
+.tx-input-block {
+    margin-top: 14px;
+    position: relative;
+    background: #181a20;
+    border-radius: 12px;
+    border: 1px solid #2b3139;
+    display: flex;
+    align-items: center;
+    padding: 4px 14px;
+}
+
+.tx-amount-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #eaecef;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 10px 0;
+}
+
+.tx-amount-input::placeholder { color: #474d57; }
+
+.tx-input-suffix {
+    color: #848e9c;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tx-calc-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #848e9c;
+    min-height: 16px;
+}
+
+.tx-fee-box {
+    margin-top: 10px;
+    background: #181a20;
+    border-radius: 12px;
+    padding: 12px 14px;
+    animation: txFadeIn 0.2s ease;
+}
+
+.tx-fee-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: #848e9c;
+    padding: 4px 0;
+}
+
+.tx-fee-total {
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid #2b3139;
+    color: #eaecef;
+    font-weight: 700;
+    font-size: 13.5px;
+}
+
+.tx-submit-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 13px 0;
+    border: none;
+    border-radius: 12px;
+    background: #0ecb81;
+    color: #0b0e11;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.tx-submit-btn:active {
+    transform: scale(0.97);
+}
+
+.tx-submit-btn.mode-sell { background: #f6465d; color: #fff; }
+.tx-submit-btn.mode-withdraw { background: #f0b90b; color: #0b0e11; }
+
+/* всплывающее уведомление об успехе/ошибке операции */
+.tx-toast {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 100px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #181a20;
+    border: 1px solid #2b3139;
+    color: #eaecef;
+    font-size: 13px;
+    text-align: center;
+    z-index: 60;
+    animation: toastIn 0.25s ease;
+}
+
+.tx-toast.error { border-color: #f6465d; color: #f6465d; }
+.tx-toast.success { border-color: #0ecb81; color: #0ecb81; }
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* история операций */
+
+.tx-history-list {
+    padding: 12px 16px;
+    height: calc(100% - 95px - 30px);
+    overflow-y: auto;
+}
+
+.tx-history-empty {
+    text-align: center;
+    color: #474d57;
+    font-size: 13px;
+    margin-top: 40px;
+}
+
+.tx-history-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #181a20;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.tx-history-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.tx-history-icon.buy      { background: rgba(14,203,129,0.15); color: #0ecb81; }
+.tx-history-icon.sell     { background: rgba(246,70,93,0.15); color: #f6465d; }
+.tx-history-icon.withdraw { background: rgba(240,185,11,0.15); color: #f0b90b; }
+
+.tx-history-info { flex: 1; }
+
+.tx-history-type {
+    color: #eaecef;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.tx-history-date {
+    color: #848e9c;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.tx-history-amount {
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    color: #eaecef;
+}
+
+/* ============================================================
+   ЗВОНКИ
+   ============================================================ */
+
+.calls-screen {
+    background: #F2F4F7;
+}
+
+.dial-display {
+    margin-top: 18px;
+    padding: 0 20px;
+}
+
+.dial-input {
+    width: 100%;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-size: 30px;
+    font-weight: 300;
+    color: #1c1c1e;
+    letter-spacing: 2px;
+    outline: none;
+}
+
+.dial-pad {
+    margin: 18px 28px 0 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.dial-key {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 500;
+    color: #1c1c1e;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.dial-key span {
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #9aa3ad;
+    margin-top: 1px;
+    font-weight: 600;
+}
+
+.dial-key:active {
+    transform: scale(0.92);
+    background: #E2F4FF;
+}
+
+.dial-key-dash {
+    font-size: 26px;
+}
+
+.dial-key-back {
+    font-size: 20px;
+    color: #9aa3ad;
+    box-shadow: none;
+    background: transparent;
+}
+
+.dial-call-btn {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 22px auto 0 auto;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(34,197,94,0.4);
+    transition: transform 0.12s ease;
+}
+
+.dial-call-btn:active {
+    transform: scale(0.92);
+}
+
+/* экран активного звонка */
+
+.call-active-screen {
+    position: relative;
+    overflow: hidden;
+}
+
+.call-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, #1c1c2e, #2d2d4a);
+}
+
+.call-info {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 70px;
+}
+
+.call-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.3);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    animation: callPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes callPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
+    50%      { box-shadow: 0 0 0 14px rgba(255,255,255,0); }
+}
+
+.call-name {
+    margin-top: 16px;
+    color: #fff;
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.call-status {
+    margin-top: 6px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13.5px;
+}
+
+.call-timer {
+    margin-top: 6px;
+    color: #4ade80;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.call-chat {
+    position: relative;
+    z-index: 2;
+    margin: 20px 16px 0 16px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 10px;
+    backdrop-filter: blur(6px);
+}
+
+.call-chat-messages {
+    max-height: 160px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px;
+}
+
+.call-chat-msg {
+    max-width: 80%;
+    padding: 7px 10px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    line-height: 1.3;
+    color: #fff;
+}
+
+.call-chat-msg.me {
+    align-self: flex-end;
+    background: #4ade80;
+    color: #0b2e1a;
+}
+
+.call-chat-msg.peer {
+    align-self: flex-start;
+    background: rgba(255,255,255,0.15);
+}
+
+.call-chat-input-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 6px 6px 6px 14px;
+}
+
+.call-chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 12.5px;
+}
+
+.call-chat-input::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+.call-chat-send {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #4ade80;
+    color: #0b2e1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.call-buttons {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+
+.call-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+}
+
+.call-btn:active { transform: scale(0.9); }
+
+.call-btn-accept  { background: #22c55e; }
+.call-btn-decline { background: #ef4444; }
+
+/* ============================================================
+   SMS
+   ============================================================ */
+
+.sms-screen {
+    background: #F2F4F7;
+}
+
+.sms-new-btn {
+    font-size: 18px;
+    width: 40px;
+    text-align: right;
+    cursor: pointer;
+    color: #249ccf;
+}
+
+.sms-operator-notice {
+    margin: 12px 16px 0 16px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #fff7e0, #ffedb3);
+    border: 1px solid #f0d98c;
+    border-radius: 14px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #7a5c00;
+}
+
+.sms-chat-list {
+    margin-top: 10px;
+    padding: 0 12px;
+    height: calc(100% - 95px - 120px);
+    overflow-y: auto;
+}
+
+.sms-chat-empty {
+    text-align: center;
+    color: #9aa3ad;
+    font-size: 13px;
+    margin-top: 30px;
+}
+
+.sms-chat-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.sms-chat-item-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #249ccf, #2bb3e0);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.sms-chat-item-info {
+    flex: 1;
+    padding-left: 10px;
+    min-width: 0;
+}
+
+.sms-chat-item-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1c1c1e;
+}
+
+.sms-chat-item-preview {
+    font-size: 12px;
+    color: #9aa3ad;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* поиск по ID */
+
+.sms-search-row {
+    margin: 18px 16px 0 16px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    padding: 4px 4px 4px 14px;
+}
+
+.sms-search-label {
+    font-size: 13px;
+    color: #9aa3ad;
+    margin-right: 8px;
+}
+
+.sms-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 10px 0;
+    background: transparent;
+    color: #1c1c1e;
+}
+
+.sms-search-btn {
+    border: none;
+    background: #249ccf;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 9px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.sms-search-result {
+    margin: 14px 16px 0 16px;
+}
+
+.sms-search-found {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.sms-search-not-found {
+    text-align: center;
+    color: #9aa3ad;
+    font-size: 13px;
+    margin-top: 14px;
+}
+
+/* переписка */
+
+.sms-chat-screen {
+    background: #F2F4F7;
+}
+
+.sms-chat-peer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sms-chat-peer-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #249ccf, #2bb3e0);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.sms-chat-screen .sms-chat-messages {
+    height: calc(100% - 95px - 70px - 30px);
+    overflow-y: auto;
+    padding: 14px 14px 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sms-msg {
+    max-width: 75%;
+    padding: 9px 13px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.35;
+    animation: txFadeIn 0.15s ease;
+}
+
+.sms-msg.me {
+    align-self: flex-end;
+    background: #249ccf;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.sms-msg.peer {
+    align-self: flex-start;
+    background: #fff;
+    color: #1c1c1e;
+    border-bottom-left-radius: 4px;
+}
+
+.sms-chat-input-row {
+    margin: 10px 14px 0 14px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 22px;
+    padding: 6px 6px 6px 16px;
+}
+
+.sms-chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13.5px;
+    background: transparent;
+    color: #1c1c1e;
+}
+
+.sms-chat-send {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #249ccf;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
