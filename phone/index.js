@@ -50,14 +50,31 @@ function closePhone() {
 document.querySelectorAll('[data-open]').forEach(el => {
     el.addEventListener('click', () => showScreen(el.dataset.open));
 });
+
+// нижняя полоска (home-indicator) работает как "смахивание вверх" на реальном iPhone —
+// тап по ней из любого приложения возвращает на главный экран.
+// Экран активного звонка намеренно исключён: сворачивание телефона не должно сбрасывать звонок.
+document.querySelectorAll('.home-indicator').forEach(el => {
+    el.addEventListener('click', () => {
+        const currentScreen = el.closest('.screen');
+        if (currentScreen && currentScreen.dataset.screen === 'callActive') return;
+        showScreen('main');
+    });
+});
 document.querySelectorAll('[data-close]').forEach(el => {
     el.addEventListener('click', () => showScreen('main'));
 });
 
 // ESC закрывает телефон и сообщает серверу снять фокус с браузера,
-// иначе курсор/ввод остаются перехваченными и экран "залипает"
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape' && phoneOpen) {
+// иначе курсор/ввод остаются перехваченными и экран "залипает".
+//
+// ВАЖНО: используем keyup, а не keydown. Официальная документация samp-cef
+// для cef_always_listen_keys прямо показывает пример именно с keyup —
+// плагин инжектит клавиатурный ввод в CEF через свой собственный механизм,
+// и keydown может не долетать до DOM надёжно даже при focus+always_listen_keys,
+// тогда как keyup стабильно работает по документации и практике плагина.
+function handlePhoneEscape(e) {
+    if ((e.code === 'Escape' || e.key === 'Escape') && phoneOpen) {
         e.preventDefault();
         closePhone();
         if (typeof cef !== 'undefined') {
@@ -65,7 +82,11 @@ document.addEventListener('keydown', (e) => {
             cef.emit('phone:toggle', 0);
         }
     }
-});
+}
+
+document.addEventListener('keyup', handlePhoneEscape);
+// keydown оставляем как резервный путь на случай, если конкретная сборка клиента всё же шлёт его
+document.addEventListener('keydown', handlePhoneEscape);
 
 // сервер открывает/закрывает телефон по команде /phone или /p
 if (typeof cef !== 'undefined') {
@@ -792,3 +813,124 @@ if (typeof cef !== 'undefined') {
         badge.classList.remove('hidden');
     });
 }
+
+/* ============================================================
+   GPS — список точек, выбор запускает маршрут через серверный
+   диалог SA-MP (не внутри CEF, по требованию заказчика)
+   ============================================================ */
+
+// Те же метки и порядок, что в phone.inc (GPS_LOCATIONS) — индекс важен,
+// т.к. при выборе отправляется именно индекс, а не название, чтобы сервер
+// однозначно сопоставил точку со своим массивом координат.
+const GPS_LOCATIONS = [
+    { name: 'Больница',  icon: '🏥' },
+    { name: 'Мэрия',     icon: '🏛️' },
+    { name: 'Авторынок', icon: '🚗' },
+    { name: 'Заправка',  icon: '⛽' },
+    { name: 'Полиция',   icon: '🚓' },
+    { name: 'Рынок',     icon: '🛒' }
+];
+
+function gpsRenderList() {
+    const list = document.getElementById('gpsList');
+    list.innerHTML = GPS_LOCATIONS.map((loc, index) => `
+        <div class="gps-item" data-index="${index}">
+            <div class="gps-item-icon">${loc.icon}</div>
+            <div class="gps-item-name">${loc.name}</div>
+            <div class="gps-item-arrow">›</div>
+        </div>
+    `).join('');
+
+    list.querySelectorAll('.gps-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const index = parseInt(item.dataset.index);
+            if (typeof cef !== 'undefined') {
+                cef.emit('gps:select', index);
+            }
+            // телефон сворачивается сразу — дальше с игроком говорит уже серверный диалог SA-MP
+            showScreen('main');
+        });
+    });
+}
+
+gpsRenderList();
+
+/* ============================================================
+   НАСТРОЙКИ — обои, прозрачность, отключение звонков/SMS,
+   выключение телефона. Хранится только в памяти текущей
+   вкладки (как и SMS-переписки) — сбрасывается при перезаходе,
+   что ожидаемо для CEF-страницы без постоянного хранилища.
+   ============================================================ */
+
+const WALLPAPERS = [
+    { id: 'ocean',   css: 'linear-gradient(165deg, #4facfe 0%, #00f2fe 100%)' },
+    { id: 'sunset',  css: 'linear-gradient(165deg, #fa709a 0%, #fee140 100%)' },
+    { id: 'night',   css: 'linear-gradient(165deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' },
+    { id: 'violet',  css: 'linear-gradient(165deg, #7f7fd5 0%, #86a8e7 50%, #91eae4 100%)' },
+    { id: 'mono',    css: 'linear-gradient(165deg, #232526 0%, #414345 100%)' },
+    { id: 'peach',   css: 'linear-gradient(165deg, #ffecd2 0%, #fcb69f 100%)' }
+];
+
+let phoneIsOff = false;
+
+// --- обои ---
+function settingsRenderWallpapers() {
+    const grid = document.getElementById('wallpaperGrid');
+    const current = document.querySelector('.main-menu').style.getPropertyValue('--wallpaper') ||
+        getComputedStyle(document.querySelector('.main-menu')).getPropertyValue('--wallpaper');
+
+    grid.innerHTML = WALLPAPERS.map(w => `
+        <div class="wallpaper-option" data-wallpaper="${w.id}" style="background:${w.css}"></div>
+    `).join('');
+
+    grid.querySelectorAll('.wallpaper-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const wp = WALLPAPERS.find(w => w.id === opt.dataset.wallpaper);
+            if (!wp) return;
+            document.querySelector('.main-menu').style.setProperty('--wallpaper', wp.css);
+
+            grid.querySelectorAll('.wallpaper-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+        });
+    });
+}
+
+document.getElementById('settingsWallpaperRow').addEventListener('click', () => {
+    settingsRenderWallpapers();
+    showScreen('wallpaper');
+});
+
+// --- прозрачность (эффект размытия в шапках/доке) ---
+document.getElementById('toggleTransparency').addEventListener('change', (e) => {
+    phone.classList.toggle('transparency-off', !e.target.checked);
+});
+
+// --- отключение звонков / SMS / звука — сообщаем серверу, чтобы он не присылал события вовсе ---
+document.getElementById('toggleCalls').addEventListener('change', (e) => {
+    if (typeof cef !== 'undefined') {
+        cef.emit('settings:callsEnabled', e.target.checked ? 1 : 0);
+    }
+});
+
+document.getElementById('toggleSms').addEventListener('change', (e) => {
+    if (typeof cef !== 'undefined') {
+        cef.emit('settings:smsEnabled', e.target.checked ? 1 : 0);
+    }
+});
+
+let notificationSoundEnabled = true;
+document.getElementById('toggleSound').addEventListener('change', (e) => {
+    notificationSoundEnabled = e.target.checked;
+});
+
+// --- выключение телефона ---
+document.getElementById('settingsPowerRow').addEventListener('click', () => {
+    phoneIsOff = true;
+    document.getElementById('phoneOffOverlay').classList.add('active');
+});
+
+document.getElementById('phoneOffOverlay').addEventListener('click', () => {
+    phoneIsOff = false;
+    document.getElementById('phoneOffOverlay').classList.remove('active');
+    showScreen('main');
+});

@@ -34,18 +34,32 @@ html, body {
     display: block;
 }
 
-/* ============ ЧЁЛКА ============ */
+/* ============ ЧЁЛКА (в стиле Dynamic Island) ============ */
 
 .notch {
     position: absolute;
     top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 126px;
-    height: 32px;
+    width: 128px;
+    height: 34px;
     background: #000;
-    border-radius: 0 0 20px 20px;
+    border-radius: 20px;
     z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 14px;
+}
+
+/* точка фронтальной камеры внутри чёлки — мелкая деталь, но она и делает "яблочный" вид */
+.notch::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #2a3a4a, #0a0a0c 70%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
 }
 
 /* ============ СТАТУС-БАР ============ */
@@ -98,6 +112,21 @@ html, body {
     height: 5px;
     background: rgba(0,0,0,0.3);
     border-radius: 3px;
+    cursor: pointer;
+}
+
+/* область клика шире самой видимой полоски — чтобы было удобно попадать, как свайп-зона на реальном iPhone */
+.home-indicator::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -40px;
+    right: -40px;
+    bottom: -16px;
+}
+
+.home-indicator:active {
+    background: rgba(0,0,0,0.45);
 }
 
 .main-menu .home-indicator,
@@ -106,6 +135,15 @@ html, body {
 }
 
 /* ============ ГЛАВНЫЙ ЭКРАН ============ */
+
+/* обои главного экрана — переключаются из Настроек через CSS-переменную,
+   без неё используется запасной градиент ниже */
+.main-menu {
+    --wallpaper: linear-gradient(165deg, #4facfe 0%, #00f2fe 100%);
+    background: var(--wallpaper);
+    background-size: cover;
+    background-position: center;
+}
 
 header {
     position: absolute;
@@ -116,7 +154,9 @@ header {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    background: linear-gradient(180deg, #2bb3e0, #249ccf);
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     padding: 0 20px 14px 20px;
     border-radius: 44px 44px 0 0;
 }
@@ -291,8 +331,6 @@ header {
 .icon-home      { background: linear-gradient(135deg, #ff9a56, #ff6a3d); }
 .icon-taxi      { background: linear-gradient(135deg, #ffd93d, #ffb020); }
 .icon-gps       { background: linear-gradient(135deg, #43e97b, #2fb866); }
-.icon-sos       { background: linear-gradient(135deg, #ff5e62, #e02e36); }
-.icon-contacts  { background: linear-gradient(135deg, #a78bfa, #7c5cfc); }
 .icon-bank      { background: linear-gradient(135deg, #34d399, #0ea5a0); }
 .icon-settings  { background: linear-gradient(135deg, #9aa3ad, #6b7280); }
 
@@ -300,8 +338,9 @@ header {
     margin-top: 6px;
     font-size: 11px;
     text-align: center;
-    color: #44505a;
+    color: #fff;
     font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
 }
 
 /* ============ ОБЩИЙ APP-HEADER (Банк / Настройки) ============ */
@@ -1409,4 +1448,235 @@ header {
     font-size: 14px;
     cursor: pointer;
     flex-shrink: 0;
+}
+
+/* ============================================================
+   GPS
+   ============================================================ */
+
+.gps-screen {
+    background: #F2F4F7;
+}
+
+.gps-header {
+    background: #fff;
+    border-bottom: 1px solid #ECEFF2;
+}
+
+.gps-body {
+    padding: 16px;
+}
+
+.gps-hint {
+    font-size: 12.5px;
+    color: #9aa3ad;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.gps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gps-item {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.gps-item:active {
+    transform: scale(0.98);
+}
+
+.gps-item-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #249ccf, #2bb3e0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.gps-item-name {
+    flex: 1;
+    padding-left: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1c1c1e;
+}
+
+.gps-item-arrow {
+    color: #c7cbd1;
+    font-size: 17px;
+}
+
+/* ============================================================
+   НАСТРОЙКИ — тумблеры в стиле iOS, выбор обоев, выключение
+   ============================================================ */
+
+.settings-row-toggle {
+    cursor: default;
+}
+
+.settings-row-icon.callicon { background: #34c759; }
+.settings-row-icon.sms      { background: #30d158; }
+.settings-row-icon.power    { background: #ff3b30; }
+
+/* тумблер-переключатель как в iOS */
+.settings-switch {
+    position: relative;
+    width: 44px;
+    height: 26px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.settings-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.settings-switch-slider {
+    position: absolute;
+    inset: 0;
+    background: #e4e6ea;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.settings-switch-slider::before {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    left: 2px;
+    top: 2px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+}
+
+.settings-switch input:checked + .settings-switch-slider {
+    background: #34c759;
+}
+
+.settings-switch input:checked + .settings-switch-slider::before {
+    transform: translateX(18px);
+}
+
+#settingsPowerRow {
+    cursor: pointer;
+}
+
+#settingsWallpaperRow {
+    cursor: pointer;
+}
+
+/* экран выбора обоев */
+
+.wallpaper-screen {
+    background: #F2F4F7;
+}
+
+.wallpaper-grid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.wallpaper-option {
+    aspect-ratio: 9 / 16;
+    border-radius: 16px;
+    cursor: pointer;
+    position: relative;
+    border: 3px solid transparent;
+    transition: transform 0.12s ease, border-color 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.wallpaper-option:active {
+    transform: scale(0.96);
+}
+
+.wallpaper-option.selected {
+    border-color: #249ccf;
+}
+
+.wallpaper-option.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #249ccf;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ============================================================
+   ПРОЗРАЧНОСТЬ — применяется на весь телефон переключателем
+   ============================================================ */
+
+.phone.transparency-off .app-header,
+.phone.transparency-off header {
+    background: #E2F4FF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.phone.transparency-off .dock {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* ============================================================
+   ЭКРАН "ТЕЛЕФОН ВЫКЛЮЧЕН"
+   ============================================================ */
+
+.phone-off-overlay {
+    position: absolute;
+    inset: 12px;
+    border-radius: 44px;
+    background: #000;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.phone-off-overlay.active {
+    display: flex;
+}
+
+.phone-off-icon {
+    font-size: 40px;
+    opacity: 0.5;
+}
+
+.phone-off-text {
+    margin-top: 14px;
+    color: rgba(255,255,255,0.4);
+    font-size: 13px;
 }

@@ -8,6 +8,11 @@
 </head>
 <body>
     <div class="phone">
+        <div class="phone-off-overlay" id="phoneOffOverlay">
+            <div class="phone-off-icon">⏻</div>
+            <div class="phone-off-text">Телефон выключен · нажмите, чтобы включить</div>
+        </div>
+
         <div class="notch"></div>
 
         <div class="status-bar">
@@ -50,17 +55,9 @@
                         <div class="icon-image icon-taxi">🚕</div>
                         <p>Такси</p>
                     </div>
-                    <div class="icon-card">
+                    <div class="icon-card" data-open="gps">
                         <div class="icon-image icon-gps">📍</div>
                         <p>GPS</p>
-                    </div>
-                    <div class="icon-card">
-                        <div class="icon-image icon-sos">🆘</div>
-                        <p>Помощь</p>
-                    </div>
-                    <div class="icon-card">
-                        <div class="icon-image icon-contacts">👥</div>
-                        <p>Контакты</p>
                     </div>
                     <div class="icon-card" data-open="bank">
                         <div class="icon-image icon-bank">💳</div>
@@ -183,48 +180,84 @@
             </div>
 
             <div class="settings-group">
-                <div class="settings-row">
-                    <span class="settings-row-icon wifi">📶</span>
-                    <span class="settings-row-label">Wi-Fi</span>
-                    <span class="settings-row-value">RevageRP</span>
-                    <span class="settings-chevron">›</span>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-row-icon bt">🔵</span>
-                    <span class="settings-row-label">Bluetooth</span>
-                    <span class="settings-row-value">Вкл.</span>
-                    <span class="settings-chevron">›</span>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-row-icon cell">📡</span>
-                    <span class="settings-row-label">Сотовая связь</span>
-                    <span class="settings-chevron">›</span>
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <div class="settings-row">
-                    <span class="settings-row-icon sound">🔊</span>
-                    <span class="settings-row-label">Звуки, тактильные сигналы</span>
-                    <span class="settings-chevron">›</span>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-row-icon bright">🔆</span>
-                    <span class="settings-row-label">Экран и яркость</span>
-                    <span class="settings-chevron">›</span>
-                </div>
-                <div class="settings-row">
+                <div class="settings-row" id="settingsWallpaperRow">
                     <span class="settings-row-icon wall">🖼️</span>
                     <span class="settings-row-label">Обои</span>
                     <span class="settings-chevron">›</span>
                 </div>
+                <div class="settings-row settings-row-toggle">
+                    <span class="settings-row-icon bright">🌫️</span>
+                    <span class="settings-row-label">Прозрачность</span>
+                    <label class="settings-switch">
+                        <input type="checkbox" id="toggleTransparency" checked>
+                        <span class="settings-switch-slider"></span>
+                    </label>
+                </div>
             </div>
 
             <div class="settings-group">
-                <div class="settings-row">
-                    <span class="settings-row-icon priv">🔒</span>
-                    <span class="settings-row-label">Конфиденциальность</span>
-                    <span class="settings-chevron">›</span>
+                <div class="settings-row settings-row-toggle">
+                    <span class="settings-row-icon callicon">📞</span>
+                    <span class="settings-row-label">Входящие звонки</span>
+                    <label class="settings-switch">
+                        <input type="checkbox" id="toggleCalls" checked>
+                        <span class="settings-switch-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row settings-row-toggle">
+                    <span class="settings-row-icon sms">💬</span>
+                    <span class="settings-row-label">Входящие SMS</span>
+                    <label class="settings-switch">
+                        <input type="checkbox" id="toggleSms" checked>
+                        <span class="settings-switch-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row settings-row-toggle">
+                    <span class="settings-row-icon sound">🔊</span>
+                    <span class="settings-row-label">Звук уведомлений</span>
+                    <label class="settings-switch">
+                        <input type="checkbox" id="toggleSound" checked>
+                        <span class="settings-switch-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-row" id="settingsPowerRow">
+                    <span class="settings-row-icon power">⏻</span>
+                    <span class="settings-row-label" style="color:#ff3b30;">Выключить телефон</span>
+                </div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ВЫБОРА ОБОЕВ -->
+        <div class="screen wallpaper-screen" data-screen="wallpaper">
+            <div class="app-header">
+                <span class="back-btn" data-close="wallpaper">‹</span>
+                <span class="app-title">Выбор обоев</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="wallpaper-grid" id="wallpaperGrid"></div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН GPS -->
+        <div class="screen gps-screen" data-screen="gps">
+            <div class="app-header gps-header">
+                <span class="back-btn" data-close="gps">‹</span>
+                <span class="app-title">GPS Навигатор</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="gps-body">
+                <div class="gps-hint">Выберите точку, чтобы проложить маршрут</div>
+
+                <div class="gps-list" id="gpsList">
+                    <!-- заполняется из JS: GPS_LOCATIONS -->
                 </div>
             </div>
 
