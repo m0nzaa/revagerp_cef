@@ -934,3 +934,17 @@ document.getElementById('phoneOffOverlay').addEventListener('click', () => {
     document.getElementById('phoneOffOverlay').classList.remove('active');
     showScreen('main');
 });
+
+/* ============================================================
+   ТАКСИ — пока только стиль, без функционала (по просьбе заказчика).
+   Клик просто подсвечивает выбранную роль.
+   ============================================================ */
+
+document.querySelectorAll('.taxi-role-card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelectorAll('.taxi-role-card').forEach(c => c.style.opacity = '1');
+        card.style.opacity = '0.7';
+        setTimeout(() => { card.style.opacity = '1'; }, 200);
+        // здесь позже подключится реальная логика выбора роли (cef.emit('taxi:role', ...))
+    });
+});

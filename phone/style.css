@@ -38,7 +38,7 @@ html, body {
 
 .notch {
     position: absolute;
-    top: 12px;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
     width: 128px;
@@ -82,9 +82,14 @@ html, body {
 
 .status-icons {
     display: flex;
-    gap: 5px;
-    font-size: 11px;
+    gap: 6px;
     align-items: center;
+}
+
+.status-icons svg {
+    fill: #fff;
+    stroke: #fff;
+    display: block;
 }
 
 /* ============ ЭКРАНЫ ============ */
@@ -201,11 +206,35 @@ header {
 
 .bank-content {
     margin: 112px 20px 0 20px;
-    padding: 16px 18px;
-    background: linear-gradient(135deg, #2c2c2e, #1c1c1e);
+    padding: 16px 18px 18px 18px;
+    background: linear-gradient(145deg, #3a3a3d 0%, #1c1c1e 55%, #0c0c0d 100%);
     border-radius: 18px;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+}
+
+/* диагональный блик поверх карты — придаёт объём, как на фото настоящих банковских карт */
+.bank-card-shine {
+    position: absolute;
+    top: -60%;
+    left: -20%;
+    width: 160%;
+    height: 220%;
+    background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.07) 48%, rgba(255,255,255,0.02) 52%, transparent 60%);
+    pointer-events: none;
+}
+
+.bank-balance {
+    position: relative;
+}
+
+.bank-card-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
 }
 
 .bank-card-chip {
@@ -213,11 +242,32 @@ header {
     height: 22px;
     border-radius: 5px;
     background: linear-gradient(135deg, #d4af37, #f4e5a1);
-    margin-bottom: 10px;
 }
 
 .bank-card-chip.light {
     background: linear-gradient(135deg, #e8e8e8, #fff);
+}
+
+.bank-card-logo {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.85);
+    font-style: italic;
+}
+
+.bank-card-logo span {
+    font-weight: 400;
+    font-style: normal;
+    color: rgba(255,255,255,0.5);
+}
+
+.bank-card-number {
+    margin-top: 10px;
+    font-size: 11.5px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.4);
+    font-variant-numeric: tabular-nums;
 }
 
 .bank-title {
@@ -1679,4 +1729,94 @@ header {
     margin-top: 14px;
     color: rgba(255,255,255,0.4);
     font-size: 13px;
+}
+
+/* ============================================================
+   ТАКСИ — выбор роли (стиль, без функционала)
+   ============================================================ */
+
+.taxi-screen {
+    background: #FFF8EC;
+}
+
+.taxi-header {
+    background: #FFF8EC;
+}
+
+.taxi-body {
+    padding: 10px 16px 0 16px;
+}
+
+.taxi-hero {
+    text-align: center;
+    padding: 18px 10px 24px 10px;
+}
+
+.taxi-hero-icon {
+    font-size: 44px;
+}
+
+.taxi-hero-title {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1c1c1e;
+}
+
+.taxi-hero-sub {
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: #9a8465;
+}
+
+.taxi-role-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    transition: transform 0.12s ease;
+}
+
+.taxi-role-card:active {
+    transform: scale(0.98);
+}
+
+.taxi-role-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.taxi-role-driver    { background: linear-gradient(135deg, #ffd166, #f4a623); }
+.taxi-role-passenger { background: linear-gradient(135deg, #6bcB77, #2fa84f); }
+
+.taxi-role-info {
+    flex: 1;
+    padding-left: 12px;
+}
+
+.taxi-role-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #1c1c1e;
+}
+
+.taxi-role-desc {
+    font-size: 11.5px;
+    color: #9aa3ad;
+    margin-top: 2px;
+}
+
+.taxi-role-arrow {
+    color: #c7cbd1;
+    font-size: 18px;
 }

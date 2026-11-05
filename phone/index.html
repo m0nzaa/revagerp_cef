@@ -18,9 +18,22 @@
         <div class="status-bar">
             <span class="time">21:47</span>
             <div class="status-icons">
-                <span class="si">▂▄▆█</span>
-                <span class="si">📶</span>
-                <span class="si">🔋</span>
+                <svg class="si-signal" viewBox="0 0 18 12" width="18" height="12">
+                    <rect x="0"  y="7" width="3" height="5" rx="0.8"/>
+                    <rect x="5"  y="5" width="3" height="7" rx="0.8"/>
+                    <rect x="10" y="3" width="3" height="9" rx="0.8"/>
+                    <rect x="15" y="0" width="3" height="12" rx="0.8"/>
+                </svg>
+                <svg class="si-wifi" viewBox="0 0 16 12" width="16" height="12">
+                    <path d="M8 10.2a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z"/>
+                    <path d="M4.4 6.6a5.1 5.1 0 0 1 7.2 0l-1.3 1.3a3.3 3.3 0 0 0-4.6 0L4.4 6.6Z"/>
+                    <path d="M1.6 3.8a9 9 0 0 1 12.8 0l-1.3 1.3a7.2 7.2 0 0 0-10.2 0L1.6 3.8Z"/>
+                </svg>
+                <svg class="si-battery" viewBox="0 0 25 12" width="25" height="12">
+                    <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" fill="none" stroke-width="1"/>
+                    <rect x="2" y="2" width="18" height="8" rx="1.3"/>
+                    <rect x="22.5" y="4" width="1.8" height="4" rx="0.8"/>
+                </svg>
             </div>
         </div>
 
@@ -31,27 +44,25 @@
                     <div class="avatar-circle" id="avatarLetter">V</div>
                     <div class="header-name" id="playerName">Valdemar</div>
                 </div>
-                <div class="header-right">
-                    <span class="hicon">🔍</span>
-                    <span class="hicon">📁</span>
-                </div>
+                <div class="header-right"></div>
             </header>
 
             <div class="bank-content" data-open="bank">
+                <div class="bank-card-shine"></div>
                 <div class="bank-balance">
-                    <div class="bank-card-chip"></div>
+                    <div class="bank-card-top-row">
+                        <div class="bank-card-chip"></div>
+                        <div class="bank-card-logo">RP<span>bank</span></div>
+                    </div>
                     <div class="bank-title text">Баланс карты</div>
                     <div class="bank-money text" id="bankBalanceMain">$0</div>
+                    <div class="bank-card-number">•••• •••• •••• 4471</div>
                 </div>
             </div>
 
             <div class="apps">
                 <div class="icon-grid">
-                    <div class="icon-card">
-                        <div class="icon-image icon-home">🏠</div>
-                        <p>Дом</p>
-                    </div>
-                    <div class="icon-card">
+                    <div class="icon-card" data-open="taxi">
                         <div class="icon-image icon-taxi">🚕</div>
                         <p>Такси</p>
                     </div>
@@ -82,9 +93,6 @@
                 <div class="dock-icon dock-sms" data-open="sms">
                     <div class="icon-image icon-sms">💬</div>
                     <span class="dock-badge hidden" id="smsBadge">0</span>
-                </div>
-                <div class="dock-icon dock-camera">
-                    <div class="icon-image icon-camera">📷</div>
                 </div>
                 <div class="dock-icon dock-music">
                     <div class="icon-image icon-music">🎵</div>
@@ -241,6 +249,43 @@
             </div>
 
             <div class="wallpaper-grid" id="wallpaperGrid"></div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН ТАКСИ -->
+        <div class="screen taxi-screen" data-screen="taxi">
+            <div class="app-header taxi-header">
+                <span class="back-btn" data-close="taxi">‹</span>
+                <span class="app-title">Такси</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <div class="taxi-body">
+                <div class="taxi-hero">
+                    <div class="taxi-hero-icon">🚕</div>
+                    <div class="taxi-hero-title">Городское такси</div>
+                    <div class="taxi-hero-sub">Выберите свою роль, чтобы продолжить</div>
+                </div>
+
+                <div class="taxi-role-card" data-role="driver">
+                    <div class="taxi-role-icon taxi-role-driver">🚘</div>
+                    <div class="taxi-role-info">
+                        <div class="taxi-role-title">Я водитель</div>
+                        <div class="taxi-role-desc">Принимать заказы и возить пассажиров</div>
+                    </div>
+                    <span class="taxi-role-arrow">›</span>
+                </div>
+
+                <div class="taxi-role-card" data-role="passenger">
+                    <div class="taxi-role-icon taxi-role-passenger">🙋</div>
+                    <div class="taxi-role-info">
+                        <div class="taxi-role-title">Я пассажир</div>
+                        <div class="taxi-role-desc">Заказать поездку до нужной точки</div>
+                    </div>
+                    <span class="taxi-role-arrow">›</span>
+                </div>
+            </div>
 
             <div class="home-indicator"></div>
         </div>
