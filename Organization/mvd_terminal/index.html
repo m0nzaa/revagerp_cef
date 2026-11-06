@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МВД — Информационный терминал</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="mvdRoot" class="mvd-hidden">
+
+  <div class="mvd-overlay"></div>
+
+  <div class="mvd-terminal">
+
+    <!-- Шапка терминала -->
+    <div class="mvd-header">
+      <div class="mvd-header-left">
+        <div class="mvd-emblem">МВД</div>
+        <div class="mvd-header-text">
+          <div class="mvd-header-title">Центр административных услуг</div>
+          <div class="mvd-header-sub">Информационный терминал</div>
+        </div>
+      </div>
+      <div class="mvd-header-right">
+        <div class="mvd-citizen-name" id="mvdCitizenName">Гражданин</div>
+        <div class="mvd-wanted-badge" id="mvdWantedBadge">
+          <span class="mvd-wanted-label">Розыск</span>
+          <span class="mvd-wanted-stars" id="mvdWantedStars"></span>
+        </div>
+      </div>
+      <button class="mvd-close-btn" id="mvdCloseBtn" title="Закрыть (ESC)">✕</button>
+    </div>
+
+    <!-- ===================== ГЛАВНОЕ МЕНЮ ===================== -->
+    <div class="mvd-screen mvd-screen-active" data-screen="menu">
+      <div class="mvd-menu-intro">Выберите необходимую операцию</div>
+
+      <div class="mvd-menu-grid">
+
+        <button class="mvd-menu-item" data-goto="tickets">
+          <div class="mvd-menu-icon mvd-icon-tickets"></div>
+          <div class="mvd-menu-item-text">
+            <div class="mvd-menu-item-title">Мои штрафы</div>
+            <div class="mvd-menu-item-desc">Список неоплаченных штрафов</div>
+          </div>
+          <div class="mvd-menu-badge mvd-hidden" id="mvdUnpaidBadge">0</div>
+        </button>
+
+        <button class="mvd-menu-item" data-goto="pay">
+          <div class="mvd-menu-icon mvd-icon-pay"></div>
+          <div class="mvd-menu-item-text">
+            <div class="mvd-menu-item-title">Оплатить штраф</div>
+            <div class="mvd-menu-item-desc">Списание суммы с банковского счёта</div>
+          </div>
+        </button>
+
+        <button class="mvd-menu-item" data-goto="history">
+          <div class="mvd-menu-icon mvd-icon-history"></div>
+          <div class="mvd-menu-item-text">
+            <div class="mvd-menu-item-title">История штрафов</div>
+            <div class="mvd-menu-item-desc">Ранее оплаченные взыскания</div>
+          </div>
+        </button>
+
+        <button class="mvd-menu-item" data-goto="penalties">
+          <div class="mvd-menu-icon mvd-icon-penalties"></div>
+          <div class="mvd-menu-item-text">
+            <div class="mvd-menu-item-title">Мои административные взыскания</div>
+            <div class="mvd-menu-item-desc">Предупреждения и ограничения</div>
+          </div>
+        </button>
+
+        <button class="mvd-menu-item" data-goto="rules">
+          <div class="mvd-menu-icon mvd-icon-rules"></div>
+          <div class="mvd-menu-item-text">
+            <div class="mvd-menu-item-title">Информация и правила</div>
+            <div class="mvd-menu-item-desc">Регламент работы МВД</div>
+          </div>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ===================== МОИ ШТРАФЫ (неоплаченные) ===================== -->
+    <div class="mvd-screen" data-screen="tickets">
+      <div class="mvd-screen-header">
+        <button class="mvd-back-btn" data-goto="menu">← Назад</button>
+        <div class="mvd-screen-title">Мои штрафы</div>
+      </div>
+
+      <div class="mvd-list" id="mvdTicketsList">
+        <!-- заполняется из JS -->
+      </div>
+
+      <div class="mvd-empty-state mvd-hidden" id="mvdTicketsEmpty">
+        <div class="mvd-empty-icon">✓</div>
+        <div class="mvd-empty-text">Неоплаченных штрафов нет</div>
+      </div>
+    </div>
+
+    <!-- ===================== ОПЛАТИТЬ ШТРАФ ===================== -->
+    <div class="mvd-screen" data-screen="pay">
+      <div class="mvd-screen-header">
+        <button class="mvd-back-btn" data-goto="menu">← Назад</button>
+        <div class="mvd-screen-title">Оплатить штраф</div>
+      </div>
+
+      <div class="mvd-pay-info">
+        <div class="mvd-pay-balance">
+          Баланс карты: <span id="mvdBalanceValue">0</span> $
+        </div>
+      </div>
+
+      <div class="mvd-list" id="mvdPayList">
+        <!-- заполняется из JS, карточки с кнопкой "Оплатить" -->
+      </div>
+
+      <div class="mvd-empty-state mvd-hidden" id="mvdPayEmpty">
+        <div class="mvd-empty-icon">✓</div>
+        <div class="mvd-empty-text">Оплачивать нечего — штрафов нет</div>
+      </div>
+    </div>
+
+    <!-- ===================== ИСТОРИЯ ШТРАФОВ ===================== -->
+    <div class="mvd-screen" data-screen="history">
+      <div class="mvd-screen-header">
+        <button class="mvd-back-btn" data-goto="menu">← Назад</button>
+        <div class="mvd-screen-title">История штрафов</div>
+      </div>
+
+      <div class="mvd-list" id="mvdHistoryList">
+        <!-- заполняется из JS -->
+      </div>
+
+      <div class="mvd-empty-state mvd-hidden" id="mvdHistoryEmpty">
+        <div class="mvd-empty-icon">—</div>
+        <div class="mvd-empty-text">История пуста</div>
+      </div>
+    </div>
+
+    <!-- ===================== АДМИНИСТРАТИВНЫЕ ВЗЫСКАНИЯ ===================== -->
+    <div class="mvd-screen" data-screen="penalties">
+      <div class="mvd-screen-header">
+        <button class="mvd-back-btn" data-goto="menu">← Назад</button>
+        <div class="mvd-screen-title">Мои административные взыскания</div>
+      </div>
+
+      <div class="mvd-list" id="mvdPenaltiesList">
+        <!-- заполняется из JS -->
+      </div>
+
+      <div class="mvd-empty-state mvd-hidden" id="mvdPenaltiesEmpty">
+        <div class="mvd-empty-icon">✓</div>
+        <div class="mvd-empty-text">Взысканий не числится</div>
+      </div>
+    </div>
+
+    <!-- ===================== ИНФОРМАЦИЯ И ПРАВИЛА ===================== -->
+    <div class="mvd-screen" data-screen="rules">
+      <div class="mvd-screen-header">
+        <button class="mvd-back-btn" data-goto="menu">← Назад</button>
+        <div class="mvd-screen-title">Информация и правила</div>
+      </div>
+
+      <div class="mvd-rules">
+
+        <div class="mvd-rules-block">
+          <div class="mvd-rules-block-title">О терминале</div>
+          <p>Информационный терминал Министерства внутренних дел предназначен для самостоятельной проверки и оплаты административных штрафов, а также ознакомления с текущим статусом взысканий гражданина. Все операции фиксируются и доступны сотрудникам МВД.</p>
+        </div>
+
+        <div class="mvd-rules-block">
+          <div class="mvd-rules-block-title">Штрафы</div>
+          <p>Штраф выписывается сотрудником МВД за нарушение установленных правил и подлежит оплате в течение установленного срока. Оплата производится через раздел «Оплатить штраф» списанием суммы с банковского счёта гражданина. После оплаты штраф переходит в раздел «История штрафов» и больше не считается задолженностью.</p>
+          <p>Неоплаченный в срок штраф может повлечь дополнительные меры воздействия со стороны правоохранительных органов, вплоть до административного задержания.</p>
+        </div>
+
+        <div class="mvd-rules-block">
+          <div class="mvd-rules-block-title">Уровень розыска</div>
+          <p>Уровень розыска отражает степень внимания правоохранительных органов к гражданину и может составлять от 0 до 7 звёзд.</p>
+          <ul class="mvd-rules-list">
+            <li><b>0 звёзд</b> — розыск отсутствует, гражданин не находится в поле зрения МВД.</li>
+            <li><b>1–6 звёзд</b> — гражданин находится в розыске, сотрудники МВД вправе применять меры задержания соразмерно уровню розыска.</li>
+            <li><b>7 звёзд</b> — высший уровень розыска. Сотрудникам МВД разрешено немедленное применение оружия на поражение без дополнительных предупреждений.</li>
+          </ul>
+          <p>Уровень розыска снижается сотрудниками МВД после устранения причин розыска либо автоматически согласно внутреннему регламенту.</p>
+        </div>
+
+        <div class="mvd-rules-block">
+          <div class="mvd-rules-block-title">Административные взыскания</div>
+          <p>Помимо денежных штрафов, к гражданину могут применяться иные меры воздействия: предупреждения, временные ограничения прав, конфискация имущества, полученного незаконным путём. Информация об этих мерах отображается в соответствующем разделе терминала.</p>
+        </div>
+
+        <div class="mvd-rules-block">
+          <div class="mvd-rules-block-title">Обжалование</div>
+          <p>Если гражданин считает штраф или иное взыскание необоснованным, он вправе обратиться к руководству МВД или администрации сервера для рассмотрения жалобы в установленном порядке.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Тост-уведомление (успех/ошибка оплаты и т.д.) -->
+  <div class="mvd-toast" id="mvdToast"></div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
