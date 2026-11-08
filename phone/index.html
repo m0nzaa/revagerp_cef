@@ -66,6 +66,10 @@
                         <div class="icon-image icon-taxi">🚕</div>
                         <p>Такси</p>
                     </div>
+                    <div class="icon-card" data-open="carshare">
+                        <div class="icon-image icon-carshare">🚗</div>
+                        <p>Каршеринг</p>
+                    </div>
                     <div class="icon-card" data-open="gps">
                         <div class="icon-image icon-gps">📍</div>
                         <p>GPS</p>
@@ -249,6 +253,90 @@
             </div>
 
             <div class="wallpaper-grid" id="wallpaperGrid"></div>
+
+            <div class="home-indicator"></div>
+        </div>
+
+        <!-- ЭКРАН КАРШЕРИНГА -->
+        <div class="screen carshare-screen" data-screen="carshare">
+            <div class="app-header cs-header">
+                <span class="back-btn" data-close="carshare">‹</span>
+                <span class="app-title">Каршеринг</span>
+                <span class="header-spacer"></span>
+            </div>
+
+            <!-- СОСТОЯНИЕ 1: выбор тарифа -->
+            <div class="cs-state cs-state-select active" id="csStateSelect">
+                <div class="cs-hero">
+                    <div class="cs-hero-icon">🚗</div>
+                    <div class="cs-hero-title">Аренда авто</div>
+                    <div class="cs-hero-sub">Выберите подходящий тариф</div>
+                </div>
+
+                <div class="cs-tariff-card" data-tariff="pickup">
+                    <div class="cs-tariff-top">
+                        <span class="cs-tariff-name">Найти рядом</span>
+                        <span class="cs-tariff-price">650 ₽<span>/час</span></span>
+                    </div>
+                    <div class="cs-tariff-desc">Ближайшая свободная машина на парковке каршеринга. Нужно дойти самому.</div>
+                </div>
+
+                <div class="cs-tariff-card" data-tariff="delivery">
+                    <div class="cs-tariff-top">
+                        <span class="cs-tariff-name">С доставкой</span>
+                        <span class="cs-tariff-price">1250 ₽<span>/час</span></span>
+                    </div>
+                    <div class="cs-tariff-desc">Машину подгонят прямо к вам. Нужно немного подождать подачу.</div>
+                </div>
+
+                <div class="cs-pay-row">
+                    <span class="cs-pay-label">Оплата с:</span>
+                    <div class="cs-pay-toggle">
+                        <div class="cs-pay-option active" data-pay="bank">Карта</div>
+                        <div class="cs-pay-option" data-pay="cash">Наличные</div>
+                    </div>
+                </div>
+
+                <div class="cs-rent-btn disabled" id="csRentBtn">Выберите тариф</div>
+            </div>
+
+            <!-- СОСТОЯНИЕ 2: ожидание подачи -->
+            <div class="cs-state cs-state-waiting" id="csStateWaiting">
+                <div class="cs-waiting-anim">
+                    <div class="cs-waiting-car">🚗</div>
+                    <div class="cs-waiting-ring"></div>
+                </div>
+                <div class="cs-waiting-title">Машина в пути</div>
+                <div class="cs-waiting-sub" id="csWaitingSub">Ожидайте подачу...</div>
+                <div class="cs-waiting-timer" id="csWaitingTimer">00:00</div>
+                <div class="cs-cancel-btn" id="csCancelBtn">Отменить заказ</div>
+            </div>
+
+            <!-- СОСТОЯНИЕ 3: активная аренда -->
+            <div class="cs-state cs-state-active" id="csStateActive">
+                <div class="cs-active-card">
+                    <div class="cs-active-top">
+                        <span class="cs-active-label">Активная аренда</span>
+                        <span class="cs-active-dot"></span>
+                    </div>
+                    <div class="cs-active-time" id="csActiveTimer">59:42</div>
+                    <div class="cs-active-sub">осталось времени</div>
+                </div>
+
+                <div class="cs-active-info">
+                    <div class="cs-active-info-row">
+                        <span>Тариф</span>
+                        <span id="csActiveTariff">Найти рядом</span>
+                    </div>
+                    <div class="cs-active-info-row">
+                        <span>Оплачено</span>
+                        <span id="csActivePrice">650 ₽</span>
+                    </div>
+                </div>
+
+                <div class="cs-extend-btn" id="csExtendBtn">Продлить ещё на час</div>
+                <div class="cs-finish-btn" id="csFinishBtn">Завершить аренду</div>
+            </div>
 
             <div class="home-indicator"></div>
         </div>

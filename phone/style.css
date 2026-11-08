@@ -1820,3 +1820,338 @@ header {
     color: #c7cbd1;
     font-size: 18px;
 }
+
+/* ============================================================
+   КАРШЕРИНГ
+   ============================================================ */
+
+.icon-carshare { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+
+.carshare-screen {
+    background: #0f1115;
+    color: #fff;
+}
+
+.cs-header {
+    background: #0f1115;
+    border-bottom: 1px solid #1f232b;
+}
+
+.cs-header .back-btn,
+.cs-header .app-title {
+    color: #fff;
+}
+
+.cs-state {
+    display: none;
+    padding: 10px 18px 0 18px;
+    height: calc(100% - 95px - 30px);
+}
+
+.cs-state.active {
+    display: block;
+}
+
+/* --- выбор тарифа --- */
+
+.cs-hero {
+    text-align: center;
+    padding: 10px 0 20px 0;
+}
+
+.cs-hero-icon {
+    font-size: 40px;
+}
+
+.cs-hero-title {
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.cs-hero-sub {
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: #8b93a3;
+}
+
+.cs-tariff-card {
+    background: #181b22;
+    border: 1px solid #262b35;
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.12s ease;
+}
+
+.cs-tariff-card:active {
+    transform: scale(0.98);
+}
+
+.cs-tariff-card.selected {
+    border-color: #38bdf8;
+    background: #151e26;
+}
+
+.cs-tariff-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.cs-tariff-name {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.cs-tariff-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.cs-tariff-price span {
+    font-size: 11px;
+    font-weight: 400;
+    color: #8b93a3;
+}
+
+.cs-tariff-desc {
+    margin-top: 6px;
+    font-size: 11.5px;
+    color: #8b93a3;
+    line-height: 1.4;
+}
+
+.cs-pay-row {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cs-pay-label {
+    font-size: 13px;
+    color: #8b93a3;
+}
+
+.cs-pay-toggle {
+    display: flex;
+    background: #181b22;
+    border-radius: 10px;
+    padding: 3px;
+}
+
+.cs-pay-option {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8b93a3;
+    cursor: pointer;
+}
+
+.cs-pay-option.active {
+    background: #38bdf8;
+    color: #0f1115;
+}
+
+.cs-rent-btn {
+    margin-top: 20px;
+    text-align: center;
+    padding: 14px 0;
+    border-radius: 14px;
+    background: #38bdf8;
+    color: #0f1115;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+}
+
+.cs-rent-btn:active {
+    transform: scale(0.97);
+}
+
+.cs-rent-btn.disabled {
+    background: #1f232b;
+    color: #5b6372;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* --- ожидание подачи --- */
+
+.cs-state-waiting {
+    display: none;
+    text-align: center;
+    padding-top: 40px;
+}
+
+.cs-waiting-anim {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-waiting-car {
+    font-size: 40px;
+    z-index: 2;
+}
+
+.cs-waiting-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid #38bdf8;
+    opacity: 0.4;
+    animation: csRingPulse 1.6s infinite ease-out;
+}
+
+@keyframes csRingPulse {
+    0%   { transform: scale(0.6); opacity: 0.6; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+
+.cs-waiting-title {
+    margin-top: 18px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.cs-waiting-sub {
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: #8b93a3;
+}
+
+.cs-waiting-timer {
+    margin-top: 16px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #38bdf8;
+    font-variant-numeric: tabular-nums;
+}
+
+.cs-cancel-btn {
+    margin: 28px auto 0 auto;
+    width: fit-content;
+    padding: 10px 22px;
+    border-radius: 20px;
+    background: #1f232b;
+    color: #ff6b6b;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- активная аренда --- */
+
+.cs-state-active {
+    display: none;
+}
+
+.cs-active-card {
+    background: linear-gradient(145deg, #182230, #0f1620);
+    border-radius: 18px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 8px;
+}
+
+.cs-active-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.cs-active-label {
+    font-size: 12.5px;
+    color: #8b93a3;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.cs-active-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 0 0 rgba(52,211,153,0.6);
+    animation: csDotPulse 1.5s infinite;
+}
+
+@keyframes csDotPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+    70%  { box-shadow: 0 0 0 7px rgba(52,211,153,0); }
+    100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+}
+
+.cs-active-time {
+    margin-top: 10px;
+    font-size: 36px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.cs-active-sub {
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: #8b93a3;
+}
+
+.cs-active-info {
+    margin-top: 14px;
+    background: #181b22;
+    border-radius: 14px;
+    padding: 4px 14px;
+}
+
+.cs-active-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #262b35;
+    color: #8b93a3;
+}
+
+.cs-active-info-row:last-child {
+    border-bottom: none;
+}
+
+.cs-active-info-row span:last-child {
+    color: #fff;
+    font-weight: 600;
+}
+
+.cs-extend-btn {
+    margin-top: 16px;
+    text-align: center;
+    padding: 12px 0;
+    border-radius: 14px;
+    background: #181b22;
+    border: 1px solid #262b35;
+    color: #38bdf8;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cs-finish-btn {
+    margin-top: 10px;
+    text-align: center;
+    padding: 12px 0;
+    border-radius: 14px;
+    background: #ff3b30;
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+}

@@ -948,3 +948,216 @@ document.querySelectorAll('.taxi-role-card').forEach(card => {
         // здесь позже подключится реальная логика выбора роли (cef.emit('taxi:role', ...))
     });
 });
+
+/* ============================================================
+   КАРШЕРИНГ — выбор тарифа, ожидание подачи, активная аренда
+   с живым обратным отсчётом. Все проверки условий (есть ли
+   свободная машина, активна ли уже аренда и т.д.) — на сервере,
+   JS только показывает то, что сервер прислал.
+   ============================================================ */
+
+let csSelectedTariff = null;
+let csSelectedPay = 'bank';
+let csWaitingInterval = null;
+let csWaitingSeconds = 0;
+let csActiveInterval = null;
+let csActiveSecondsLeft = 0;
+
+function csShowState(stateName) {
+    document.querySelectorAll('.cs-state').forEach(s => s.classList.remove('active'));
+    document.getElementById('csState' + stateName.charAt(0).toUpperCase() + stateName.slice(1)).classList.add('active');
+}
+
+// --- выбор тарифа (только подсвечивает карточку и включает кнопку "Арендовать") ---
+document.querySelectorAll('.cs-tariff-card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelectorAll('.cs-tariff-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        csSelectedTariff = card.dataset.tariff;
+        csUpdateRentButton();
+    });
+});
+
+// --- выбор способа оплаты ---
+document.querySelectorAll('.cs-pay-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+        document.querySelectorAll('.cs-pay-option').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        csSelectedPay = opt.dataset.pay;
+    });
+});
+
+// --- кнопка "Арендовать": включена только после выбора тарифа, именно здесь уходит заказ на сервер ---
+function csUpdateRentButton() {
+    const btn = document.getElementById('csRentBtn');
+    if (csSelectedTariff) {
+        btn.classList.remove('disabled');
+        btn.textContent = 'Арендовать';
+    } else {
+        btn.classList.add('disabled');
+        btn.textContent = 'Выберите тариф';
+    }
+}
+
+document.getElementById('csRentBtn').addEventListener('click', () => {
+    if (!csSelectedTariff) return;
+    if (typeof cef !== 'undefined') {
+        cef.emit('carshare:order', csSelectedTariff, csSelectedPay);
+    }
+});
+
+// --- отмена заказа во время ожидания подачи ---
+document.getElementById('csCancelBtn').addEventListener('click', () => {
+    if (typeof cef !== 'undefined') {
+        cef.emit('carshare:cancel');
+    }
+});
+
+// --- продление и завершение активной аренды ---
+document.getElementById('csExtendBtn').addEventListener('click', () => {
+    if (typeof cef !== 'undefined') {
+        cef.emit('carshare:extend');
+    }
+});
+
+document.getElementById('csFinishBtn').addEventListener('click', () => {
+    if (typeof cef !== 'undefined') {
+        cef.emit('carshare:finish');
+    }
+});
+
+// --- таймер ожидания подачи (считает вверх, просто для отображения) ---
+function csStartWaitingTimer() {
+    csWaitingSeconds = 0;
+    csWaitingTimerUpdate();
+    csWaitingInterval = setInterval(() => {
+        csWaitingSeconds++;
+        csWaitingTimerUpdate();
+    }, 1000);
+}
+
+function csWaitingTimerUpdate() {
+    const m = Math.floor(csWaitingSeconds / 60);
+    const s = csWaitingSeconds % 60;
+    document.getElementById('csWaitingTimer').textContent =
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function csStopWaitingTimer() {
+    if (csWaitingInterval) { clearInterval(csWaitingInterval); csWaitingInterval = null; }
+}
+
+// --- таймер активной аренды (считает вниз от значения, присланного сервером) ---
+function csStartActiveTimer(secondsLeft) {
+    csActiveSecondsLeft = secondsLeft;
+    csActiveTimerUpdate();
+    if (csActiveInterval) clearInterval(csActiveInterval);
+    csActiveInterval = setInterval(() => {
+        csActiveSecondsLeft = Math.max(0, csActiveSecondsLeft - 1);
+        csActiveTimerUpdate();
+        if (csActiveSecondsLeft <= 0) {
+            clearInterval(csActiveInterval);
+            csActiveInterval = null;
+        }
+    }, 1000);
+}
+
+function csActiveTimerUpdate() {
+    const m = Math.floor(csActiveSecondsLeft / 60);
+    const s = csActiveSecondsLeft % 60;
+    document.getElementById('csActiveTimer').textContent =
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function csStopActiveTimer() {
+    if (csActiveInterval) { clearInterval(csActiveInterval); csActiveInterval = null; }
+}
+
+// при открытии приложения просим сервер сказать, в каком состоянии сейчас аренда у игрока —
+// это нужно, чтобы если игрок закрыл телефон во время аренды и открыл снова, видел актуальный экран
+document.querySelector('[data-open="carshare"]').addEventListener('click', () => {
+    if (typeof cef !== 'undefined') {
+        cef.emit('carshare:statusRequest');
+    }
+});
+
+// --- события от сервера ---
+if (typeof cef !== 'undefined') {
+    // сервер подтвердил заказ и начал подачу/поиск — показываем экран ожидания
+    cef.on('carshare:waiting', (tariffLabel) => {
+        document.getElementById('csWaitingSub').textContent =
+            tariffLabel === 'delivery' ? 'Машину подгоняют к вам...' : 'Идите к ближайшей свободной парковке...';
+        csShowState('waiting');
+        csStopActiveTimer();
+        csStartWaitingTimer();
+    });
+
+    // машина подана/найдена, аренда началась — сервер шлёт оставшееся время в секундах
+    cef.on('carshare:started', (tariffLabel, priceText, secondsLeft) => {
+        csStopWaitingTimer();
+        document.getElementById('csActiveTariff').textContent =
+            tariffLabel === 'delivery' ? 'С доставкой' : 'Найти рядом';
+        document.getElementById('csActivePrice').textContent = priceText;
+        csShowState('active');
+        csStartActiveTimer(parseInt(secondsLeft) || 0);
+    });
+
+    // аренда продлена — сервер шлёт новое оставшееся время
+    cef.on('carshare:extended', (secondsLeft) => {
+        csStartActiveTimer(parseInt(secondsLeft) || 0);
+    });
+
+    // аренда завершена (игрок нажал "завершить", вышло время, или машину забрали — любая причина)
+    cef.on('carshare:ended', (reason) => {
+        csStopWaitingTimer();
+        csStopActiveTimer();
+
+        const reasons = {
+            finished: 'Аренда завершена',
+            timeout: 'Время аренды истекло',
+            cancelled: 'Заказ отменён',
+            notpicked: 'Вы не забрали машину вовремя, заказ отменён'
+        };
+
+        csShowToast(reasons[reason] || 'Аренда завершена');
+        csShowState('select');
+
+        document.querySelectorAll('.cs-tariff-card').forEach(c => c.classList.remove('selected'));
+        csSelectedTariff = null;
+        csUpdateRentButton();
+    });
+
+    cef.on('carshare:error', (message) => {
+        csShowToast(message || 'Ошибка заказа', true);
+    });
+
+    // ответ на carshare:statusRequest — восстанавливает нужный экран при переоткрытии телефона
+    cef.on('carshare:status', (state, tariffLabel, priceText, secondsLeft) => {
+        if (state === 'waiting') {
+            document.getElementById('csWaitingSub').textContent =
+                tariffLabel === 'delivery' ? 'Машину подгоняют к вам...' : 'Идите к ближайшей свободной парковке...';
+            csShowState('waiting');
+            csStartWaitingTimer();
+        } else if (state === 'active') {
+            document.getElementById('csActiveTariff').textContent =
+                tariffLabel === 'delivery' ? 'С доставкой' : 'Найти рядом';
+            document.getElementById('csActivePrice').textContent = priceText;
+            csShowState('active');
+            csStartActiveTimer(parseInt(secondsLeft) || 0);
+        } else {
+            csShowState('select');
+        }
+    });
+}
+
+function csShowToast(text, isError) {
+    const old = document.querySelector('.cs-toast');
+    if (old) old.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'tx-toast ' + (isError ? 'error' : 'success') + ' cs-toast';
+    toast.textContent = text;
+    document.querySelector('.carshare-screen').appendChild(toast);
+
+    setTimeout(() => toast.remove(), 2800);
+}
