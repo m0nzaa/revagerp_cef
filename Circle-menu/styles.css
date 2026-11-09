@@ -1,0 +1,318 @@
+:root {
+    --bg-ring: rgba(12, 14, 20, 0.86);
+    --bg-ring-border: rgba(255, 255, 255, 0.06);
+    --accent: #5B8CFF;
+    --accent-soft: rgba(91, 140, 255, 0.16);
+    --accent-glow: rgba(91, 140, 255, 0.55);
+    --text-main: #F2F3F6;
+    --text-dim: #8A91A3;
+    --center-bg: rgba(18, 20, 27, 0.92);
+    --divider: rgba(255, 255, 255, 0.07);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    background: transparent;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', -apple-system, 'Segoe UI', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    user-select: none;
+    cursor: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+/* Pawn включает курсор через cef_always_listen_keys/отдельный native
+   системы курсора; здесь просто показываем свой cursor внутри CEF-слоя,
+   чтобы наведение на сектора было видно */
+body.menu-open {
+    cursor: default;
+    visibility: visible;
+    opacity: 1;
+}
+
+.circle-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 520px;
+    height: 520px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.55));
+}
+
+.circle-menu.active {
+    display: flex;
+}
+
+.circle-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+}
+
+/* базовое кольцо-подложка — тонкая рамка, разделители между секторами */
+.ring-base {
+    fill: var(--bg-ring);
+    stroke: var(--bg-ring-border);
+    stroke-width: 1;
+}
+
+.ring-outline {
+    fill: none;
+    stroke: var(--divider);
+    stroke-width: 1;
+}
+
+.sector {
+    fill: transparent;
+    stroke: var(--divider);
+    stroke-width: 1;
+    transition: fill 0.18s ease;
+    cursor: pointer;
+}
+
+.sector.active {
+    fill: var(--accent-soft);
+}
+
+.sector-hit {
+    fill: transparent;
+    cursor: pointer;
+}
+
+/* центральный круг */
+.center-wrap {
+    position: absolute;
+    width: 168px;
+    height: 168px;
+    border-radius: 50%;
+    background: var(--center-bg);
+    border: 1px solid var(--bg-ring-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.82);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    padding: 0 18px;
+}
+
+.center-wrap.ready {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.center-icon {
+    width: 30px;
+    height: 30px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    transition: color 0.18s ease;
+}
+
+.center-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    color: var(--text-main);
+    line-height: 1.3;
+}
+
+.center-desc {
+    margin: 4px 0 0;
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--text-dim);
+    line-height: 1.4;
+    max-width: 140px;
+}
+
+/* иконки по кругу */
+#icons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 520px;
+    height: 520px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.icon-slot {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.85);
+    transition: opacity 0.22s ease, transform 0.22s ease, color 0.18s ease;
+    color: var(--text-dim);
+}
+
+.icon-slot.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.icon-slot.active-icon {
+    color: var(--accent);
+}
+
+.icon-slot svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.18s ease;
+}
+
+.icon-slot.active-icon svg {
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+.icon-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    color: inherit;
+    opacity: 0.85;
+}
+
+/* лёгкая засечка-тик на внешнем крае каждого сектора (как в tactical HUD) */
+.tick {
+    stroke: var(--divider);
+    stroke-width: 1;
+}
+
+/* ===================== подменю "Финансы" ===================== */
+
+.pay-center {
+    pointer-events: auto;
+    width: 176px;
+    height: 176px;
+    padding: 0 14px;
+}
+
+.pay-label {
+    margin: 0 0 6px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: var(--text-dim);
+}
+
+.pay-id-input {
+    width: 100px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--bg-ring-border);
+    border-radius: 8px;
+    padding: 7px 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.pay-id-input:focus {
+    border-color: var(--accent);
+    background: rgba(91, 140, 255, 0.07);
+}
+
+.pay-id-input::placeholder {
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.pay-hint {
+    margin: 8px 0 0;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    line-height: 1.4;
+    max-width: 130px;
+}
+
+.pay-hint.pay-hint-error {
+    color: #ff6b6b;
+}
+
+#payAmountsLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 520px;
+    height: 520px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.amount-slot {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.85);
+    transition: opacity 0.22s ease, transform 0.22s ease, color 0.18s ease;
+    color: var(--text-dim);
+}
+
+.amount-slot.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.amount-slot.active-icon {
+    color: var(--accent);
+}
+
+.amount-value {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+}
+
+.amount-currency {
+    font-size: 9.5px;
+    font-weight: 500;
+    opacity: 0.7;
+}

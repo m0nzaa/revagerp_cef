@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="circle-menu" id="mainMenu">
+        <svg class="circle-svg" width="520" height="520" viewBox="0 0 520 520">
+            <circle class="ring-base" cx="260" cy="260" r="248" />
+            <g id="sectors"></g>
+            <g id="ticks"></g>
+            <circle class="ring-outline" cx="260" cy="260" r="248" />
+            <circle class="ring-outline" cx="260" cy="260" r="168" />
+        </svg>
+        <div id="icons"></div>
+        <div class="center-wrap" id="centerWrap">
+            <svg class="center-icon" id="centerIcon" viewBox="0 0 24 24"></svg>
+            <p class="center-title" id="centerTitle">—</p>
+            <p class="center-desc" id="centerDesc"></p>
+        </div>
+    </div>
+
+    <!-- подменю "Финансы": центр - ввод ID, вокруг - 4 суммы -->
+    <div class="circle-menu pay-menu" id="payMenu">
+        <svg class="circle-svg" width="520" height="520" viewBox="0 0 520 520">
+            <circle class="ring-base" cx="260" cy="260" r="248" />
+            <g id="paySectors"></g>
+            <g id="payTicks"></g>
+            <circle class="ring-outline" cx="260" cy="260" r="248" />
+            <circle class="ring-outline" cx="260" cy="260" r="168" />
+        </svg>
+        <div id="payAmountsLayer"></div>
+        <div class="center-wrap pay-center" id="payCenterWrap">
+            <p class="pay-label">Кому</p>
+            <input class="pay-id-input" id="payIdInput" type="text" inputmode="numeric" placeholder="ID игрока" autocomplete="off" maxlength="4">
+            <p class="pay-hint" id="payHint">Выберите сумму в кольце</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
