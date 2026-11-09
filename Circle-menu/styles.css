@@ -28,9 +28,12 @@ body {
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
     user-select: none;
-    cursor: none;
-    visibility: hidden;
-    opacity: 0;
+    cursor: default;
+    /* VREMENNO DLYA DIAGNOSTIKI: ubrano visibility:hidden/opacity:0,
+       chtoby proverit rendeitsya li stranica voobshche, nezavisimo
+       ot togo doletaet li sobytie openCircleMenu iz Pawn */
+    visibility: visible;
+    opacity: 1;
     transition: opacity 0.15s ease;
 }
 
