@@ -514,11 +514,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.warn('[CircleMenu] obekt cef NE naiden na stranice!');
     }
-
-    // VREMENNO DLYA DIAGNOSTIKI: prinuditelno stroim glavnoe menyu
-    // srazu pri zagruzke, ne dozhidayas sobytiya ot Pawn
-    mainMenu.build();
-    document.body.classList.add('menu-open');
 });
 
 // доступно для прямого вызова из Pawn-моста / консоли при отладке

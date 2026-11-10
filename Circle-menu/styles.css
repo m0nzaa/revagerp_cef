@@ -29,11 +29,11 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* VREMENNO DLYA DIAGNOSTIKI: ubrano visibility:hidden/opacity:0,
-       chtoby proverit rendeitsya li stranica voobshche, nezavisimo
-       ot togo doletaet li sobytie openCircleMenu iz Pawn */
-    visibility: visible;
-    opacity: 1;
+    /* skryto po umolchaniyu - pokazyvaetsya tolko kogda JS dobavlyaet
+       klass menu-open (sm. openCircleMenu/closeCircleMenu v script.js) */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
     transition: opacity 0.15s ease;
 }
 
@@ -44,6 +44,7 @@ body.menu-open {
     cursor: default;
     visibility: visible;
     opacity: 1;
+    pointer-events: auto;
 }
 
 .circle-menu {
