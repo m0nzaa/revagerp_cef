@@ -500,11 +500,11 @@ document.addEventListener('DOMContentLoaded', () => {
     mainMenu = new MainMenu();
     payMenu = new PayMenu();
 
+    // VREMENNO DLYA DIAGNOSTIKI: pokazyvaem v konsoli, zagruzilsya li
+    // obekt cef voobshche k etomu momentu
     console.log('[CircleMenu] DOMContentLoaded, typeof cef =', typeof cef);
 
     if (typeof cef !== 'undefined') {
-        // v igre (vnutri CEF): menyu skryto po umolchaniyu (sm. styles.css),
-        // pokazyvaetsya tolko po realnomu sobytiyu openCircleMenu ot Pawn
         cef.on('openCircleMenu', () => {
             console.log('[CircleMenu] poluchil sobytie openCircleMenu ot Pawn');
             openCircleMenu();
@@ -512,12 +512,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cef.on('closeCircleMenu', () => closeCircleMenu());
         console.log('[CircleMenu] podpiski cef.on zaregistrirovany');
     } else {
-        // obychnyy brauzer (ne CEF) - obekta cef net i sobytiy ot Pawn
-        // nikogda ne pridet, poetomu dlya preview/otladki pokazyvaem
-        // menyu srazu, chtoby bylo vidno chto stranica vообще rabotaet
-        console.warn('[CircleMenu] obekt cef NE naiden - otkryto v obychnom brauzere, pokazyvayu menyu dlya preview');
-        openCircleMenu();
+        console.warn('[CircleMenu] obekt cef NE naiden na stranice!');
     }
+
+    // VREMENNO DLYA DIAGNOSTIKI: prinuditelno stroim glavnoe menyu
+    // srazu pri zagruzke, ne dozhidayas sobytiya ot Pawn
+    mainMenu.build();
+    document.body.classList.add('menu-open');
 });
 
 // доступно для прямого вызова из Pawn-моста / консоли при отладке
