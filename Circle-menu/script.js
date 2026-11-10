@@ -185,9 +185,37 @@ class MainMenu {
     }
 
     handleSelect(index) {
+        // защита от двойного срабатывания: клик по сектору всплывает
+        // и до document-обработчика в handleEvents(), и сама иконка
+        // может сгенерировать второй click почти одновременно (особенно
+        // в CEF, где события мыши иногда дублируются). Без этой защиты
+        // handleSelect мог вызваться дважды подряд за один клик: второй
+        // вызов уходил уже после closeCircleMenu(), и в паре с гонкой
+        // Pawn-событий (circlemenu:select / circlemenu:closed, порядок
+        // доставки которых не гарантирован) мог привести к тому, что
+        // меню визуально снова показывалось / оставалось висеть.
+        if (this.selecting) return;
+        this.selecting = true;
+
         const item = this.items[index];
         console.log(`Выбран пункт меню: ${item.ident}`);
         playSound();
+
+        if (item.ident === 'finance') {
+            // Финансы - не закрываем всё меню, а переключаемся на
+            // подменю с вводом ID и выбором суммы.
+            // ВАЖНО: переключаемся ДО emit, чтобы Pawn получал
+            // circlemenu:select только когда DOM уже в нужном состоянии.
+            switchToPayMenu();
+        } else {
+            // ВАЖНО: сначала закрываем меню локально (JS не ждёт Pawn),
+            // и только потом шлём событие - так closeCircleMenu()
+            // гарантированно не выполнится ПОСЛЕ того как Pawn, получив
+            // circlemenu:select, пришлёт свой closeCircleMenu обратно
+            // (что раньше могло создавать порядок operations, при
+            // котором что-то из двух "закрытий" перекрывало другое).
+            closeCircleMenu();
+        }
 
         // gamemode подпишется на это событие и сам решит, какую
         // команду/систему открыть по item.ident (см. таблицу в чате)
@@ -195,13 +223,9 @@ class MainMenu {
             cef.emit('circlemenu:select', item.ident);
         }
 
-        if (item.ident === 'finance') {
-            // Финансы - не закрываем всё меню, а переключаемся на
-            // подменю с вводом ID и выбором суммы
-            switchToPayMenu();
-        } else {
-            closeCircleMenu();
-        }
+        // снимаем блокировку с небольшой задержкой - на случай если
+        // игрок снова откроет меню клавишей Y почти сразу
+        setTimeout(() => { this.selecting = false; }, 300);
     }
 
     handleEvents() {
@@ -365,6 +389,8 @@ class PayMenu {
     }
 
     handleSelect(index) {
+        if (this.selecting) return;
+
         const targetId = this.idInput.value.trim();
         if (!targetId.length) {
             this.setHint('Сначала введите ID игрока', true);
@@ -372,15 +398,21 @@ class PayMenu {
             return;
         }
 
+        this.selecting = true;
+
         const amount = this.amounts[index];
         playSound();
+
+        // сначала закрываем локально, потом шлём событие в Pawn -
+        // см. комментарий в MainMenu.handleSelect
+        closeCircleMenu();
 
         if (typeof cef !== 'undefined') {
             // сервер принимает (targetId, amount) и сам делает /pay-перевод
             cef.emit('circlemenu:pay', parseInt(targetId, 10), amount);
         }
 
-        closeCircleMenu();
+        setTimeout(() => { this.selecting = false; }, 300);
     }
 
     reset() {
