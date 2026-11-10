@@ -29,11 +29,11 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* по умолчанию CEF-слой скрыт и не перехватывает ввод/обзор;
-       включается только когда Pawn шлёт openCircleMenu и JS
-       добавляет body.menu-open */
-    visibility: hidden;
-    opacity: 0;
+    /* VREMENNO DLYA DIAGNOSTIKI: ubrano visibility:hidden/opacity:0,
+       chtoby proverit rendeitsya li stranica voobshche, nezavisimo
+       ot togo doletaet li sobytie openCircleMenu iz Pawn */
+    visibility: visible;
+    opacity: 1;
     transition: opacity 0.15s ease;
 }
 
