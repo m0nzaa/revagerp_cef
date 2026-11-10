@@ -29,11 +29,11 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* VREMENNO DLYA DIAGNOSTIKI: ubrano visibility:hidden/opacity:0,
-       chtoby proverit rendeitsya li stranica voobshche, nezavisimo
-       ot togo doletaet li sobytie openCircleMenu iz Pawn */
-    visibility: visible;
-    opacity: 1;
+    /* po umolchaniyu CEF-sloy skryt (kak u telefona - sm. phone.inc):
+       plagin ne pryachet brauzer sam, vidimost upravlyaetsya tolko
+       etim CSS cherez klass body.menu-open */
+    visibility: hidden;
+    opacity: 0;
     transition: opacity 0.15s ease;
 }
 
