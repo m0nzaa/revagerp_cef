@@ -538,6 +538,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('menu-open');
 });
 
-// доступно для прямого вызова из Pawn-моста / консоли при отладке
-window.openCircleMenu = () => openCircleMenu();
-window.closeCircleMenu = () => closeCircleMenu();
+// openCircleMenu/closeCircleMenu uzhe dostupny kak window.openCircleMenu /
+// window.closeCircleMenu avtomaticheski (obychnye function-deklaracii v
+// globalnoy oblasti vidimosti brauzer sam veshaet na window) - otdelnyy
+// wrapper NE nuzhen i byl prichinoy beskonechnoy rekursii: posle
+// window.openCircleMenu = () => openCircleMenu() lyuboy vyzov
+// window.openCircleMenu() (v tom chisle prosto openCircleMenu() iz
+// konsoli ili pri povtornom otkrytii) rezolvil imya openCircleMenu
+// vnutri strelochnoy funkcii v SAMOGO SEBYA (window.openCircleMenu,
+// kotoryy uzhe byl perezapisan k etomu momentu) - RangeError: Maximum
+// call stack size exceeded.
