@@ -473,6 +473,23 @@ function openCircleMenu() {
     requestAnimationFrame(() => {
         void document.body.offsetHeight;
     });
+
+    // VREMENNO DLYA DIAGNOSTIKI: otpravlyaem sostoyanie DOM obratno v
+    // Pawn cherez cef.emit, chtoby uvidet ego v obychnoy konsoli
+    // servera - bez etogo net sposoba posmotret DevTools v igre.
+    if (typeof cef !== 'undefined') {
+        try {
+            const rect = mainMenu.root.getBoundingClientRect();
+            const dbgMsg = 'body=[' + document.body.className + '] mainMenu=[' + mainMenu.root.className +
+                '] rect=' + Math.round(rect.width) + 'x' + Math.round(rect.height) +
+                ' computedDisplay=' + getComputedStyle(mainMenu.root).display +
+                ' bodyOpacity=' + getComputedStyle(document.body).opacity +
+                ' bodyVisibility=' + getComputedStyle(document.body).visibility;
+            cef.emit('circlemenu:debug', dbgMsg);
+        } catch (e) {
+            cef.emit('circlemenu:debug', 'DEBUG EXCEPTION: ' + e.message);
+        }
+    }
 }
 
 function switchToPayMenu() {
