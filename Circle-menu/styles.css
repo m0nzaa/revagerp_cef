@@ -29,11 +29,14 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* по умолчанию браузер прозрачен и "пропускает" клики в игру -
-       CEF рендер-луп при этом продолжает работать (hide идёт только
-       через CSS, а не через cef_hide_browser), поэтому при повторном
-       открытии не возникает паузы на пробуждение рендера */
-    visibility: hidden;
+    /* ВАЖНО: НЕ используем visibility:hidden здесь. В off-screen
+       рендере CEF (SA-MP плагин рисует страницу в текстуру) элемент
+       с visibility:hidden на верхнем уровне документа может считаться
+       браузером "невидимым" и переставать композититься вовсе - это
+       та же самая проблема, что раньше была с cef_hide_browser, только
+       перенесённая в CSS. Поэтому скрытие делаем ТОЛЬКО через opacity
+       и pointer-events - страница всегда остаётся "видимой" для CEF
+       и продолжает рендериться, а геймплейно прозрачна/некликабельна. */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease;
@@ -41,7 +44,6 @@ body {
 
 body.menu-open {
     cursor: default;
-    visibility: visible;
     opacity: 1;
     pointer-events: auto;
 }
