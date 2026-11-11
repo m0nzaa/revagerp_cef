@@ -29,21 +29,21 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* VREMENNO DLYA DIAGNOSTIKI: ubrano visibility:hidden/opacity:0,
-       chtoby proverit rendeitsya li stranica voobshche, nezavisimo
-       ot togo doletaet li sobytie openCircleMenu iz Pawn */
-    visibility: visible;
-    opacity: 1;
+    /* по умолчанию браузер прозрачен и "пропускает" клики в игру -
+       CEF рендер-луп при этом продолжает работать (hide идёт только
+       через CSS, а не через cef_hide_browser), поэтому при повторном
+       открытии не возникает паузы на пробуждение рендера */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
     transition: opacity 0.15s ease;
 }
 
-/* Pawn включает курсор через cef_always_listen_keys/отдельный native
-   системы курсора; здесь просто показываем свой cursor внутри CEF-слоя,
-   чтобы наведение на сектора было видно */
 body.menu-open {
     cursor: default;
     visibility: visible;
     opacity: 1;
+    pointer-events: auto;
 }
 
 .circle-menu {
