@@ -29,14 +29,11 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* po umolchaniyu CEF-sloy skryt (kak u telefona): teper eto
-       edinstvennyy mehanizm vidimosti - Pawn-storona bolshe NE
-       pryachet brauzer cherez cef_hide_browser (sm. circlemenu.inc),
-       chtoby izbezhat baga s "zamorozhennym" kadrom pri povtornom
-       otkrytii. Vidimost upravlyaetsya tolko etim CSS cherez
-       klass body.menu-open */
-    visibility: hidden;
-    opacity: 0;
+    /* VREMENNO DLYA DIAGNOSTIKI: ubrano visibility:hidden/opacity:0,
+       chtoby proverit rendeitsya li stranica voobshche, nezavisimo
+       ot togo doletaet li sobytie openCircleMenu iz Pawn */
+    visibility: visible;
+    opacity: 1;
     transition: opacity 0.15s ease;
 }
 
