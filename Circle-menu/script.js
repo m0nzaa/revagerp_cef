@@ -500,12 +500,21 @@ document.addEventListener('DOMContentLoaded', () => {
     mainMenu = new MainMenu();
     payMenu = new PayMenu();
 
+    // VREMENNO DLYA DIAGNOSTIKI: pokazyvaem v konsoli, zagruzilsya li
+    // obekt cef voobshche k etomu momentu
+    console.log('[CircleMenu] DOMContentLoaded, typeof cef =', typeof cef);
+
     if (typeof cef !== 'undefined') {
-        cef.on('openCircleMenu', () => openCircleMenu());
+        cef.on('openCircleMenu', () => {
+            console.log('[CircleMenu] poluchil sobytie openCircleMenu ot Pawn');
+            openCircleMenu();
+        });
         cef.on('closeCircleMenu', () => closeCircleMenu());
+        console.log('[CircleMenu] podpiski cef.on zaregistrirovany');
     } else {
         console.warn('[CircleMenu] obekt cef NE naiden na stranice!');
     }
+
 });
 
 // доступно для прямого вызова из Pawn-моста / консоли при отладке

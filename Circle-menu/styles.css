@@ -29,23 +29,24 @@ body {
     overflow: hidden;
     user-select: none;
     cursor: default;
-    /* ВАЖНО: НЕ используем visibility:hidden здесь. В off-screen
-       рендере CEF (SA-MP плагин рисует страницу в текстуру) элемент
-       с visibility:hidden на верхнем уровне документа может считаться
-       браузером "невидимым" и переставать композититься вовсе - это
-       та же самая проблема, что раньше была с cef_hide_browser, только
-       перенесённая в CSS. Поэтому скрытие делаем ТОЛЬКО через opacity
-       и pointer-events - страница всегда остаётся "видимой" для CEF
-       и продолжает рендериться, а геймплейно прозрачна/некликабельна. */
+    /* po umolchaniyu CEF-sloy skryt (kak u telefona): teper eto
+       edinstvennyy mehanizm vidimosti - Pawn-storona bolshe NE
+       pryachet brauzer cherez cef_hide_browser (sm. circlemenu.inc),
+       chtoby izbezhat baga s "zamorozhennym" kadrom pri povtornom
+       otkrytii. Vidimost upravlyaetsya tolko etim CSS cherez
+       klass body.menu-open */
+    visibility: hidden;
     opacity: 0;
-    pointer-events: none;
     transition: opacity 0.15s ease;
 }
 
+/* Pawn включает курсор через cef_always_listen_keys/отдельный native
+   системы курсора; здесь просто показываем свой cursor внутри CEF-слоя,
+   чтобы наведение на сектора было видно */
 body.menu-open {
     cursor: default;
+    visibility: visible;
     opacity: 1;
-    pointer-events: auto;
 }
 
 .circle-menu {
