@@ -458,6 +458,21 @@ function openCircleMenu() {
     mainMenu.root.classList.add('active');
     payMenu.root.classList.remove('active');
     payMenu.reset();
+
+    // Prinuditelnyy reflow/repaint. Pervoe otkrytie sovpadaet s
+    // zagruzkoy stranicy (DOMContentLoaded), tam brauzer risuet kadr
+    // sam po sebe. No pri POVTORNOM otkrytii (posle closeCircleMenu)
+    // CEF-offscreen-render inogda ne pererisovyvaet kadr srazu posle
+    // smeny klassov, poka ne proizoydet kakoe-to "fizicheskoe"
+    // izmenenie layouta - prinuditelno chitaem offsetHeight (eto
+    // sinhronno forsiruet reflow) srazu posle smeny klassov vyshe.
+    void document.body.offsetHeight;
+
+    // Na vsyakiy sluchay dublируем cherez rAF - nekotorye CEF-sborki
+    // pererisovyvayut kadr tolko na sleduyushchiy animation frame
+    requestAnimationFrame(() => {
+        void document.body.offsetHeight;
+    });
 }
 
 function switchToPayMenu() {
@@ -471,6 +486,8 @@ function closeCircleMenu() {
     document.body.classList.remove('menu-open');
     mainMenu.root.classList.remove('active');
     payMenu.root.classList.remove('active');
+
+    void document.body.offsetHeight;
 
     if (typeof cef !== 'undefined') {
         cef.emit('circlemenu:closed');
