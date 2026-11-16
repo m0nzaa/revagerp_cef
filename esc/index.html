@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESC Menu</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scene">
+
+  <div class="hint" id="hint">ESC — открыть/закрыть меню</div>
+
+  <!-- ===== MAIN ESC MENU ===== -->
+  <div class="menu-root" id="mainMenu">
+    <div class="glass-panel"></div>
+
+    <div class="afk-wrap">
+      <span class="afk-label">Вы в АФК</span>
+      <span id="afkClock">00:02</span>
+    </div>
+
+    <div class="menu-content">
+      <div class="panel">
+        <button class="menu-item" id="btnContinue">Продолжить</button>
+        <button class="menu-item" id="btnSettings">Настройки</button>
+        <button class="menu-item" id="btnReconnect">Переподключиться</button>
+        <button class="menu-item danger" id="btnExit">Выйти из игры</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="settings-root" id="settingsRoot">
+    <div class="settings-card">
+
+      <div class="s-sidebar">
+        <div class="s-sidebar-title">Настройки</div>
+
+        <div class="s-tab active" data-pane="graphics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+          Графика
+        </div>
+        <div class="s-tab" data-pane="sound">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 8.5a5 5 0 010 7"/></svg>
+          Звук
+        </div>
+        <div class="s-tab" data-pane="controls">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="10" rx="3"/><path d="M7 12h.01M10 12h3M16 10v4M18 12h.01"/></svg>
+          Управление
+        </div>
+        <div class="s-tab" data-pane="interface">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Интерфейс
+        </div>
+        <div class="s-tab" data-pane="account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+          Аккаунт
+        </div>
+      </div>
+
+      <div class="s-content">
+        <div class="s-header">
+          <h2 id="paneTitle">Графика</h2>
+          <div class="s-close" id="settingsClose">✕</div>
+        </div>
+
+        <!-- GRAPHICS -->
+        <div class="pane active" data-pane="graphics">
+          <div class="s-section-label">Изображение</div>
+          <div class="s-row s-slider-row">
+            <div class="s-slider-top"><span class="t" style="font-size:13.5px;color:var(--text-main);font-weight:500;">Дальность прорисовки</span><span class="s-slider-val">320 м</span></div>
+            <input type="range" min="100" max="600" value="320" data-key="draw_distance">
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Тени</span><span class="d">Мягкие тени от объектов</span></div>
+            <label class="switch"><input type="checkbox" checked data-key="shadows"><span class="track"></span></label>
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Вертикальная синхронизация</span><span class="d">Устраняет разрывы кадра</span></div>
+            <label class="switch"><input type="checkbox" data-key="vsync"><span class="track"></span></label>
+          </div>
+          <div class="s-section-label">Качество</div>
+          <div class="pill-group" data-key="graphics_quality">
+            <div class="pill" data-value="low">Низкое</div>
+            <div class="pill" data-value="medium">Среднее</div>
+            <div class="pill active" data-value="high">Высокое</div>
+            <div class="pill" data-value="ultra">Ультра</div>
+          </div>
+        </div>
+
+        <!-- SOUND -->
+        <div class="pane" data-pane="sound">
+          <div class="s-section-label">Громкость</div>
+          <div class="s-row s-slider-row">
+            <div class="s-slider-top"><span class="t" style="font-size:13.5px;color:var(--text-main);font-weight:500;">Музыка</span><span class="s-slider-val">65%</span></div>
+            <input type="range" min="0" max="100" value="65" data-key="volume_music">
+          </div>
+          <div class="s-row s-slider-row">
+            <div class="s-slider-top"><span class="t" style="font-size:13.5px;color:var(--text-main);font-weight:500;">Эффекты</span><span class="s-slider-val">80%</span></div>
+            <input type="range" min="0" max="100" value="80" data-key="volume_sfx">
+          </div>
+          <div class="s-row s-slider-row">
+            <div class="s-slider-top"><span class="t" style="font-size:13.5px;color:var(--text-main);font-weight:500;">Голосовой чат</span><span class="s-slider-val">100%</span></div>
+            <input type="range" min="0" max="100" value="100" data-key="volume_voice">
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Звук радио в машине</span><span class="d">Включает проигрыватель SA-MP</span></div>
+            <label class="switch"><input type="checkbox" checked data-key="car_radio"><span class="track"></span></label>
+          </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="pane" data-pane="controls">
+          <div class="s-section-label">Управление</div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Чувствительность мыши</span></div>
+          </div>
+          <div class="s-row s-slider-row">
+            <div class="s-slider-top"><span class="t" style="font-size:13.5px;color:var(--text-main);font-weight:500;">Камера</span><span class="s-slider-val">42%</span></div>
+            <input type="range" min="0" max="100" value="42" data-key="mouse_sensitivity">
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Инверсия оси Y</span><span class="d">Для авиасимуляторного режима</span></div>
+            <label class="switch"><input type="checkbox" data-key="invert_y"><span class="track"></span></label>
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Удерживать для бега</span><span class="d">Иначе переключение по Caps Lock</span></div>
+            <label class="switch"><input type="checkbox" checked data-key="hold_to_run"><span class="track"></span></label>
+          </div>
+        </div>
+
+        <!-- INTERFACE -->
+        <div class="pane" data-pane="interface">
+          <div class="s-section-label">HUD</div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Показывать мини-карту</span></div>
+            <label class="switch"><input type="checkbox" checked data-key="show_minimap"><span class="track"></span></label>
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Чат на экране</span><span class="d">Авто-скрытие через 8 секунд</span></div>
+            <label class="switch"><input type="checkbox" checked data-key="show_chat"><span class="track"></span></label>
+          </div>
+          <div class="s-section-label">Масштаб интерфейса</div>
+          <div class="pill-group" data-key="ui_scale">
+            <div class="pill" data-value="90">90%</div>
+            <div class="pill active" data-value="100">100%</div>
+            <div class="pill" data-value="110">110%</div>
+            <div class="pill" data-value="125">125%</div>
+          </div>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div class="pane" data-pane="account">
+          <div class="s-section-label">Аккаунт</div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Привязка Discord</span><span class="d">Не привязан</span></div>
+            <div class="btn primary" id="btnLinkDiscord" style="padding:8px 16px;font-size:12px;">Привязать</div>
+          </div>
+          <div class="s-row">
+            <div class="s-row-label"><span class="t">Двухфакторная аутентификация</span><span class="d">Защита входа по email-коду</span></div>
+            <label class="switch"><input type="checkbox" data-key="two_factor_auth"><span class="track"></span></label>
+          </div>
+        </div>
+
+        <div class="s-footer">
+          <div class="btn" id="btnBackToMenu">Назад</div>
+          <div class="btn primary" id="btnSaveSettings">Сохранить</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
