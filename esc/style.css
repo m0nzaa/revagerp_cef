@@ -35,7 +35,7 @@ html,body{
   position:absolute;
   inset:0;
   width:100%;
-  display:flex;
+  display:none;   /* [FIX] меню скрыто по умолчанию - показывается только по /esc (cef_esc_open) */
   z-index:5;
   pointer-events:none;
 }

@@ -158,7 +158,12 @@ function closeSettingsPanel(){
 /* Открыть/закрыть всё ESC-меню целиком (вызывается из ASI через ESC).
    В реальном проекте эта функция будет дёргаться не кликом, а приходом
    события от клиента (CEF show/hide), но оставляю и ручной вызов для теста. */
-function toggleEscMenu(forceState){
+// notifyServer=false используется, когда ЗАКРЫТИЕ пришло от самого сервера
+// (событие cef_esc_close после повторного /esc) - тогда НЕ шлём cef_esc_resume
+// обратно, иначе получится петля "сервер закрыл -> клиент сказал resume ->
+// сервер ещё раз обработал закрытие". При клике по кнопке "Продолжить"
+// notifyServer остаётся true, как и раньше.
+function toggleEscMenu(forceState, notifyServer){
   const isOpening = typeof forceState === 'boolean'
     ? forceState
     : (mainMenu.style.display === 'none' && !settingsRoot.classList.contains('active'));
@@ -172,7 +177,7 @@ function toggleEscMenu(forceState){
     hideMainMenu();
     settingsRoot.classList.remove('active');
     stopAfkTimer();
-    GameBridge.resumeGame();
+    if(notifyServer !== false) GameBridge.resumeGame();
   }
 }
 
@@ -302,11 +307,14 @@ if(typeof cef === 'undefined'){
    ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
    ============================================================ */
 (function init(){
+  // [FIX] Меню по умолчанию скрыто (см. style.css) и AFK-таймер НЕ запускается
+  // сам по себе - только когда сервер реально просит показать меню (/esc).
   renderAfkTimer();
-  startAfkTimer();
+  hideMainMenu();
 
-  // Сервер (cef_emit_event "cef_esc_open") просит показать главное меню.
+  // Сервер (cef_emit_event "cef_esc_open"/"cef_esc_close") просит показать/скрыть меню.
   if(typeof cef !== 'undefined' && cef.on){
-    cef.on('cef_esc_open', () => toggleEscMenu(true));
+    cef.on('cef_esc_open',  () => toggleEscMenu(true));
+    cef.on('cef_esc_close', () => toggleEscMenu(false, false));
   }
 })();
