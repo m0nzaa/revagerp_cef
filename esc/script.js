@@ -6,23 +6,31 @@
    (например cef.call("menu:resume") или аналог твоей библиотеки).
    ============================================================ */
 
+// Отправка события на сервер (Pawn: cef_subscribe). Вне игры (в браузере) молчит.
+function cefEmit(event, ...args){
+  if(typeof cef !== 'undefined' && cef.emit) cef.emit(event, ...args);
+}
+
 window.GameBridge = {
 
   // Продолжить — закрыть меню и возобновить игру
   resumeGame(){
     console.log('[GameBridge] resumeGame()');
+    cefEmit('cef_esc_resume');
     // TODO(ASI): вызвать cef -> client: снять паузу, скрыть CEF-окно
   },
 
   // Переподключиться — реконнект на тот же сервер
   reconnect(){
     console.log('[GameBridge] reconnect()');
+    cefEmit('cef_esc_reconnect');
     // TODO(ASI): вызвать cef -> client: SAMP reconnect к текущему IP:порту
   },
 
   // Выйти из игры
   exitGame(){
     console.log('[GameBridge] exitGame()');
+    cefEmit('cef_esc_exit');
     // TODO(ASI): вызвать cef -> client: закрыть процесс игры
   },
 
@@ -39,6 +47,7 @@ window.GameBridge = {
   // Сохранить все текущие настройки — вызывается по кнопке "Сохранить"
   saveSettings(settings){
     console.log('[GameBridge] saveSettings()', settings);
+    cefEmit('cef_esc_save', JSON.stringify(settings));
     // TODO(ASI): отправить объект settings в клиент (cef -> client),
     // клиент должен применить и сохранить в конфиг (ini/json/реестр)
   },
@@ -277,11 +286,16 @@ document.getElementById('btnLinkDiscord').addEventListener('click', () => {
    на стороне клиента (до того, как он доходит до игры), который
    затем кажет/прячет CEF-окно и дергает toggleEscMenu() через JS-bridge.
    ============================================================ */
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape'){
-    toggleEscMenu();
-  }
-});
+// В игре ESC обрабатывает ASI (шлёт /esc на сервер), поэтому слушатель нужен
+// только при открытии страницы в обычном браузере — иначе будет двойное
+// переключение (меню закроется и тут же откроется).
+if(typeof cef === 'undefined'){
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      toggleEscMenu();
+    }
+  });
+}
 
 
 /* ============================================================
@@ -290,4 +304,9 @@ document.addEventListener('keydown', (e) => {
 (function init(){
   renderAfkTimer();
   startAfkTimer();
+
+  // Сервер (cef_emit_event "cef_esc_open") просит показать главное меню.
+  if(typeof cef !== 'undefined' && cef.on){
+    cef.on('cef_esc_open', () => toggleEscMenu(true));
+  }
 })();
