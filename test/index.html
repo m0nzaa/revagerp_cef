@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>CEF STUDIO INTERFACE</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/fonts/stylesheet.css">
+</head>
+<body>
+    <div id="cefstudio-radial-menu" v-if="isRadialActive" v-cloak>
+        <div class="information-block" v-if="menuList[currentMenu] && menuList[currentMenu].menuButton[currentButtonId - 1]" :style="{ top:!menuList[currentMenu].menuButton[currentButtonId - 1].isActive? '42%' : '44%' }">
+            <div class="button-name">{{ currentButtonName }}</div>
+            <div v-if="currentButtonId && !menuList[currentMenu].menuButton[currentButtonId - 1].isActive" class="red">{{ menuList[currentMenu].menuButton[currentButtonId - 1].reason }}</div>
+            <div class="mouse-block">
+                <div class="mouse">
+                    <img src="images/icon-rightclick.png">
+                    <p>Выбрать</p>
+                </div>
+                <div class="mouse">
+                    <img src="images/icon-leftclick.png">
+                    <p>Назад</p>
+                </div>
+            </div>
+        </div>
+        <div class="information-block" v-else>
+            <div class="button-name">Быстрые действия</div>
+            <div class="mouse-block">
+                <div class="mouse">
+                    <img src="images/icon-rightclick.png">
+                    <p>Выбрать</p>
+                </div>
+                <div class="mouse">
+                    <img src="images/icon-leftclick.png">
+                    <p>Назад</p>
+                </div>
+            </div>
+        </div>
+        <svg height="620px" width="620px" :style="{ transform: currentMenu === 0 ? '' : currentMenu === 1 ? 'rotate(0deg)' : 'rotate(60deg)' }">
+            <defs>
+                <radialGradient id="radialGradient" cx="50%" cy="50%" r="50%" fx="48%" fy="47%">
+                    <stop offset="0%" stop-color="black" stop-opacity="0.7" />
+                    <stop offset="20%" stop-color="black" stop-opacity="0.6" />
+                    <stop offset="100%" stop-color="black" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="radialGradientWhite" cx="50%" cy="50%" r="50%" fx="48%" fy="47%">
+                    <stop offset="0%" stop-color="white" stop-opacity="0" />
+                    <stop offset="20%" stop-color="white" stop-opacity="0" />
+                    <stop offset="70%" stop-color="white" stop-opacity="0.05" />
+                    <stop offset="100%" stop-color="white" stop-opacity="0" />
+                </radialGradient>
+            </defs>
+            <circle cx="310" cy="310" r="280" fill="url(#radialGradient)" />
+            <circle cx="300" cy="300" r="310" fill="url(#radialGradientWhite)" />
+            <template v-if="currentMenu === 0">
+                <g class="button" 
+                v-for="(button, index) in visibleButtons" 
+                :key="button.id" 
+                :class="buttonClasses[index]"
+                @click="click(button.id)" 
+                @mouseover="mouseOver(button.id, button.name)" 
+                @mouseout="mouseOut()" 
+                fill="rgba(0, 0, 0, 0.35)" lazy>
+                    <path :d="button.path" :fill="button.isActive ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.30)'"></path>
+                    <path :d="button.stroke" :fill="button.isActive ? 'rgba(255, 255, 255, 0.50)' : 'rgba(0, 0, 0, 0.30)'"></path>
+                    <image :xlink:href="button.imageUrl" :x="button.imageX" :y="button.imageY" :width="button.imageWidth" :height="button.imageHeight" style="display: block" :class="{ 'image-noactive': !button.isActive }">
+                    </image>
+                </g>
+            </template>
+            <template v-if="currentMenu === 1" style="transform: rotate(0deg)">
+                <g class="button" 
+                v-for="(button, index) in visibleButtons" 
+                :key="button.id" 
+                :class="buttonClasses[index]"
+                @click="click(button.id)" 
+                @mouseover="mouseOver(button.id, button.name)" 
+                @mouseout="mouseOut()" 
+                fill="rgba(0, 0, 0, 0.35)" lazy>
+                    <path :d="button.path" :fill="button.isActive ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.30)'"></path>
+                    <path :d="button.stroke" :fill="button.isActive ? 'rgba(255, 255, 255, 0.50)' : 'rgba(0, 0, 0, 0.30)'"></path>
+                    <image :xlink:href="button.imageUrl" :x="button.imageX" :y="button.imageY" :width="button.imageWidth" :height="button.imageHeight" style="display: block; transform: rotateZ(0)" :class="{ 'image-noactive': !button.isActive }">
+                    </image>
+                </g>
+            </template>
+            <template v-if="currentMenu === 2" style="transform: rotate(60deg)">
+                <g class="button" 
+                v-for="(button, index) in visibleButtons" 
+                :key="button.id" 
+                :class="buttonClasses[index]"
+                @click="click(button.id)" 
+                @mouseover="mouseOver(button.id, button.name)" 
+                @mouseout="mouseOut()" 
+                fill="rgba(0, 0, 0, 0.35)" lazy>
+                    <path :d="button.path" :fill="button.isActive ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0.30)'"></path>
+                    <path :d="button.stroke" :fill="button.isActive ? 'rgba(255, 255, 255, 0.50)' : 'rgba(0, 0, 0, 0.30)'"></path>
+                    <image :xlink:href="button.imageUrl" :x="button.imageX" :y="button.imageY" :width="button.imageWidth" :height="button.imageHeight" style="display: block; transform: rotate(-60deg)" :class="{ 'image-noactive': !button.isActive }">
+                    </image>
+                </g>
+            </template>
+        </svg>
+        <div 
+            class="cef-studio-credit" 
+            v-if="showCredit">
+            {{ creditText }}
+        </div>
+        <div class="time-info">
+            <div class="time-block">
+                <div class="content">
+                    <div class="time">{{ timeInGame}} мин</div>
+                    <div class="description">время в игре за сегодня</div>
+                </div>
+            </div>
+            <div class="time-block">
+                <div class="content">
+                    <div class="time">{{ timeInAFK }} мин</div>
+                    <div class="description" style="max-width: 10vh;">время в AFK за сегодня</div>
+                </div>
+            </div>
+            <div class="time-block">
+                <div class="content">
+                    <div class="time">{{ timeInCurrentHour }} мин</div>
+                    <div class="description">время в игре за текущий час</div>
+                </div>
+            </div>
+        </div>
+        <div class="server-info">
+            <div class="info-block">
+                <div class="content">
+                    <div class="info online">{{ playersOnline }}</div>
+                    <div class="description">Игроков онлайн</div>
+                </div>
+                <img src="images/online.svg"/>
+            </div>
+            <div class="info-block">
+                <div class="content">
+                    <div class="info">{{ playerNick }}</div>
+                    <div class="description">{{ playerNetwork }}</div>
+                </div>
+                <img src="images/network.svg"/>
+            </div>
+            <div class="info-block">
+                <div class="content">
+                    <div class="info">Голосовой сервер</div>
+                    <div class="description">{{ playerVoiceNetwork }}</div>
+                </div>
+                <img src="images/microphone.svg"/>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
