@@ -37,6 +37,13 @@ function showScreen(name) {
 function openPhone() {
     phone.classList.add('open');
     phoneOpen = true;
+
+    // FIX: сервер теперь также шлёт phone:show для принудительного открытия
+    // телефона при входящем звонке (см. calls:incoming ниже) — не затираем
+    // экран звонка на главный, если он уже активен (звонок идёт прямо сейчас)
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen && activeScreen.dataset.screen === 'callActive') return;
+
     showScreen('main');
 }
 
@@ -594,6 +601,29 @@ if (typeof cef !== 'undefined') {
         document.getElementById('callChat').classList.remove('hidden');
         document.getElementById('callAcceptBtn').classList.add('hidden');
         callStartTimer();
+    });
+
+    // FIX (баг: пропадали кнопки принять/сбросить) — сервер шлёт это при
+    // каждом открытии телефона, если звонок идёт в фоне (игрок успел
+    // свернуть телефон ESC-ом и во время входящего, и во время разговора —
+    // звонок при этом не обрывается). Восстанавливаем нужный экран вместо
+    // того, чтобы открыться на главном экране с "потерянным" звонком.
+    cef.on('calls:restore', (state, peerName) => {
+        if (state === 'incoming') {
+            callShowIncoming(peerName, peerName ? peerName.charAt(0).toUpperCase() : '?');
+        } else if (state === 'ringing') {
+            callIsOutgoing = true;
+            callShowOutgoing(peerName || callDialedNumber);
+        } else if (state === 'active') {
+            callIsOutgoing = true; // не влияет на кнопки ниже, просто для консистентности состояния
+            showScreen('callActive');
+            document.getElementById('callAvatarLetter').textContent = peerName ? peerName.charAt(0).toUpperCase() : '?';
+            document.getElementById('callPeerName').textContent = peerName || document.getElementById('callPeerName').textContent;
+            document.getElementById('callStatus').textContent = 'Соединено';
+            document.getElementById('callAcceptBtn').classList.add('hidden');
+            document.getElementById('callChat').classList.remove('hidden');
+            if (!callTimerInterval) callStartTimer();
+        }
     });
 
     // вызов завершён (любой стороной, не ответили, занято, ошибка) — сервер говорит почему
