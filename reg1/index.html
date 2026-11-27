@@ -6,168 +6,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}
+
 body{
-    background:#0a0800;
+    background:#111213;
     color:#e5e5e5;
     min-height:100vh;
     display:flex;
     overflow:hidden;
     cursor:default;
+    position:relative;
 }
 
+/* единый фон на весь экран - без стыка между половинами */
 body::before{
     content:"";
     position:fixed;
     inset:0;
     background:
-        radial-gradient(ellipse 80% 60% at 75% 100%, rgba(180,130,30,0.18) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 20% 0%,   rgba(180,130,30,0.07) 0%, transparent 65%),
-        linear-gradient(160deg, #0e0b00 0%, #090700 40%, #0a0800 100%);
+        radial-gradient(ellipse 70% 60% at 78% 55%, rgba(255,255,255,0.035) 0%, transparent 65%),
+        #111213;
     z-index:0;
-    pointer-events:none;
 }
-body::after{
-    content:"";
-    position:fixed;
-    bottom:0;left:0;right:0;
-    height:2px;
-    background:linear-gradient(90deg, transparent 0%, rgba(212,170,60,0.5) 30%, rgba(212,170,60,0.7) 50%, rgba(212,170,60,0.5) 70%, transparent 100%);
-    z-index:0;
+
+/* ───────── левая половина — форма ───────── */
+.layout-left{
+    width:46%;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    z-index:3;
+}
+
+/* ───────── правая половина — арт персонажа на том же фоне ───────── */
+.layout-right{
+    width:54%;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+    z-index:1;
+}
+.layout-right img{
+    position:absolute;
+    bottom:0;
+    left:38%;
+    height:102%;
+    width:auto;
+    max-width:none;
+    object-fit:cover;
+    transform:translateX(-42%) scale(1.04);
+    opacity:0;
+    animation:fadeInImage .8s ease-out .1s forwards;
+    /* растушёвка по краям картинки вместо прямого среза */
+    -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 22%, #000 88%, transparent 100%),
+                        linear-gradient(to bottom, #000 80%, transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:linear-gradient(to right, transparent 0%, #000 22%, #000 88%, transparent 100%),
+                linear-gradient(to bottom, #000 80%, transparent 100%);
+    mask-composite:intersect;
+    filter:drop-shadow(0 30px 40px rgba(0,0,0,.5));
+}
+
+/* мягкий контактный блик под ногами персонажа - "стоит на полу" */
+.layout-right .ground-glow{
+    position:absolute;
+    left:38%;
+    bottom:0;
+    width:46%;
+    height:18%;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse 60% 100% at 50% 100%, rgba(255,255,255,.07), transparent 70%);
+    z-index:1;
     pointer-events:none;
 }
 
-.layout-left{width:75%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;padding-right:15vw}
-.layout-right{width:25%;height:100vh;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
-.layout-right img{height:95%;width:auto;object-fit:contain;display:block;transform:translateX(-180px);filter:drop-shadow(0 0 30px rgba(180,130,20,0.25)) drop-shadow(0 0 8px rgba(0,0,0,0.8));position:relative;z-index:1;animation:slideInImage .8s cubic-bezier(.2,.8,.2,1) forwards;opacity:0}
-.layout-right::after{content:"";position:absolute;top:0;right:0;width:70%;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,0.85));z-index:2;pointer-events:none;animation:fadeIn 1.2s ease-out forwards;opacity:0}
+/* лёгкая общая виньетка снизу всего экрана - объединяет обе половины */
+.scene-vignette{
+    position:fixed;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    background:linear-gradient(to top, rgba(0,0,0,.4) 0%, transparent 22%);
+}
 
 .project-title{
-    position:absolute;bottom:8%;left:0;width:100%;
-    text-align:center;font-size:64px;font-weight:900;font-style:italic;
-    text-transform:uppercase;letter-spacing:2px;z-index:10;
-    pointer-events:none;
-    font-family:"Arial Black","Segoe UI Black",sans-serif;
-    transform:translateX(-60px);
-    animation:fadeInTitle 1s ease-out .3s forwards;opacity:0;
-    background:linear-gradient(135deg, #c8a84b 0%, #f0d060 40%, #c8a84b 70%, #a07828 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-    filter:drop-shadow(0 2px 12px rgba(180,130,20,0.4));
+    position:absolute;
+    right:40px;
+    bottom:36px;
+    z-index:5;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:.04em;
+    color:#e8e8e8;
+    text-align:right;
+    opacity:0;
+    animation:fadeInUp .5s ease-out .25s forwards;
+}
+.project-title span{
+    display:block;
+    margin-top:4px;
+    font-size:13px;
+    font-weight:400;
+    color:#6b6b6b;
+    letter-spacing:.02em;
 }
 
-.auth-wrapper{width:100%;max-width:560px;padding:0 20px}
+/* ───────── форма ───────── */
+.auth-wrapper{width:100%;max-width:380px;padding:0 44px}
 .auth-card{
-    background:rgba(14,11,2,0.92);
-    border-radius:20px;
-    padding:50px 70px;
-    border:1px solid rgba(212,170,60,0.15);
-    box-shadow:
-        0 0 0 1px rgba(212,170,60,0.06),
-        0 25px 60px rgba(0,0,0,.8),
-        inset 0 1px 0 rgba(212,170,60,0.1);
-    animation:cardEntrance .6s cubic-bezier(.2,.8,.2,1) forwards;
-    opacity:0;transform:translateY(20px);
-    position:relative;overflow:hidden;
+    opacity:0;
+    transform:translateY(10px);
+    animation:fadeInUp .45s ease-out forwards;
 }
-.auth-card::before{
-    content:"";position:absolute;top:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg,transparent,rgba(212,170,60,0.7) 30%,rgba(212,170,60,0.7) 70%,transparent);
+.auth-card.switching{animation:cardSwitch .18s ease forwards}
+@keyframes cardSwitch{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
+@keyframes fadeInUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes fadeInImage{0%{opacity:0;transform:translateX(-50%) scale(1.05)}100%{opacity:1;transform:translateX(-50%) scale(1.02)}}
+
+.brand{font-size:13px;font-weight:600;letter-spacing:.12em;color:#5c5c5c;text-transform:uppercase;margin-bottom:28px}
+
+.tabs{display:flex;gap:24px;margin-bottom:30px;border-bottom:1px solid #232425}
+.tab{
+    position:relative;
+    padding:0 0 12px;
+    background:none;border:none;
+    font-size:14px;font-weight:500;color:#5c5c5c;
+    cursor:pointer;
+    transition:color .15s;
+}
+.tab:hover{color:#9b9b9b}
+.tab.active{color:#f0f0f0}
+.tab.active::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+    background:#f0f0f0;
+    border-radius:2px;
 }
 
-@keyframes slideInImage{0%{transform:translateX(100px);opacity:0}100%{transform:translateX(-180px);opacity:1}}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-@keyframes fadeInTitle{0%{transform:translateX(-60px) translateY(20px);opacity:0}100%{transform:translateX(-60px) translateY(0);opacity:1}}
-@keyframes cardEntrance{0%{transform:translateY(30px) scale(.95);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
-.auth-card.switching{animation:cardSwitch .2s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes cardSwitch{0%{opacity:1;transform:scale(1)}50%{opacity:0;transform:scale(.97)}100%{opacity:1;transform:scale(1)}}
+.auth-title{font-size:19px;font-weight:600;color:#f0f0f0;margin-bottom:4px}
+.auth-subtitle{font-size:13px;color:#6b6b6b;margin-bottom:26px}
 
-.tabs{display:flex;background:rgba(255,255,255,0.03);border:1px solid rgba(212,170,60,0.1);border-radius:10px;padding:4px;margin-bottom:32px;gap:4px}
-.tab{flex:1;height:40px;border-radius:7px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;color:#555;background:transparent;letter-spacing:.05em}
-.tab.active{background:rgba(212,170,60,0.12);color:rgba(212,170,60,0.9);}
-.tab:hover:not(.active){color:#888}
-
-.auth-title{font-size:20px;line-height:1.5;color:#d4aa3c;margin-bottom:6px;opacity:.9}
-.auth-title.spaced{margin-bottom:28px}
-.auth-title span{display:block;font-size:14px;color:#555;margin-top:6px}
-.auth-subtitle{font-size:14px;color:#555;margin-bottom:28px}
-
-.field{margin-bottom:16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:#6b6b6b;margin-bottom:6px}
 .field input{
-    width:100%;height:52px;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(212,170,60,0.15);
-    border-radius:8px;border:1px solid rgba(212,170,60,0.12);
-    outline:none;padding:0 18px;font-size:15px;color:#f5f5f5;
-    user-select:text;-webkit-user-select:text;cursor:text;
-    transition:border-color .15s,background .15s;
+    width:100%;height:44px;
+    background:#1a1b1c;
+    border:1px solid #27282a;
+    border-radius:6px;
+    outline:none;
+    padding:0 14px;
+    font-size:14px;
+    color:#eaeaea;
+    user-select:text;-webkit-user-select:text;
+    cursor:text;
+    transition:border-color .15s, background .15s;
 }
-.field input:focus{
-    background:rgba(212,170,60,0.05);
-    border-color:rgba(212,170,60,0.4);
+.field input::placeholder{color:#55575a}
+.field input:focus{border-color:#4a4b4d;background:#1d1e1f}
+
+.error-msg{
+    font-size:12px;color:#e2574c;
+    min-height:0;margin:0 0 0;
+    max-height:0;overflow:hidden;
+    transition:max-height .15s ease, margin .15s ease;
 }
-.field input::placeholder{color:#3a3320}
+.error-msg.visible{max-height:30px;margin:2px 0 10px}
 
-.error-msg{font-size:13px;color:#ff6666;min-height:18px;margin-bottom:10px;display:none;text-align:center}
-.error-msg.visible{display:block}
-
-.buttons-row{display:flex;gap:12px;margin-top:24px}
-.btn{flex:1;height:52px;border-radius:8px;border:none;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center}
-.btn:active{transform:scale(0.98)}
-.btn:disabled{opacity:.35;cursor:default}
-.btn-primary{
-    background:linear-gradient(135deg,#c8a84b,#e8c870);
-    color:#111;font-weight:600;
+.buttons-row{margin-top:18px}
+.btn{
+    width:100%;height:44px;
+    border-radius:6px;border:none;
+    font-size:14px;font-weight:600;
+    cursor:pointer;
+    transition:background .15s, opacity .15s, transform .1s;
 }
-.btn-primary:hover:not(:disabled){opacity:.9}
-.btn-secondary{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#666}
-.btn-secondary:hover{background:rgba(255,255,255,0.07);color:#999}
+.btn:active{transform:scale(.99)}
+.btn-primary{background:#eaeaea;color:#121212}
+.btn-primary:hover{background:#ffffff}
 
-.forgot{margin-top:24px;text-align:center;font-size:13px;color:#3a3320}
-.forgot a{margin-left:5px;color:rgba(212,170,60,0.6);text-decoration:none;cursor:pointer}
-.forgot a:hover{color:rgba(212,170,60,0.9)}
+.switch-line{margin-top:20px;text-align:center;font-size:13px;color:#6b6b6b}
+.switch-line a{margin-left:5px;color:#c9c9c9;text-decoration:none;cursor:pointer}
+.switch-line a:hover{color:#f0f0f0;text-decoration:underline}
+
+.forgot{margin-top:14px;text-align:center}
+.forgot a{font-size:12.5px;color:#55575a;text-decoration:none;cursor:pointer}
+.forgot a:hover{color:#8a8a8a}
 
 .page{display:none}
 .page.active{display:block}
 
-/* ── Выбор пола ── */
-.gender-row{display:flex;gap:16px;margin-bottom:8px}
-.gender-card{
-    flex:1;height:140px;border-radius:12px;
-    border:1px solid rgba(212,170,60,0.15);
-    background:rgba(255,255,255,0.03);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-    cursor:pointer;transition:border-color .15s,background .15s,transform .1s;
+@media(max-width:900px){
+    .layout-right{display:none}
+    .layout-left{width:100%}
 }
-.gender-card:hover{background:rgba(212,170,60,0.06);border-color:rgba(212,170,60,0.3)}
-.gender-card:active{transform:scale(.98)}
-.gender-card.selected{background:rgba(212,170,60,0.12);border-color:rgba(212,170,60,0.6)}
-.gender-icon{font-size:38px;color:rgba(212,170,60,0.8)}
-.gender-label{font-size:14px;font-weight:600;color:#e5e5e5}
-
-/* ── Выбор скина ── */
-.skin-grid{
-    display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;
-    max-height:280px;overflow-y:auto;margin-bottom:8px;padding-right:4px;
-}
-.skin-grid::-webkit-scrollbar{width:4px}
-.skin-grid::-webkit-scrollbar-thumb{border-radius:10px;background:rgba(212,170,60,0.3)}
-.skin-card{
-    padding:16px;border-radius:10px;
-    border:1px solid rgba(212,170,60,0.12);
-    background:rgba(255,255,255,0.03);
-    cursor:pointer;font-size:13px;color:#ccc;
-    transition:border-color .15s,background .15s,transform .1s;
-    text-align:left;
-}
-.skin-card:hover{background:rgba(212,170,60,0.06);border-color:rgba(212,170,60,0.3)}
-.skin-card:active{transform:scale(.98)}
-.skin-card.selected{background:rgba(212,170,60,0.12);border-color:rgba(212,170,60,0.6);color:#f0d060}
-
-@media(min-width:1921px){.auth-wrapper{transform:scale(1.15)}.project-title{font-size:80px}}
-@media(max-height:800px){.auth-wrapper{transform:scale(.88)}}
-@media(max-width:900px){.layout-right{display:none}.layout-left{width:100%;padding-right:0}}
-@media(max-width:600px){.auth-card{padding:36px 28px}.auth-wrapper{max-width:100%}}
+@media(max-height:700px){.auth-wrapper{transform:scale(.92)}}
     </style>
 </head>
 <body>
@@ -176,41 +208,36 @@ body::after{
     <div class="auth-wrapper">
         <div class="auth-card" id="authCard">
 
-            <!-- Вкладки видны только на этапе логина/регистрации -->
-            <div class="tabs" id="tabsRow">
-                <button class="tab active" id="tab-login"    onclick="switchTab('login')">Войти</button>
+            <div class="brand">Revage Roleplay</div>
+
+            <div class="tabs">
+                <button class="tab active" id="tab-login"    onclick="switchTab('login')">Вход</button>
                 <button class="tab"        id="tab-register" onclick="switchTab('register')">Регистрация</button>
             </div>
 
             <!-- ЛОГИН -->
             <div class="page active" id="page-login">
-                <div class="auth-title spaced">
-                    Добро пожаловать.
-                    <span>Войдите под своим аккаунтом.</span>
-                </div>
-                <div class="field">
-                    <input type="text" id="login-name" placeholder="Никнейм" autocomplete="off" />
-                </div>
+                <div class="auth-title">С возвращением</div>
+                <div class="auth-subtitle">Войдите под своим аккаунтом</div>
+
                 <div class="field">
                     <input type="password" id="login-pass" placeholder="Пароль" />
                 </div>
                 <div class="error-msg" id="login-error"></div>
+
                 <div class="buttons-row">
-                    <button class="btn btn-primary"   onclick="doLogin()">Войти</button>
-                    <button class="btn btn-secondary" onclick="switchTab('register')">Регистрация</button>
+                    <button class="btn btn-primary" onclick="doLogin()">Войти</button>
                 </div>
-                <div class="forgot">Забыли пароль? <a onclick="void(0)">Восстановить</a></div>
+
+                <div class="forgot"><a onclick="void(0)">Забыли пароль?</a></div>
+                <div class="switch-line">Нет аккаунта?<a onclick="switchTab('register')">Зарегистрироваться</a></div>
             </div>
 
             <!-- РЕГИСТРАЦИЯ -->
             <div class="page" id="page-register">
-                <div class="auth-title spaced">
-                    Новый аккаунт.
-                    <span>Придумайте никнейм и пароль.</span>
-                </div>
-                <div class="field">
-                    <input type="text" id="reg-name" placeholder="Никнейм" autocomplete="off" />
-                </div>
+                <div class="auth-title">Создание аккаунта</div>
+                <div class="auth-subtitle">Придумайте пароль для входа</div>
+
                 <div class="field">
                     <input type="password" id="reg-pass" placeholder="Пароль" />
                 </div>
@@ -218,81 +245,40 @@ body::after{
                     <input type="password" id="reg-pass2" placeholder="Повторите пароль" />
                 </div>
                 <div class="error-msg" id="reg-error"></div>
-                <div class="buttons-row">
-                    <button class="btn btn-primary"   onclick="doRegister()">Зарегистрироваться</button>
-                    <button class="btn btn-secondary" onclick="switchTab('login')">Отмена</button>
-                </div>
-            </div>
 
-            <!-- ШАГ 3 (после успешной регистрации): ПОЛ -->
-            <div class="page" id="page-gender">
-                <div class="auth-title">Создание персонажа.</div>
-                <div class="auth-subtitle">Выберите пол вашего персонажа.</div>
-                <div class="gender-row">
-                    <div class="gender-card" id="g-male" onclick="pickGender(1)">
-                        <div class="gender-icon">♂</div>
-                        <div class="gender-label">Мужской</div>
-                    </div>
-                    <div class="gender-card" id="g-female" onclick="pickGender(0)">
-                        <div class="gender-icon">♀</div>
-                        <div class="gender-label">Женский</div>
-                    </div>
-                </div>
                 <div class="buttons-row">
-                    <button class="btn btn-primary" id="genderNext" onclick="goToSkin()" disabled>Далее →</button>
+                    <button class="btn btn-primary" onclick="doRegister()">Зарегистрироваться</button>
                 </div>
-            </div>
 
-            <!-- ШАГ 4: СКИН -->
-            <div class="page" id="page-skin">
-                <div class="auth-title">Внешность.</div>
-                <div class="auth-subtitle">Выберите стартовый образ персонажа.</div>
-                <div class="skin-grid" id="skinGrid"></div>
-                <div class="buttons-row">
-                    <button class="btn btn-secondary" onclick="switchTab('gender')">← Назад</button>
-                    <button class="btn btn-primary" id="skinConfirm" onclick="confirmSelection()" disabled>Начать игру</button>
-                </div>
+                <div class="switch-line">Уже есть аккаунт?<a onclick="switchTab('login')">Войти</a></div>
             </div>
 
         </div>
     </div>
 </div>
 
+<div class="scene-vignette"></div>
 <div class="layout-right">
-    <div class="project-title">Revage Roleplay</div>
     <img src="img/pers.png" alt="">
+    <div class="ground-glow"></div>
+    <div class="project-title">
+        Revage Roleplay
+        <span>Авторизация персонажа</span>
+    </div>
 </div>
 
 <script>
-var ST = { gender: null, skinIndex: null };
-
-// Соответствуют g_MaleBumSkins / g_FemaleBumSkins в auth.inc —
-// индекс в списке = listitem, который сервер применяет к нужному массиву.
-var SKIN_NAMES = {
-    1: ['Бомж (белый) 1','Бомж (белый) 2','Бомж (чёрный) 1','Бомж (чёрный) 2','Бомж (белый) 3',
-        'Бомж (чёрный), молодой','Бомж (белый) 4','Бомж, потрёпанный 1','Бомж, потрёпанный 2','Бомж (белый) 5'],
-    0: ['Бедная девушка (чёрная)','Бедная девушка (латина)','Бедная девушка (белая)','Бедная девушка (др.)']
-};
-
-var ALL_PAGES = ['login','register','gender','skin'];
-
 function switchTab(tab) {
     var card = document.getElementById('authCard');
     card.classList.add('switching');
     setTimeout(function() {
-        ALL_PAGES.forEach(function(t) {
+        ['login','register'].forEach(function(t) {
             document.getElementById('page-' + t).classList.toggle('active', t === tab);
+            document.getElementById('tab-'  + t).classList.toggle('active', t === tab);
         });
-        // Вкладки "Войти/Регистрация" показываем только на первых двух шагах
-        document.getElementById('tabsRow').style.display =
-            (tab === 'login' || tab === 'register') ? 'flex' : 'none';
-        if (tab === 'login' || tab === 'register') {
-            document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-            document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-        }
         clearErrors();
         card.classList.remove('switching');
-    }, 100);
+    }, 90);
 }
 
 function clearErrors() {
@@ -308,92 +294,31 @@ function showError(id, text) {
     el.classList.add('visible');
 }
 
-// ── Пол / скин ───────────────
-function pickGender(g) {
-    ST.gender = g;
-    document.getElementById('g-male').classList.toggle('selected', g === 1);
-    document.getElementById('g-female').classList.toggle('selected', g === 0);
-    document.getElementById('genderNext').disabled = false;
-}
+cef.on('cef_init', function(mode) {
+    switchTab(mode === 'login' ? 'login' : 'register');
+});
 
-function goToSkin() {
-    if (ST.gender === null) return;
-    renderSkins();
-    switchTab('skin');
-}
-
-function renderSkins() {
-    var grid = document.getElementById('skinGrid');
-    grid.innerHTML = '';
-    ST.skinIndex = null;
-    document.getElementById('skinConfirm').disabled = true;
-
-    var names = SKIN_NAMES[ST.gender] || [];
-    names.forEach(function(name, i) {
-        var el = document.createElement('div');
-        el.className = 'skin-card';
-        el.textContent = name;
-        el.onclick = function() {
-            ST.skinIndex = i;
-            document.querySelectorAll('.skin-card').forEach(function(c) { c.classList.remove('selected'); });
-            el.classList.add('selected');
-            document.getElementById('skinConfirm').disabled = false;
-        };
-        grid.appendChild(el);
-    });
-}
-
-function confirmSelection() {
-    if (ST.gender === null || ST.skinIndex === null) return;
-    var btn = document.getElementById('skinConfirm');
-    btn.disabled = true;
-    btn.textContent = 'Загрузка...';
-    if (typeof cef !== 'undefined') {
-        // arguments = "<gender 0|1> <skinIndex>", разделитель — пробел
-        cef.emit('cef_character_select', ST.gender + ' ' + ST.skinIndex);
-    }
-}
-
-// ── CEF-события от сервера ───────────────
-if (typeof cef !== 'undefined') {
-    cef.on('cef_init', function(mode) {
-        switchTab(mode === 'login' ? 'login' : 'register');
-    });
-
-    cef.on('cef_auth_error', function(code) {
-        authSubmitting = false;
-        var errors = {
-            'err_mode':  'Ошибка режима. Переподключитесь.',
-            'err_empty': 'Введите пароль.',
-            'err_short': 'Пароль слишком короткий (минимум 6 символов).',
-            'err_long':  'Пароль слишком длинный (максимум 32 символа).',
-            'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
-        };
-        var isLogin = document.getElementById('page-login').classList.contains('active');
-        showError(isLogin ? 'login-error' : 'reg-error', errors[code] || code);
-    });
-
-    // Регистрация прошла успешно — плавно переходим к выбору персонажа
-    // ВНУТРИ ТОГО ЖЕ браузера, без пересоздания CEF-окна.
-    cef.on('cef_show_skin_select', function() {
-        switchTab('gender');
-    });
-}
-
-var authSubmitting = false;
+cef.on('cef_auth_error', function(code) {
+    var errors = {
+        'err_mode':  'Ошибка режима. Переподключитесь.',
+        'err_empty': 'Введите пароль.',
+        'err_short': 'Пароль слишком короткий (минимум 6 символов).',
+        'err_long':  'Пароль слишком длинный (максимум 32 символа).',
+        'err_pass':  'Неверный пароль. Попробуйте ещё раз.'
+    };
+    var isLogin = document.getElementById('page-login').classList.contains('active');
+    showError(isLogin ? 'login-error' : 'reg-error', errors[code] || code);
+});
 
 function doLogin() {
-    if (authSubmitting) return;
     clearErrors();
     var pass = document.getElementById('login-pass').value;
     if (!pass) { showError('login-error', 'Введите пароль.'); return; }
     if (pass.length < 6) { showError('login-error', 'Минимум 6 символов.'); return; }
-    authSubmitting = true;
-    if (typeof cef !== 'undefined') cef.emit('cef_auth_login', pass);
+    cef.emit('cef_auth_login', pass);
 }
 
 function doRegister() {
-    if (authSubmitting) return;
     clearErrors();
     var pass  = document.getElementById('reg-pass').value;
     var pass2 = document.getElementById('reg-pass2').value;
@@ -401,15 +326,13 @@ function doRegister() {
     if (pass.length < 6) { showError('reg-error', 'Минимум 6 символов.'); return; }
     if (pass.length > 32){ showError('reg-error', 'Максимум 32 символа.'); return; }
     if (pass !== pass2)  { showError('reg-error', 'Пароли не совпадают.'); return; }
-    authSubmitting = true;
-    if (typeof cef !== 'undefined') cef.emit('cef_auth_register', pass, 'male');
+    cef.emit('cef_auth_register', pass, 'male');
 }
 
 document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
-    if (e.repeat) return; // игнорируем автоповтор при зажатой клавише
     if (document.getElementById('page-login').classList.contains('active')) doLogin();
-    else if (document.getElementById('page-register').classList.contains('active')) doRegister();
+    else doRegister();
 });
 </script>
 

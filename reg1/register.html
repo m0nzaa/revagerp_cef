@@ -10,24 +10,25 @@
 <div class="layout-left">
     <div class="auth-wrapper">
         <div class="auth-card">
-            <div class="auth-title">
-                Добро пожаловать на сервер.
-                <span>Вам необходимо пройти регистрацию.</span>
+            <div class="brand">Revage Roleplay</div>
+
+            <div class="auth-title">Создание аккаунта</div>
+            <div class="auth-subtitle">Заполните данные для регистрации</div>
+
+            <div class="field">
+                <input type="text" placeholder="Логин">
             </div>
             <div class="field">
-                <input type="text" placeholder="Введите логин">
+                <input type="email" placeholder="Email">
             </div>
             <div class="field">
-                <input type="email" placeholder="Введите Email">
-            </div>
-            <div class="field">
-                <input type="password" placeholder="Введите пароль">
+                <input type="password" placeholder="Пароль">
             </div>
             <div class="field">
                 <input type="password" placeholder="Повторите пароль">
             </div>
             <div class="field">
-                <input type="text" placeholder="Введите промокод">
+                <input type="text" placeholder="Промокод (необязательно)">
             </div>
             <div class="buttons-row">
                 <button class="btn btn-primary">Зарегистрироваться</button>
@@ -36,9 +37,14 @@
         </div>
     </div>
 </div>
+<div class="scene-vignette"></div>
 <div class="layout-right">
-    <div class="project-title">Название сервака</div>
     <img src="img/pers.png" alt="">
+    <div class="ground-glow"></div>
+    <div class="project-title">
+        Revage Roleplay
+        <span>Авторизация персонажа</span>
+    </div>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -50,7 +56,7 @@
                     document.body.classList.add('page-exit');
                     setTimeout(() => {
                         window.location.href = target;
-                    }, 400);
+                    }, 280);
                 });
             }
         });

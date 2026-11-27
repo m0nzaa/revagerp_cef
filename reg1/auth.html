@@ -10,30 +10,33 @@
 <div class="layout-left">
     <div class="auth-wrapper">
         <div class="auth-card">
-            <div class="auth-title">
-                Добро пожаловать на сервер.
-                <span>Войдите под своим аккаунтом или зарегистрируйте новый.</span>
+            <div class="brand">Revage Roleplay</div>
+
+            <div class="auth-title">С возвращением</div>
+            <div class="auth-subtitle">Войдите под своим аккаунтом</div>
+
+            <div class="field">
+                <input type="text" placeholder="Логин">
             </div>
             <div class="field">
-                <input type="text" placeholder="Введите логин">
-            </div>
-            <div class="field">
-                <input type="password" placeholder="Введите пароль">
+                <input type="password" placeholder="Пароль">
             </div>
             <div class="buttons-row">
                 <button class="btn btn-primary">Войти</button>
-                <a href="register.html" class="btn btn-secondary">Зарегистрироваться</a>
+                <a href="register.html" class="btn btn-secondary">Регистрация</a>
             </div>
-            <div class="forgot">
-                Забыли пароль?
-                <a href="#">Восстановить</a>
-            </div>
+            <div class="forgot">Забыли пароль?<a href="#">Восстановить</a></div>
         </div>
     </div>
 </div>
+<div class="scene-vignette"></div>
 <div class="layout-right">
-    <div class="project-title">Revage Roleplay</div>
     <img src="img/pers.png" alt="">
+    <div class="ground-glow"></div>
+    <div class="project-title">
+        Revage Roleplay
+        <span>Авторизация персонажа</span>
+    </div>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -45,7 +48,7 @@
                     document.body.classList.add('page-exit');
                     setTimeout(() => {
                         window.location.href = target;
-                    }, 400);
+                    }, 280);
                 });
             }
         });
